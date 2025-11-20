@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Champion Travels & Tours</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link id="google-fonts-link" rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- The href for fonts will be dynamically updated by App.tsx -->
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;700&family=Roboto:wght@400;500;700&family=Teko:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- AOS Animation Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+    <style id="dynamic-theme-styles">
+      /* This block will be dynamically populated by the React application */
+    </style>
+    <style>
+      html {
+        scroll-behavior: smooth;
+        overflow-x: hidden;
+      }
+       /* Basic prose styles for custom pages */
+      .prose h1, .prose h2, .prose h3 {
+        color: var(--color-light-text, #F3F4F6);
+        font-family: var(--font-display, 'Teko', sans-serif);
+      }
+      .prose h1 { font-size: 2.5em; margin-bottom: 0.5em; }
+      .prose h2 { font-size: 2em; margin-bottom: 0.5em; }
+      .prose h3 { font-size: 1.5em; margin-bottom: 0.5em; }
+      .prose p {
+        color: var(--color-muted-text, #9CA3AF);
+        line-height: 1.7;
+        margin-bottom: 1.25em;
+      }
+      .prose a {
+        color: var(--color-primary, #C5A47E);
+        text-decoration: underline;
+      }
+       .prose ul, .prose ol {
+        color: var(--color-muted-text, #9CA3AF);
+        margin-left: 1.5em;
+        margin-bottom: 1.25em;
+      }
+      .prose li {
+        margin-bottom: 0.5em;
+      }
+       .prose strong {
+        color: var(--color-light-text, #F3F4F6);
+      }
+      /* Slider animation styles */
+      .hero-slide-content {
+        transform: translateY(20px);
+        opacity: 0;
+        transition: transform 0.8s cubic-bezier(0.19, 1, 0.22, 1), opacity 0.8s cubic-bezier(0.19, 1, 0.22, 1);
+        transition-delay: 0.2s;
+      }
+      .hero-slide.active .hero-slide-content {
+        transform: translateY(0);
+        opacity: 1;
+      }
+
+      /* --- NEW LUXURY STYLES --- */
+
+      /* Ken Burns Effect for Hero Images */
+      @keyframes kenBurns {
+        0% { transform: scale(1); }
+        100% { transform: scale(1.1); }
+      }
+      .ken-burns {
+        animation: kenBurns 20s ease-out infinite alternate;
+      }
+
+      /* Glassmorphism Card Effect */
+      .glass-card {
+        background: rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+      }
+      
+      /* Luxury Hover Shadow */
+      .luxury-shadow:hover {
+        box-shadow: 0 20px 40px -5px rgba(197, 164, 126, 0.15); /* Primary color glow */
+      }
+
+      /* Custom Scrollbar */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #111827; 
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #C5A47E; 
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #B38B6D; 
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "firebase/app": "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js",
+    "firebase/firestore": "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js",
+    "firebase/auth": "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js",
+    "firebase/": "https://aistudiocdn.com/firebase@^12.6.0/"
+  }
+}
+</script>
+</head>
+  <body class="antialiased">
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>
