@@ -7,6 +7,21 @@ const CalculatorIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="
 const TasbeehIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>; 
 const CurrencyIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v.01" /></svg>;
 
+// Reusable Dark Input Component
+interface InputFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
+    label: string;
+}
+
+const InputField: React.FC<InputFieldProps> = ({ label, ...props }) => (
+    <div className="flex flex-col gap-2">
+        <label className="text-xs font-bold text-[var(--color-muted-text)] uppercase tracking-wider ml-1">{label}</label>
+        <input 
+            {...props} 
+            className="w-full bg-[#111827] border border-gray-600 rounded-lg p-3 text-white placeholder-gray-500 focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)] outline-none transition-all"
+        />
+    </div>
+);
+
 const ZakatCalculator: React.FC<{ googleSheetUrl?: string }> = ({ googleSheetUrl }) => {
     const [assets, setAssets] = useState({
         cash: 0,
@@ -24,7 +39,8 @@ const ZakatCalculator: React.FC<{ googleSheetUrl?: string }> = ({ googleSheetUrl
     const [showSaveForm, setShowSaveForm] = useState(false);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setAssets({ ...assets, [e.target.name]: parseFloat(e.target.value) || 0 });
+        const val = parseFloat(e.target.value);
+        setAssets({ ...assets, [e.target.name]: isNaN(val) ? 0 : val });
     };
 
     const calculateZakat = () => {
@@ -81,56 +97,50 @@ const ZakatCalculator: React.FC<{ googleSheetUrl?: string }> = ({ googleSheetUrl
     };
 
     return (
-        <div className="space-y-4 text-[var(--color-light-text)]">
-            <h3 className="text-2xl font-bold text-[var(--color-primary)] text-center mb-6">Zakat Calculator</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <input type="number" name="cash" placeholder="Cash in Hand/Bank (BDT)" onChange={handleChange} className="w-full bg-[var(--color-dark-bg)]/50 border border-gray-600 rounded-lg p-3 focus:border-[var(--color-primary)] outline-none" />
-                <input type="number" name="gold" placeholder="Value of Gold (BDT)" onChange={handleChange} className="w-full bg-[var(--color-dark-bg)]/50 border border-gray-600 rounded-lg p-3 focus:border-[var(--color-primary)] outline-none" />
-                <input type="number" name="silver" placeholder="Value of Silver (BDT)" onChange={handleChange} className="w-full bg-[var(--color-dark-bg)]/50 border border-gray-600 rounded-lg p-3 focus:border-[var(--color-primary)] outline-none" />
-                <input type="number" name="investments" placeholder="Business/Investments (BDT)" onChange={handleChange} className="w-full bg-[var(--color-dark-bg)]/50 border border-gray-600 rounded-lg p-3 focus:border-[var(--color-primary)] outline-none" />
+        <div className="space-y-6 text-[var(--color-light-text)] max-w-3xl mx-auto">
+            <div className="text-center mb-8">
+                <h3 className="text-3xl font-display font-bold text-[var(--color-primary)]">Zakat Calculator</h3>
+                <p className="text-sm text-[var(--color-muted-text)] mt-2">Calculate your Zakat accurately based on your assets.</p>
             </div>
-            <input type="number" placeholder="Liabilities/Debts to Pay (BDT)" value={liabilities || ''} onChange={(e) => setLiabilities(parseFloat(e.target.value) || 0)} className="w-full bg-[var(--color-dark-bg)]/50 border border-gray-600 rounded-lg p-3 focus:border-[var(--color-primary)] outline-none" />
             
-            <button onClick={calculateZakat} className="w-full bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] text-white font-bold py-3 rounded-lg shadow-lg hover:opacity-90 transition">Calculate</button>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <InputField type="number" name="cash" label="Cash in Hand/Bank" placeholder="Amount in BDT" onChange={handleChange} />
+                <InputField type="number" name="gold" label="Value of Gold" placeholder="Amount in BDT" onChange={handleChange} />
+                <InputField type="number" name="silver" label="Value of Silver" placeholder="Amount in BDT" onChange={handleChange} />
+                <InputField type="number" name="investments" label="Business/Investments" placeholder="Amount in BDT" onChange={handleChange} />
+            </div>
+            
+            <InputField type="number" label="Liabilities / Debts" placeholder="Amount in BDT" value={liabilities || ''} onChange={(e) => setLiabilities(parseFloat(e.target.value) || 0)} />
+            
+            <button onClick={calculateZakat} className="w-full bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] text-white font-bold py-4 rounded-lg shadow-lg hover:shadow-[var(--color-primary)]/30 hover:-translate-y-1 transition-all duration-300 mt-4">
+                CALCULATE ZAKAT
+            </button>
             
             {zakatAmount !== null && (
-                <div className="mt-4 p-4 bg-[var(--color-secondary)]/20 border border-[var(--color-secondary)] rounded-lg text-center animate-fade-in-up">
-                    <p className="text-[var(--color-muted-text)]">Your Payable Zakat:</p>
-                    <p className="text-3xl font-bold text-[var(--color-light-text)]">৳ {zakatAmount.toLocaleString()}</p>
+                <div className="mt-8 p-6 bg-[#111827] border border-[var(--color-primary)] rounded-xl text-center animate-fade-in-up shadow-2xl relative overflow-hidden">
+                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[var(--color-primary)] to-transparent opacity-50"></div>
+                    <p className="text-[var(--color-muted-text)] uppercase tracking-widest text-xs font-bold mb-2">Total Payable Zakat</p>
+                    <p className="text-4xl font-display font-bold text-white mb-2">৳ {zakatAmount.toLocaleString()}</p>
                     
                     {!showSaveForm && saveStatus !== 'success' && (
                         <button 
                             onClick={() => setShowSaveForm(true)}
-                            className="mt-4 text-sm text-[var(--color-secondary)] hover:underline"
+                            className="mt-4 text-sm text-[var(--color-primary)] hover:text-white underline transition-colors"
                         >
-                            Save/Send Calculation
+                            Save or Send Calculation
                         </button>
                     )}
 
                     {showSaveForm && saveStatus !== 'success' && (
-                        <form onSubmit={handleSave} className="mt-4 pt-4 border-t border-gray-700/50 text-left">
-                            <p className="text-sm text-[var(--color-muted-text)] mb-3 text-center">Save your calculation for future reference or consultation.</p>
-                            <div className="space-y-3">
-                                <input 
-                                    type="text" 
-                                    placeholder="Your Name" 
-                                    required
-                                    value={userInfo.name}
-                                    onChange={e => setUserInfo({...userInfo, name: e.target.value})}
-                                    className="w-full bg-[var(--color-dark-bg)]/50 border border-gray-600 rounded p-2 text-sm"
-                                />
-                                <input 
-                                    type="tel" 
-                                    placeholder="Phone Number" 
-                                    required
-                                    value={userInfo.phone}
-                                    onChange={e => setUserInfo({...userInfo, phone: e.target.value})}
-                                    className="w-full bg-[var(--color-dark-bg)]/50 border border-gray-600 rounded p-2 text-sm"
-                                />
+                        <form onSubmit={handleSave} className="mt-6 pt-6 border-t border-gray-700 text-left max-w-md mx-auto">
+                            <p className="text-sm text-gray-300 mb-4 text-center">Enter details to save this record for future reference.</p>
+                            <div className="space-y-4">
+                                <InputField label="Your Name" type="text" placeholder="Full Name" required value={userInfo.name} onChange={e => setUserInfo({...userInfo, name: e.target.value})} />
+                                <InputField label="Phone Number" type="tel" placeholder="017..." required value={userInfo.phone} onChange={e => setUserInfo({...userInfo, phone: e.target.value})} />
                                 <button 
                                     type="submit" 
                                     disabled={isSaving}
-                                    className="w-full bg-[var(--color-secondary)] text-white font-bold py-2 rounded text-sm hover:bg-green-700 disabled:opacity-50"
+                                    className="w-full bg-[var(--color-secondary)] text-white font-bold py-3 rounded-lg text-sm hover:bg-green-700 disabled:opacity-50 transition-colors"
                                 >
                                     {isSaving ? 'Saving...' : 'Save Record'}
                                 </button>
@@ -139,10 +149,14 @@ const ZakatCalculator: React.FC<{ googleSheetUrl?: string }> = ({ googleSheetUrl
                     )}
 
                     {saveStatus === 'success' && (
-                        <p className="mt-4 text-green-400 font-medium">Calculation saved successfully!</p>
+                        <div className="mt-4 p-3 bg-green-900/30 border border-green-600 rounded text-green-400 font-medium">
+                            Calculation saved successfully!
+                        </div>
                     )}
                     {saveStatus === 'error' && (
-                        <p className="mt-4 text-red-400 font-medium">Failed to save. Please try again.</p>
+                        <div className="mt-4 p-3 bg-red-900/30 border border-red-600 rounded text-red-400 font-medium">
+                            Failed to save. Please try again.
+                        </div>
                     )}
                 </div>
             )}
@@ -160,32 +174,48 @@ const DigitalTasbeeh = () => {
     };
 
     const reset = () => {
-        if(confirm('Reset counter?')) setCount(0);
+        if(confirm('Are you sure you want to reset the counter?')) setCount(0);
     };
 
     return (
-        <div className="text-center flex flex-col items-center justify-center h-full text-[var(--color-light-text)]">
-            <select value={dhikr} onChange={(e) => setDhikr(e.target.value)} className="mb-6 bg-[var(--color-dark-bg)] border border-gray-600 rounded px-4 py-2">
-                <option>SubhanAllah</option>
-                <option>Alhamdulillah</option>
-                <option>Allahu Akbar</option>
-                <option>Astaghfirullah</option>
-                <option>La ilaha illallah</option>
-            </select>
+        <div className="text-center flex flex-col items-center justify-center h-full text-[var(--color-light-text)] py-10">
+            <div className="w-full max-w-xs mb-8">
+                <label className="block text-xs font-bold text-[var(--color-muted-text)] uppercase tracking-wider mb-2 text-left">Select Dhikr</label>
+                <select 
+                    value={dhikr} 
+                    onChange={(e) => setDhikr(e.target.value)} 
+                    className="w-full bg-[#111827] border border-gray-600 rounded-lg px-4 py-3 text-white outline-none focus:border-[var(--color-primary)]"
+                >
+                    <option>SubhanAllah</option>
+                    <option>Alhamdulillah</option>
+                    <option>Allahu Akbar</option>
+                    <option>Astaghfirullah</option>
+                    <option>La ilaha illallah</option>
+                </select>
+            </div>
             
-            <div className="relative w-48 h-48 mb-8">
-                <div className="absolute inset-0 rounded-full border-4 border-[var(--color-primary)] opacity-20 animate-pulse"></div>
+            <div className="relative w-64 h-64 mb-10 flex items-center justify-center">
+                {/* Outer Glow Ring */}
+                <div className="absolute inset-0 rounded-full border-2 border-[var(--color-primary)]/30 animate-[spin_10s_linear_infinite]"></div>
+                <div className="absolute inset-4 rounded-full border border-[var(--color-primary)]/10"></div>
+                
+                {/* Main Button */}
                 <button 
                     onClick={handleCount}
-                    className="absolute inset-2 rounded-full bg-gradient-to-br from-gray-800 to-black border-4 border-[var(--color-primary)] flex items-center justify-center shadow-[0_0_30px_rgba(197,164,126,0.3)] active:scale-95 transition-transform"
+                    className="relative z-10 w-48 h-48 rounded-full bg-gradient-to-br from-gray-800 to-black border-4 border-[var(--color-primary)] flex flex-col items-center justify-center shadow-[0_0_40px_rgba(197,164,126,0.2)] active:scale-95 transition-transform group"
                 >
-                    <span className="text-5xl font-display font-bold text-white">{count}</span>
+                    <span className="text-[var(--color-muted-text)] text-xs uppercase tracking-widest mb-1">Count</span>
+                    <span className="text-6xl font-display font-bold text-white group-hover:text-[var(--color-primary)] transition-colors">{count}</span>
                 </button>
             </div>
 
-            <div className="flex gap-4">
-                 <button onClick={reset} className="text-sm text-red-400 hover:text-red-300 underline">Reset</button>
-            </div>
+            <button 
+                onClick={reset} 
+                className="flex items-center gap-2 text-sm text-red-400 hover:text-red-300 hover:bg-red-900/20 px-4 py-2 rounded-full transition-all"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                Reset Counter
+            </button>
         </div>
     );
 };
@@ -213,26 +243,44 @@ const CurrencyConverter = () => {
     const result = (amount / getRate(from) * getRate(to)).toFixed(2);
 
     return (
-        <div className="space-y-6 text-[var(--color-light-text)]">
-             <h3 className="text-2xl font-bold text-[var(--color-primary)] text-center mb-6">Currency Converter</h3>
-             <div className="flex flex-col space-y-4">
-                <div className="relative">
-                    <label className="block text-xs text-[var(--color-muted-text)] mb-1">Amount</label>
-                    <input type="number" value={amount} onChange={(e) => setAmount(parseFloat(e.target.value))} className="w-full bg-[var(--color-dark-bg)] border border-gray-600 rounded p-3 text-xl font-bold outline-none" />
+        <div className="space-y-8 text-[var(--color-light-text)] max-w-2xl mx-auto py-8">
+             <div className="text-center mb-8">
+                <h3 className="text-3xl font-display font-bold text-[var(--color-primary)]">Currency Converter</h3>
+                <p className="text-sm text-[var(--color-muted-text)] mt-2">Real-time exchange rate estimation for pilgrims.</p>
+             </div>
+
+             <div className="bg-[#111827] p-8 rounded-xl border border-gray-700 shadow-xl">
+                <div className="mb-6">
+                    <InputField 
+                        label="Amount" 
+                        type="number" 
+                        value={amount} 
+                        onChange={(e) => setAmount(parseFloat(e.target.value))} 
+                        style={{ fontSize: '1.25rem', fontWeight: 'bold' }}
+                    />
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                    <div>
-                        <label className="block text-xs text-[var(--color-muted-text)] mb-1">From</label>
-                        <select value={from} onChange={(e) => setFrom(e.target.value)} className="w-full bg-[var(--color-dark-bg)] border border-gray-600 rounded p-3 outline-none">
+
+                <div className="grid grid-cols-2 gap-6 mb-8">
+                    <div className="flex flex-col gap-2">
+                        <label className="text-xs font-bold text-[var(--color-muted-text)] uppercase tracking-wider ml-1">From</label>
+                        <select 
+                            value={from} 
+                            onChange={(e) => setFrom(e.target.value)} 
+                            className="w-full bg-[#1f2937] border border-gray-600 rounded-lg p-3 text-white outline-none focus:border-[var(--color-primary)] appearance-none"
+                        >
                             <option value="SAR">SAR (Saudi Riyal)</option>
                             <option value="BDT">BDT (Taka)</option>
                             <option value="USD">USD (Dollar)</option>
                             <option value="EUR">EUR (Euro)</option>
                         </select>
                     </div>
-                    <div>
-                        <label className="block text-xs text-[var(--color-muted-text)] mb-1">To</label>
-                         <select value={to} onChange={(e) => setTo(e.target.value)} className="w-full bg-[var(--color-dark-bg)] border border-gray-600 rounded p-3 outline-none">
+                    <div className="flex flex-col gap-2">
+                        <label className="text-xs font-bold text-[var(--color-muted-text)] uppercase tracking-wider ml-1">To</label>
+                         <select 
+                            value={to} 
+                            onChange={(e) => setTo(e.target.value)} 
+                            className="w-full bg-[#1f2937] border border-gray-600 rounded-lg p-3 text-white outline-none focus:border-[var(--color-primary)] appearance-none"
+                        >
                             <option value="BDT">BDT (Taka)</option>
                             <option value="SAR">SAR (Saudi Riyal)</option>
                             <option value="USD">USD (Dollar)</option>
@@ -240,11 +288,13 @@ const CurrencyConverter = () => {
                         </select>
                     </div>
                 </div>
-                <div className="bg-[var(--color-dark-bg)]/50 p-4 rounded-lg text-center border border-gray-700 mt-4">
-                    <p className="text-[var(--color-muted-text)] text-sm mb-1">Converted Amount</p>
-                    <p className="text-3xl font-bold text-[var(--color-secondary)]">{result} {to}</p>
-                    <p className="text-xs text-gray-500 mt-2">*Approximate rates for estimation only.</p>
+
+                <div className="bg-gradient-to-r from-[var(--color-dark-bg)] to-[#1f2937] p-6 rounded-lg text-center border border-gray-600 relative overflow-hidden group">
+                    <div className="absolute inset-0 bg-[var(--color-primary)]/5 group-hover:bg-[var(--color-primary)]/10 transition-colors"></div>
+                    <p className="text-[var(--color-muted-text)] text-xs uppercase tracking-widest mb-2 relative z-10">Converted Amount</p>
+                    <p className="text-4xl font-display font-bold text-[var(--color-secondary)] relative z-10">{result} <span className="text-lg text-gray-400">{to}</span></p>
                 </div>
+                <p className="text-xs text-gray-500 mt-4 text-center italic">*Exchange rates are approximate and for estimation only.</p>
              </div>
         </div>
     );
@@ -254,34 +304,30 @@ const IslamicTools: React.FC = () => {
     const { appData } = useContext(DataContext);
     const config = appData.pages.home.sections.islamicTools;
     
-    // Safety check if config is missing or disabled entirely
     if (!config || config.enabled === false) return null;
 
     const [isOpen, setIsOpen] = useState(false);
     
-    // Determine visible tabs
     const showZakat = config.zakat?.enabled !== false;
     const showTasbeeh = config.tasbeeh?.enabled !== false;
     const showCurrency = config.currency?.enabled !== false;
     
-    // Set initial active tab based on availability
     const [activeTab, setActiveTab] = useState<'zakat' | 'tasbeeh' | 'currency'>(
         showZakat ? 'zakat' : showTasbeeh ? 'tasbeeh' : showCurrency ? 'currency' : 'zakat'
     );
 
-    // If all sub-tools are disabled, don't render the button
     if (!showZakat && !showTasbeeh && !showCurrency) return null;
 
     return (
         <>
-            {/* Trigger Button - Centered and floating way above the filter bar */}
+            {/* Trigger Button */}
             <div className="relative z-40 -mt-56 md:-mt-72 h-0 flex justify-center items-start pointer-events-none">
                  <button
                     onClick={() => setIsOpen(true)}
                     className="pointer-events-auto group relative inline-flex items-center justify-center p-0.5 mb-2 mr-2 overflow-hidden text-sm font-medium rounded-full hover:text-white focus:ring-4 focus:outline-none focus:ring-[var(--color-primary)]/50 shadow-[0_0_30px_rgba(197,164,126,0.6)] hover:shadow-[0_0_50px_rgba(197,164,126,0.9)] transition-all duration-300 transform hover:-translate-y-1 animate-bounce-slow"
                  >
                     <span className="absolute w-full h-full bg-gradient-to-br from-[var(--color-primary)] via-[#FDE047] to-[var(--color-secondary)] group-hover:from-[var(--color-secondary)] group-hover:to-[var(--color-primary)] transition-all duration-1000"></span>
-                    <span className="relative px-6 sm:px-8 py-3 transition-all ease-in duration-75 bg-[var(--color-dark-bg)] rounded-full group-hover:bg-opacity-0 flex items-center gap-2 sm:gap-3">
+                    <span className="relative px-6 sm:px-8 py-3 transition-all ease-in duration-75 bg-[#0f172a] rounded-full group-hover:bg-opacity-0 flex items-center gap-2 sm:gap-3">
                          <span className="text-[var(--color-primary)] group-hover:text-white transition-colors">
                             <CalculatorIcon />
                          </span>
@@ -305,40 +351,40 @@ const IslamicTools: React.FC = () => {
 
             {/* Modal */}
             <Modal isOpen={isOpen} onClose={() => setIsOpen(false)}>
-                <div className="flex flex-col md:flex-row min-h-[500px]">
+                <div className="flex flex-col md:flex-row min-h-[600px] bg-[#1F2937] text-white rounded-lg overflow-hidden">
                      {/* Sidebar Tabs */}
-                    <div className="md:w-1/3 bg-black/20 p-4 md:p-6 flex flex-row md:flex-col gap-2 md:gap-4 border-b md:border-b-0 md:border-r border-gray-700 overflow-x-auto">
+                    <div className="md:w-1/3 bg-[#111827] p-4 md:p-6 flex flex-row md:flex-col gap-2 md:gap-4 border-b md:border-b-0 md:border-r border-gray-700 overflow-x-auto">
                         {showZakat && (
                             <button 
                                 onClick={() => setActiveTab('zakat')}
-                                className={`flex-1 p-4 rounded-lg flex items-center gap-3 transition-all whitespace-nowrap ${activeTab === 'zakat' ? 'bg-[var(--color-primary)] text-white shadow-lg' : 'text-[var(--color-muted-text)] hover:bg-white/5'}`}
+                                className={`flex-1 p-4 rounded-xl flex items-center gap-4 transition-all duration-300 whitespace-nowrap ${activeTab === 'zakat' ? 'bg-[var(--color-primary)] text-white shadow-lg translate-x-1' : 'text-gray-400 hover:bg-gray-800 hover:text-white'}`}
                             >
                                 <CalculatorIcon />
-                                <span className="font-bold">Zakat Calculator</span>
+                                <span className="font-bold font-display text-lg">Zakat Calculator</span>
                             </button>
                         )}
                         {showTasbeeh && (
                             <button 
                                 onClick={() => setActiveTab('tasbeeh')}
-                                className={`flex-1 p-4 rounded-lg flex items-center gap-3 transition-all whitespace-nowrap ${activeTab === 'tasbeeh' ? 'bg-[var(--color-primary)] text-white shadow-lg' : 'text-[var(--color-muted-text)] hover:bg-white/5'}`}
+                                className={`flex-1 p-4 rounded-xl flex items-center gap-4 transition-all duration-300 whitespace-nowrap ${activeTab === 'tasbeeh' ? 'bg-[var(--color-primary)] text-white shadow-lg translate-x-1' : 'text-gray-400 hover:bg-gray-800 hover:text-white'}`}
                             >
                                 <TasbeehIcon />
-                                <span className="font-bold">Digital Tasbeeh</span>
+                                <span className="font-bold font-display text-lg">Digital Tasbeeh</span>
                             </button>
                         )}
                         {showCurrency && (
                             <button 
                                 onClick={() => setActiveTab('currency')}
-                                className={`flex-1 p-4 rounded-lg flex items-center gap-3 transition-all whitespace-nowrap ${activeTab === 'currency' ? 'bg-[var(--color-primary)] text-white shadow-lg' : 'text-[var(--color-muted-text)] hover:bg-white/5'}`}
+                                className={`flex-1 p-4 rounded-xl flex items-center gap-4 transition-all duration-300 whitespace-nowrap ${activeTab === 'currency' ? 'bg-[var(--color-primary)] text-white shadow-lg translate-x-1' : 'text-gray-400 hover:bg-gray-800 hover:text-white'}`}
                             >
                                 <CurrencyIcon />
-                                <span className="font-bold">Currency Converter</span>
+                                <span className="font-bold font-display text-lg">Currency Converter</span>
                             </button>
                         )}
                     </div>
 
                     {/* Content Area */}
-                    <div className="flex-1 p-6 md:p-10 bg-[var(--color-light-bg)]/30 backdrop-blur-sm overflow-y-auto max-h-[60vh] md:max-h-[70vh]">
+                    <div className="flex-1 p-6 md:p-10 bg-[#1F2937] overflow-y-auto max-h-[80vh]">
                         {activeTab === 'zakat' && showZakat && <ZakatCalculator googleSheetUrl={config.zakat?.googleSheetUrl} />}
                         {activeTab === 'tasbeeh' && showTasbeeh && <DigitalTasbeeh />}
                         {activeTab === 'currency' && showCurrency && <CurrencyConverter />}

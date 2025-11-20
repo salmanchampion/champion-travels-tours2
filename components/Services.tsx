@@ -40,11 +40,11 @@ const Services: React.FC<ServicesProps> = ({ showTitle = true }) => {
   const [selectedService, setSelectedService] = useState<Service | null>(null);
   const { appData } = useContext(DataContext);
   const data = showTitle ? appData.pages.home.sections.services : appData.pages.services.pageBanner;
-  const services = appData.pages.services.list.filter(s => s.enabled);
+  const services = appData.pages.services.list ? appData.pages.services.list.filter(s => s.enabled) : [];
 
   return (
     <>
-      <section className={`${showTitle ? 'py-20' : 'pb-20'} bg-[var(--color-dark-bg)]`}>
+      <section className={`${showTitle ? 'py-20' : 'py-16'} bg-[var(--color-dark-bg)]`}>
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           {showTitle && (
               <div className="text-center mb-12">
@@ -52,18 +52,29 @@ const Services: React.FC<ServicesProps> = ({ showTitle = true }) => {
               <p className="mt-4 text-lg text-[var(--color-muted-text)] max-w-2xl mx-auto" data-aos="fade-up" data-aos-delay="100">{data.subtitle}</p>
               </div>
           )}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {services.map((service, index) => (
-              <ServiceCard 
-                key={index} 
-                icon={iconMap[service.icon] || iconMap['Default']}
-                title={service.title}
-                description={service.description}
-                onClick={() => setSelectedService(service)} 
-                delay={index * 100}
-              />
-            ))}
-          </div>
+          
+          {services.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {services.map((service, index) => (
+                <ServiceCard 
+                  key={index} 
+                  icon={iconMap[service.icon] || iconMap['Default']}
+                  title={service.title}
+                  description={service.description}
+                  onClick={() => setSelectedService(service)} 
+                  delay={index * 100}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-16 bg-[var(--color-light-bg)] rounded-[var(--ui-border-radius)] border border-dashed border-gray-700" data-aos="fade-up">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto text-[var(--color-muted-text)] mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                </svg>
+                <h3 className="text-xl font-bold text-[var(--color-light-text)]">No Services Available</h3>
+                <p className="text-[var(--color-muted-text)] mt-2">We are currently updating our service list. Please check back soon.</p>
+            </div>
+          )}
         </div>
       </section>
 
