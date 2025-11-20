@@ -1,10 +1,4 @@
 
-
-
-
-
-
-
 import React, { useState, useContext, useMemo } from 'react';
 import PageBanner from '../components/PageBanner';
 import { DataContext } from '../contexts/DataContext';
@@ -44,13 +38,14 @@ const ExclusivePackageEditor: React.FC<{
                 <AdminInput label="Image URL" name="image" value={pkg.image} onChange={e => onChange(path, index, e.target.name, e.target.value)} />
                 <AdminInput label="PDF Flyer Link (Optional)" name="pdfLink" value={pkg.pdfLink} onChange={e => onChange(path, index, e.target.name, e.target.value)} />
                 <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-[var(--color-muted-text)] mb-1">Features (Comma Separated)</label>
-                    <input 
-                        type="text" 
-                        value={pkg.features.join(', ')} 
-                        onChange={e => onChange(path, index, 'features', e.target.value.split(',').map(s => s.trim()))} 
-                        className="w-full bg-[var(--color-dark-bg)] border border-gray-600 rounded-md py-2 px-3 text-[var(--color-light-text)] focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]"
+                    <AdminTextarea 
+                        label="Features (One per line)" 
+                        name="features" 
+                        value={pkg.features.join('\n')} 
+                        onChange={e => onChange(path, index, 'features', e.target.value.split('\n').map(s => s.trim()).filter(s => s))} 
+                        rows={5}
                     />
+                    <p className="text-xs text-[var(--color-muted-text)] mt-1">Enter each feature on a new line for proper list formatting.</p>
                 </div>
             </div>
         </div>
@@ -173,23 +168,25 @@ const AdminPage: React.FC = () => {
         setLegacyCategoryFilter('All');
     };
 
-    // Legacy Package Filtering Logic
-    const currentLegacyPackages = activePackageTab === 'hajj' ? localData.hajjPackages : localData.umrahPackages;
-    
-    // Get Unique Categories
+    // Get Unique Categories for Legacy Packages
     const legacyCategories = useMemo(() => {
-        const cats = new Set(currentLegacyPackages.map(p => p.category || 'Uncategorized'));
-        return ['All', ...Array.from(cats)];
-    }, [currentLegacyPackages]);
+        const packages = activePackageTab === 'hajj' ? localData.hajjPackages : localData.umrahPackages;
+        if(!packages) return ['All'];
+        const cats = new Set(packages.map(p => p.category ? p.category.trim() : 'Uncategorized'));
+        return ['All', ...Array.from(cats).sort()];
+    }, [localData, activePackageTab]);
 
-    // Filter Packages and preserve original index
+    // Filter Packages and preserve original index for correct updating
     const filteredLegacyPackages = useMemo(() => {
+        const packages = activePackageTab === 'hajj' ? localData.hajjPackages : localData.umrahPackages;
+        if(!packages) return [];
+        
         // We attach original index to ensure we edit the right item in the main array
-        const withIndex = currentLegacyPackages.map((pkg, idx) => ({ ...pkg, originalIndex: idx }));
+        const withIndex = packages.map((pkg, idx) => ({ ...pkg, originalIndex: idx }));
         
         if (legacyCategoryFilter === 'All') return withIndex;
-        return withIndex.filter(p => (p.category || 'Uncategorized') === legacyCategoryFilter);
-    }, [currentLegacyPackages, legacyCategoryFilter]);
+        return withIndex.filter(p => (p.category ? p.category.trim() : 'Uncategorized') === legacyCategoryFilter);
+    }, [localData, activePackageTab, legacyCategoryFilter]);
 
 
     const phoneIndex = localData.header.contactInfo?.findIndex(c => c.label === 'Phone');
@@ -1129,15 +1126,15 @@ const AdminPage: React.FC = () => {
                     
                     {/* Category Filter Bar */}
                     <div className="mb-6 overflow-x-auto pb-2">
-                        <div className="flex gap-2">
-                            {legacyCategories.map(cat => (
+                        <div className="flex flex-wrap gap-2">
+                            {legacyCategories.map((cat) => (
                                 <button
                                     key={cat}
                                     onClick={() => setLegacyCategoryFilter(cat)}
-                                    className={`px-3 py-1 rounded-full text-sm whitespace-nowrap transition-colors ${
-                                        legacyCategoryFilter === cat 
-                                            ? 'bg-[var(--color-secondary)] text-[var(--color-dark-bg)] font-bold' 
-                                            : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                                    className={`px-3 py-1 rounded-full text-sm whitespace-nowrap transition-colors border ${
+                                        legacyCategoryFilter === cat
+                                            ? 'bg-[var(--color-secondary)] text-[var(--color-dark-bg)] border-[var(--color-secondary)] font-bold'
+                                            : 'bg-transparent text-[var(--color-muted-text)] border-gray-600 hover:border-[var(--color-secondary)]'
                                     }`}
                                 >
                                     {cat}
@@ -1148,36 +1145,44 @@ const AdminPage: React.FC = () => {
 
                     {activePackageTab === 'hajj' && (
                         <div>
-                            {filteredLegacyPackages.map((pkg) => (
-                                <PackageEditor 
-                                    key={pkg.originalIndex} // Key should be unique, using original index is safe here as it's unique per list
-                                    pkg={pkg} 
-                                    index={pkg.originalIndex} 
-                                    packageType="hajj" 
-                                    onChange={handleListChange} 
-                                    onDelete={deleteListItem} 
-                                />
-                            ))}
+                            {filteredLegacyPackages.length === 0 ? (
+                                <p className="text-center text-gray-500 py-4">No packages found in this category.</p>
+                            ) : (
+                                filteredLegacyPackages.map((pkg) => (
+                                    <PackageEditor 
+                                        key={pkg.originalIndex} 
+                                        pkg={pkg} 
+                                        index={pkg.originalIndex} 
+                                        packageType="hajj" 
+                                        onChange={handleListChange} 
+                                        onDelete={deleteListItem} 
+                                    />
+                                ))
+                            )}
                             {legacyCategoryFilter === 'All' && (
-                                <button onClick={() => addListItem('hajjPackages', { name: 'New Hajj Package', price: '', enabled: true })} className="bg-green-600 text-white font-bold py-2 px-4 rounded">Add Hajj Package</button>
+                                <button onClick={() => addListItem('hajjPackages', { name: 'New Hajj Package', price: '', enabled: true, category: 'Regular Hajj' })} className="bg-green-600 text-white font-bold py-2 px-4 rounded mt-4">Add Hajj Package</button>
                             )}
                         </div>
                     )}
 
                     {activePackageTab === 'umrah' && (
                          <div>
-                            {filteredLegacyPackages.map((pkg) => (
-                                <PackageEditor 
-                                    key={pkg.originalIndex}
-                                    pkg={pkg} 
-                                    index={pkg.originalIndex} 
-                                    packageType="umrah" 
-                                    onChange={handleListChange} 
-                                    onDelete={deleteListItem} 
-                                />
-                            ))}
+                            {filteredLegacyPackages.length === 0 ? (
+                                <p className="text-center text-gray-500 py-4">No packages found in this category.</p>
+                            ) : (
+                                filteredLegacyPackages.map((pkg) => (
+                                    <PackageEditor 
+                                        key={pkg.originalIndex}
+                                        pkg={pkg} 
+                                        index={pkg.originalIndex} 
+                                        packageType="umrah" 
+                                        onChange={handleListChange} 
+                                        onDelete={deleteListItem} 
+                                    />
+                                ))
+                            )}
                              {legacyCategoryFilter === 'All' && (
-                                <button onClick={() => addListItem('umrahPackages', { name: 'New Umrah Package', price: '', enabled: true })} className="bg-green-600 text-white font-bold py-2 px-4 rounded">Add Umrah Package</button>
+                                <button onClick={() => addListItem('umrahPackages', { name: 'New Umrah Package', price: '', enabled: true, category: 'Economy' })} className="bg-green-600 text-white font-bold py-2 px-4 rounded mt-4">Add Umrah Package</button>
                              )}
                         </div>
                     )}

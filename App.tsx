@@ -115,10 +115,9 @@ const AppContent: React.FC = () => {
 
   // --- AOS Initialization ---
   useEffect(() => {
-    // @ts-ignore
-    if (window.AOS) {
-        // @ts-ignore
-        window.AOS.init({
+    const aos = (window as any).AOS;
+    if (aos) {
+        aos.init({
             duration: 1000, // Duration of animation
             once: true, // Whether animation should happen only once - while scrolling down
             easing: 'ease-out-cubic',
@@ -128,6 +127,16 @@ const AppContent: React.FC = () => {
     }
   }, []);
   // -------------------------
+
+  // Refresh AOS whenever the page changes to ensure animations trigger correctly
+  useEffect(() => {
+    const aos = (window as any).AOS;
+    if (aos) {
+        // Multiple refreshes to catch rendering timing issues
+        setTimeout(() => aos.refresh(), 100);
+        setTimeout(() => aos.refresh(), 800);
+    }
+  }, [page, appData]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -157,10 +166,6 @@ const AppContent: React.FC = () => {
       
       setPage(path);
       window.scrollTo(0, 0);
-      
-      // Refresh AOS on route change to ensure new elements animate
-      // @ts-ignore
-      if (window.AOS) { setTimeout(() => window.AOS.refresh(), 100); }
 
       if (path === '#contact' || path === '#book-now') {
         const params = new URLSearchParams(queryString || '');

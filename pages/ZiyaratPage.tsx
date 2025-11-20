@@ -19,7 +19,7 @@ const ZiyaratPage: React.FC = () => {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center relative">
          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1 h-20 bg-gradient-to-b from-transparent to-[var(--color-primary)] opacity-30"></div>
          
-         <div data-aos="fade-up">
+         <div>
             <h2 className="text-3xl md:text-5xl font-display font-bold text-[var(--color-light-text)] mb-8">Why Ziyarat is Important?</h2>
             <p className="text-xl text-[var(--color-muted-text)] max-w-4xl mx-auto leading-relaxed mb-12 font-light">
                 Performing Ziyarat allows pilgrims to connect deeply with Islamic history. 

@@ -20,6 +20,7 @@ const Partners: React.FC = () => {
                         <a 
                             key={index} 
                             href={logo.href || '#'} 
+                            onClick={(e) => logo.href === '#' && e.preventDefault()}
                             className={`group block transition-opacity duration-300 ${logo.href === '#' ? 'cursor-default' : 'hover:opacity-100'}`}
                             target={logo.href === '#' ? undefined : "_blank"}
                             rel="noopener noreferrer"
