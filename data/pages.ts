@@ -1,6 +1,8 @@
 
 
 
+
+
 import { AppData, CustomPage } from '../types';
 
 export const pagesData: AppData['pages'] = {
@@ -899,7 +901,7 @@ export const customPagesData: CustomPage[] = [
     },
     {
         id: '#hotel-booking',
-        title: 'Hotel Booking',
+        title: 'Luxury Hotel Booking',
         bannerSubtitle: 'Find the perfect stay for your journey.',
         seo: {
             title: 'Hotel Booking | Champion Travels & Tours',
@@ -913,23 +915,8 @@ export const customPagesData: CustomPage[] = [
         enabled: true
     },
     {
-        id: '#ziyarat-tours',
-        title: 'Ziyarat Tours',
-        bannerSubtitle: 'Explore the historical sites of Islam.',
-        seo: {
-            title: 'Ziyarat Tours | Champion Travels & Tours',
-            description: 'Guided Ziyarat tours in Makkah and Madinah.',
-            keywords: 'Ziyarat tours, Islamic heritage tours, Makkah Ziyarat, Madinah Ziyarat'
-        },
-        contentBlocks: [
-             { type: 'html', content: `<p>Our Ziyarat tours are designed to connect you with the history of Islam. Visit historical sites such as Cave Hira, Cave Thawr, Masjid Quba, and Mount Uhud with our knowledgeable guides.</p>` },
-             { type: 'button', text: 'Book Ziyarat Tour', href: '#contact?subject=Ziyarat Tour Inquiry' }
-        ],
-        enabled: true
-    },
-    {
         id: '#umrah-training',
-        title: 'Umrah Training',
+        title: 'Pilgrim Training',
         bannerSubtitle: 'Prepare for your spiritual journey.',
         seo: {
             title: 'Umrah Training | Champion Travels & Tours',

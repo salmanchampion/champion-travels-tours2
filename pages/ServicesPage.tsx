@@ -1,136 +1,175 @@
 
-import React, { useContext } from 'react';
-import Services from '../components/Services';
-import PageBanner from '../components/PageBanner';
-import { DataContext } from '../contexts/DataContext';
+import React from 'react';
 
-// Internal component for Process Steps
-const ProcessStep: React.FC<{ number: string; title: string; description: string }> = ({ number, title, description }) => (
-  <div className="relative flex flex-col items-center text-center p-6 bg-[var(--color-light-bg)] rounded-lg border border-gray-700 hover:border-[var(--color-primary)] transition-all duration-300 group" data-aos="fade-up">
-    <div className="w-16 h-16 rounded-full bg-[var(--color-dark-bg)] border-2 border-[var(--color-primary)] flex items-center justify-center text-2xl font-bold text-[var(--color-primary)] mb-4 shadow-[0_0_15px_rgba(197,164,126,0.3)] group-hover:bg-[var(--color-primary)] group-hover:text-white transition-colors">
-      {number}
+const ServiceSection: React.FC<{
+    title: string;
+    subtitle: string;
+    description: string;
+    features: string[];
+    image: string;
+    align: 'left' | 'right';
+    link: string;
+    buttonText?: string;
+}> = ({ title, subtitle, description, features, image, align, link, buttonText = "Inquire About This Service" }) => (
+    <div className="py-24 border-b border-gray-800/50 last:border-0 relative overflow-hidden">
+        {/* Subtle background pattern */}
+        <div className="absolute inset-0 opacity-5 pointer-events-none bg-[url('https://www.toptal.com/designers/subtlepatterns/uploads/arabesque.png')]"></div>
+        
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div className={`flex flex-col lg:flex-row items-center gap-16 ${align === 'right' ? 'lg:flex-row-reverse' : ''}`}>
+                
+                {/* Image Side */}
+                <div className="lg:w-1/2 w-full" data-aos={align === 'left' ? 'fade-right' : 'fade-left'}>
+                    <div className="relative group">
+                        <div className="absolute -inset-1 bg-gradient-to-r from-[var(--color-primary)] to-[#8B6E4E] rounded-xl blur opacity-25 group-hover:opacity-75 transition duration-1000"></div>
+                        <div className="relative overflow-hidden rounded-xl shadow-2xl h-[400px] lg:h-[500px]">
+                            <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition duration-500 z-10"></div>
+                            <img 
+                                src={image} 
+                                alt={title} 
+                                className="w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-105"
+                            />
+                        </div>
+                        {/* Decorative Box */}
+                        <div className={`absolute -bottom-6 ${align === 'left' ? '-right-6' : '-left-6'} w-24 h-24 border-2 border-[var(--color-primary)] hidden lg:block bg-transparent z-20`}></div>
+                    </div>
+                </div>
+
+                {/* Content Side */}
+                <div className="lg:w-1/2 w-full" data-aos="fade-up">
+                    <div className="flex items-center gap-4 mb-4">
+                        <div className="h-px w-12 bg-[var(--color-primary)]"></div>
+                        <span className="text-[var(--color-primary)] font-bold tracking-[0.2em] uppercase text-sm">{subtitle}</span>
+                    </div>
+                    
+                    <h2 className="text-4xl md:text-5xl font-display font-bold text-white mb-6 leading-tight">
+                        {title}
+                    </h2>
+                    <p className="text-lg text-[var(--color-muted-text)] leading-relaxed mb-8">
+                        {description}
+                    </p>
+                    
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10">
+                        {features.map((feature, idx) => (
+                            <div key={idx} className="flex items-center space-x-3 group">
+                                <div className="w-1.5 h-1.5 rounded-full bg-[var(--color-primary)] group-hover:scale-150 transition-transform"></div>
+                                <span className="text-gray-300 group-hover:text-white transition-colors">{feature}</span>
+                            </div>
+                        ))}
+                    </div>
+
+                    <a 
+                        href={link}
+                        className="inline-flex items-center space-x-3 text-white font-bold group"
+                    >
+                        <span className="border-b-2 border-[var(--color-primary)] pb-1 group-hover:text-[var(--color-primary)] transition-colors">{buttonText}</span>
+                        <svg className="w-5 h-5 transform group-hover:translate-x-1 transition-transform text-[var(--color-primary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
-    <h3 className="text-xl font-display font-bold text-white mb-2">{title}</h3>
-    <p className="text-[var(--color-muted-text)] text-sm">{description}</p>
-  </div>
 );
 
 const ServicesPage: React.FC = () => {
-  const { appData } = useContext(DataContext);
-  const { pageBanner } = appData.pages.services;
-
   return (
-    <div className="pt-20 bg-[var(--color-dark-bg)] min-h-screen flex flex-col">
-      <PageBanner 
-          title={pageBanner.title} 
-          subtitle={pageBanner.subtitle}
-          backgroundImage="https://i.postimg.cc/Y2z4HFFK/ah.jpg"
-      />
-      
-      {/* Intro / Philosophy Section */}
-      <section className="py-16 container mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="max-w-3xl mx-auto" data-aos="fade-up">
-              <span className="text-[var(--color-primary)] font-bold uppercase tracking-widest text-sm">Our Commitment</span>
-              <h2 className="text-3xl md:text-4xl font-display font-bold text-white mt-2 mb-6">Excellence in Every Step</h2>
-              <p className="text-[var(--color-muted-text)] text-lg leading-relaxed">
-                  At Champion Travels & Tours, we don't just provide services; we curate experiences. Whether you are embarking on a spiritual journey to the Holy Lands or traveling for business, our dedicated team ensures every detail is handled with precision, care, and professionalism.
+    <div className="bg-[#0B0F19] min-h-screen pt-20">
+      {/* --- Hero Section --- */}
+      <section className="relative h-[60vh] flex items-center justify-center overflow-hidden">
+          <div className="absolute inset-0">
+              <img 
+                src="https://i.postimg.cc/R0N8Mv8X/as.jpg" 
+                alt="Luxury Travel" 
+                className="w-full h-full object-cover opacity-40"
+              />
+              <div className="absolute inset-0 bg-gradient-to-b from-[#0B0F19]/90 via-[#0B0F19]/60 to-[#0B0F19]"></div>
+          </div>
+          <div className="relative z-10 text-center px-4 max-w-4xl mx-auto" data-aos="fade-up">
+              <div className="w-24 h-1 bg-gradient-to-r from-transparent via-[var(--color-primary)] to-transparent mx-auto mb-8"></div>
+              <h1 className="text-5xl md:text-7xl font-display font-bold text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-400 tracking-wide mb-6">
+                  World-Class Services
+              </h1>
+              <p className="text-xl md:text-2xl text-[var(--color-muted-text)] font-light">
+                  We don't just facilitate travel; we curate spiritual and global experiences with unmatched precision and luxury.
               </p>
           </div>
       </section>
 
-      {/* Services Grid (Existing Component) */}
-      <div className="flex-grow bg-[#0f172a]/50">
-        <Services showTitle={false} />
+      {/* --- Services List --- */}
+      <div className="bg-[#0B0F19]">
+          <ServiceSection 
+            title="Hajj & Umrah Pilgrimage"
+            subtitle="Spiritual Journeys"
+            description="Embark on the sacred journey of a lifetime with our premium Hajj and Umrah packages. We specialize in providing executive arrangements, close-proximity hotels, and scholarly guidance to ensure your worship is accepted and your comfort is guaranteed."
+            features={['VIP Shifting & Non-Shifting Hajj', 'Custom Umrah Itineraries', 'Luxury Ground Transport', 'Scholarly Guidance (Muallim)']}
+            image="https://i.postimg.cc/CL6k3832/ak.jpg"
+            align="left"
+            link="#exclusive-hajj"
+            buttonText="View Packages"
+          />
+
+          <ServiceSection 
+            title="Historical Ziyarat Tours"
+            subtitle="Echoes of History"
+            description="Walk in the footsteps of the Prophet (PBUH) and his companions. Our guided Ziyarat tours take you to the most significant historical sites in Makkah and Madinah, providing deep historical context and spiritual insight."
+            features={['Guided by Historians/Scholars', 'Exclusive Access to Sites', 'Comfortable AC Transport', 'Educational Sessions']}
+            image="https://i.postimg.cc/RZ8BGSpf/aj.webp"
+            align="right"
+            link="#ziyarat-tours"
+            buttonText="Explore Ziyarat"
+          />
+
+          <ServiceSection 
+            title="Global Visa Processing"
+            subtitle="Hassle-Free Documentation"
+            description="Navigating complex immigration rules can be daunting. Our expert visa consultants handle the intricacies of visa processing for major destinations worldwide, ensuring a high success rate and peace of mind for tourists, students, and business travelers."
+            features={['Tourist & Business Visas', 'Student Visa Assistance', 'Medical Visa Support', 'Document Verification']}
+            image="https://i.postimg.cc/x1gn4TDd/ad.jpg"
+            align="left"
+            link="#visa-processing"
+          />
+
+          <ServiceSection 
+            title="Air Ticketing & Flights"
+            subtitle="Connect to the World"
+            description="As an IATA accredited agency, we offer competitive fares on all major international airlines. Whether you need a last-minute business class seat or a budget-friendly family vacation ticket, our global distribution system ensures you get the best deal."
+            features={['Domestic & International Flights', 'Group Booking Discounts', '24/7 Flight Support', 'Date Change & Refund Assistance']}
+            image="https://i.postimg.cc/Y2z4HFFK/ah.jpg"
+            align="right"
+            link="#air-ticketing"
+          />
+
+          <ServiceSection 
+            title="Luxury Hotels & Tours"
+            subtitle="Comfort Beyond Borders"
+            description="From 5-star suites overlooking the Kaaba to serene resorts in Europe, we have partnerships with top-tier hotels globally. We also curate exclusive holiday tour packages for families and honeymoons, blending adventure with relaxation."
+            features={['Direct Hotel Booking System', 'Kaaba/Haram View Rooms', 'Custom Holiday Packages', 'Airport Transfers']}
+            image="https://i.postimg.cc/50rQG1f5/umrah-2.jpg"
+            align="left"
+            link="#contact?subject=Hotel/Tour Service Inquiry"
+          />
       </div>
 
-      {/* Our Process Section */}
-      <section className="py-20 container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-display font-bold text-white">How We Serve You</h2>
-            <p className="text-[var(--color-muted-text)] mt-2">A simple, transparent, and hassle-free process.</p>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 relative">
-            {/* Connector Line (Desktop) */}
-            <div className="hidden lg:block absolute top-14 left-0 w-full h-0.5 bg-gray-700 -z-10"></div>
-            
-            <ProcessStep 
-                number="1" 
-                title="Consultation" 
-                description="We discuss your needs, preferences, and budget to understand exactly what you are looking for." 
-            />
-            <ProcessStep 
-                number="2" 
-                title="Customization" 
-                description="Our experts tailor a package or service plan that aligns perfectly with your requirements." 
-            />
-            <ProcessStep 
-                number="3" 
-                title="Booking & Processing" 
-                description="We handle all the documentation, bookings, and visa processing efficiently." 
-            />
-            <ProcessStep 
-                number="4" 
-                title="Support & Journey" 
-                description="Enjoy your trip with our continuous support until you return home safely." 
-            />
-        </div>
-      </section>
-
-      {/* Detailed Features / Why Us for Services */}
-      <section className="py-16 bg-[var(--color-light-bg)] border-y border-gray-700">
-           <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center gap-12">
-               <div className="md:w-1/2" data-aos="fade-right">
-                   <img 
-                    src="https://i.postimg.cc/x1gn4TDd/ad.jpg" 
-                    alt="Customer Service" 
-                    className="rounded-lg shadow-2xl border-2 border-[var(--color-primary)]/20 w-full max-w-md mx-auto object-cover h-80"
-                   />
-               </div>
-               <div className="md:w-1/2" data-aos="fade-left">
-                   <h2 className="text-3xl md:text-4xl font-display font-bold text-white mb-6">Why Trust Our Services?</h2>
-                   <ul className="space-y-6">
-                       <li className="flex items-start">
-                           <div className="flex-shrink-0 w-10 h-10 rounded-full bg-[var(--color-primary)]/10 flex items-center justify-center text-[var(--color-primary)] mr-4">
-                               <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
-                           </div>
-                           <div>
-                               <h4 className="text-white font-bold text-lg">24/7 Dedicated Support</h4>
-                               <p className="text-[var(--color-muted-text)] text-sm mt-1">Our team is available round the clock to assist you with any queries or emergencies during your travel.</p>
-                           </div>
-                       </li>
-                       <li className="flex items-start">
-                           <div className="flex-shrink-0 w-10 h-10 rounded-full bg-[var(--color-primary)]/10 flex items-center justify-center text-[var(--color-primary)] mr-4">
-                               <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                           </div>
-                           <div>
-                               <h4 className="text-white font-bold text-lg">Transparent Pricing</h4>
-                               <p className="text-[var(--color-muted-text)] text-sm mt-1">No hidden fees. We provide detailed breakdowns of all costs involved so you know exactly what you are paying for.</p>
-                           </div>
-                       </li>
-                       <li className="flex items-start">
-                           <div className="flex-shrink-0 w-10 h-10 rounded-full bg-[var(--color-primary)]/10 flex items-center justify-center text-[var(--color-primary)] mr-4">
-                               <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
-                           </div>
-                           <div>
-                               <h4 className="text-white font-bold text-lg">Global Network</h4>
-                               <p className="text-[var(--color-muted-text)] text-sm mt-1">Strong partnerships with top-rated hotels and airlines worldwide ensure you get the best deals and premium service.</p>
-                           </div>
-                       </li>
-                   </ul>
-               </div>
-           </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-20 text-center bg-gradient-to-b from-[var(--color-dark-bg)] to-[#000]">
-          <div className="container mx-auto px-4">
-              <h2 className="text-3xl md:text-4xl font-display font-bold text-white mb-6">Need a Custom Service?</h2>
-              <p className="text-[var(--color-muted-text)] text-lg max-w-2xl mx-auto mb-8">
-                  If you have specific requirements or need a tailored solution, our team is ready to design a package just for you.
-              </p>
-              <a href="#contact?subject=Custom Service Request" className="inline-block bg-[var(--color-primary)] text-white font-bold py-4 px-10 rounded-full hover:bg-[var(--color-primary-dark)] transition-all duration-300 shadow-lg transform hover:scale-105">
-                  Contact Us Today
-              </a>
+      {/* --- VIP Concierge Banner --- */}
+      <section className="py-24 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-[var(--color-primary)] to-[#8B6E4E]">
+               <div className="absolute inset-0 bg-[url('https://www.toptal.com/designers/subtlepatterns/uploads/geometric-leaves.png')] opacity-10 mix-blend-multiply"></div>
+          </div>
+          <div className="container mx-auto px-4 relative z-10 flex flex-col md:flex-row items-center justify-between">
+              <div className="md:w-2/3 text-white mb-8 md:mb-0">
+                  <h2 className="text-4xl font-display font-bold mb-4 text-[#0B0F19]">Need VIP Concierge Service?</h2>
+                  <p className="text-xl text-[#0B0F19]/80 font-medium max-w-2xl">
+                      For elite travelers requiring private jets, dedicated butlers, or custom security arrangements during Hajj/Umrah, our VIP desk is at your service.
+                  </p>
+              </div>
+              <div className="md:w-1/3 text-right">
+                  <a 
+                    href="#contact?subject=VIP Concierge Request" 
+                    className="inline-block bg-[#0B0F19] text-[var(--color-primary)] font-bold py-4 px-10 rounded-none hover:bg-white transition-all duration-300 shadow-2xl transform hover:-translate-y-1 border border-[#0B0F19]"
+                  >
+                      Contact VIP Desk
+                  </a>
+              </div>
           </div>
       </section>
     </div>

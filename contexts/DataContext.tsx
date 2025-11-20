@@ -1,4 +1,8 @@
 
+
+
+
+
 import React, { createContext, useState, useEffect, ReactNode } from 'react';
 import { defaultData, AppData } from '../data';
 import { db } from '../firebase';
@@ -116,6 +120,21 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
                         }
                     }
 
+                    // Step 4: Enforce new Services Menu Structure
+                    // NOTE: This is critical to ensure 'Ziyarat Tours' appears correctly
+                    const defaultServicesLink = defaultData.header.navLinks.find(link => link.label === 'Services');
+                    const servicesIndex = navLinks.findIndex(link => link.label === 'Services');
+                    
+                    if (defaultServicesLink) {
+                        if (servicesIndex !== -1) {
+                            // Force update subLinks to match default configuration, which includes new Ziyarat link
+                            navLinks[servicesIndex].subLinks = JSON.parse(JSON.stringify(defaultServicesLink.subLinks));
+                        } else {
+                            // If not found, add it
+                             navLinks.splice(2, 0, JSON.parse(JSON.stringify(defaultServicesLink)));
+                        }
+                    }
+
                     // Rename Contact if necessary
                     const contactIndex = navLinks.findIndex(link => link.href === '#contact');
                     if (contactIndex !== -1) {
@@ -173,20 +192,6 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
                         }
                     }
                 }
-
-                // Patch: Ensure new 'Services' sub-links are present
-                const defaultServicesLink = defaultData.header.navLinks.find(link => link.label === 'Services');
-                if (dbNavLinks && defaultServicesLink) {
-                    const dbServicesLink = dbNavLinks.find(link => link.label === 'Services');
-                    if (dbServicesLink) { 
-                        dbServicesLink.subLinks = dbServicesLink.subLinks || [];
-                        defaultServicesLink.subLinks?.forEach(defaultSubLink => {
-                            if (!dbServicesLink.subLinks.some(dbSubLink => dbSubLink.href === defaultSubLink.href)) {
-                                dbServicesLink.subLinks.push(JSON.parse(JSON.stringify(defaultSubLink)));
-                            }
-                        });
-                    }
-                }
                 
                 // Patch: Ensure custom pages from defaultData exist in dbData
                 if (!dbData.customPages) {
@@ -200,7 +205,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
                 });
 
                 // Patch: Ensure contentBlocks are populated for specific pages if empty in DB
-                const targetPageIds = ['#hotel-booking', '#ziyarat-tours', '#umrah-training', '#about-us', '#privacy-policy'];
+                const targetPageIds = ['#hotel-booking', '#umrah-training', '#about-us', '#privacy-policy'];
                 targetPageIds.forEach(id => {
                     const dbPage = dbData.customPages?.find(p => p.id === id);
                     const defaultPage = defaultData.customPages?.find(p => p.id === id);
@@ -210,6 +215,11 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
                         }
                     }
                 });
+                
+                // Patch: Remove old Ziyarat custom page if it exists in DB
+                if (dbData.customPages) {
+                    dbData.customPages = dbData.customPages.filter(p => p.id !== '#ziyarat-tours');
+                }
                 
                 // Patch: Ensure exclusive data exists
                 if (!dbData.exclusiveHajj) dbData.exclusiveHajj = JSON.parse(JSON.stringify(defaultData.exclusiveHajj));

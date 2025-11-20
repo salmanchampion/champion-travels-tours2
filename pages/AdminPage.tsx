@@ -1,4 +1,8 @@
 
+
+
+
+
 import React, { useState, useContext, useMemo } from 'react';
 import PageBanner from '../components/PageBanner';
 import { DataContext } from '../contexts/DataContext';
@@ -60,8 +64,9 @@ const AdminPage: React.FC = () => {
     const [legacyCategoryFilter, setLegacyCategoryFilter] = useState('All');
     const [isSaving, setIsSaving] = useState(false);
 
-    const coreServiceIds = ['#hotel-booking', '#ziyarat-tours', '#umrah-training'];
+    const coreServiceIds = ['#hotel-booking', '#umrah-training'];
     const companyPageIds = ['#about-us', '#privacy-policy'];
+    // Removed #ziyarat-tours from coreServiceIds as it is now a premium hardcoded page
 
     // Sync local state if appData from context changes
     React.useEffect(() => {
@@ -1230,7 +1235,7 @@ const AdminPage: React.FC = () => {
                 </Section>
                 
                 <Section title="Service Details & Custom Pages">
-                    <p className="text-[var(--color-muted-text)] mb-4">Manage content for <strong>Hotel Booking, Ziyarat Tours, Umrah Training, About Us, Privacy Policy</strong>, and other custom pages.</p>
+                    <p className="text-[var(--color-muted-text)] mb-4">Manage content for <strong>Hotel Booking, Umrah Training, About Us, Privacy Policy</strong>, and other custom pages.</p>
                     
                     {/* Core Services */}
                     <h4 className="font-bold text-xl text-[var(--color-secondary)] mb-4 border-b border-gray-700 pb-2">Core Service Pages</h4>

@@ -1,128 +1,171 @@
 
 import React, { useState } from 'react';
-import PageBanner from '../components/PageBanner';
 import InteractiveMap from '../components/InteractiveMap';
 
-// Site Data for the detailed list view
-const ziyaratSites = {
+// Detailed Site Data
+const siteDetails = {
   makkah: [
     {
       title: 'Jabal Al-Nour (Cave Hira)',
-      desc: 'The mountain of light where the Prophet (PBUH) received the first revelation of the Quran.',
-      img: 'https://i.postimg.cc/RZ8BGSpf/aj.webp'
+      subtitle: 'The Dawn of Revelation',
+      desc: 'Jabal Al-Nour, meaning "Mountain of Light", houses the Cave of Hira. It is here that the Prophet Muhammad (PBUH) spent time in seclusion and received the first revelation of the Holy Quran from Archangel Jibreel (AS). The climb offers a spiritual connection to the very beginning of Islam.',
+      img: 'https://i.postimg.cc/RZ8BGSpf/aj.webp',
+      significance: 'First Revelation'
     },
     {
       title: 'Jabal Thawr',
-      desc: 'The cave where Prophet Muhammad (PBUH) and Abu Bakr (RA) hid during the migration.',
-      img: 'https://i.postimg.cc/x1gn4TDd/ad.jpg'
+      subtitle: 'The Sanctuary of Migration',
+      desc: 'This mountain contains the Cave of Thawr, a small rocky opening where the Prophet (PBUH) and his companion Abu Bakr (RA) hid from the Quraish tribe for three days during the migration (Hijrah) to Madinah. It is a symbol of divine protection and trust in Allah.',
+      img: 'https://i.postimg.cc/x1gn4TDd/ad.jpg',
+      significance: 'Refuge during Hijrah'
     },
     {
       title: 'Jannat al-Mualla',
-      desc: 'The historical cemetery in Makkah where the Prophet\'s wife Khadija (RA) is buried.',
-      img: 'https://i.postimg.cc/VkQL0LnX/al.webp'
-    },
-    {
-      title: 'Mina, Arafat & Muzdalifah',
-      desc: 'Visit the key sites of Hajj rituals and understand their historical context.',
-      img: 'https://i.postimg.cc/CL6k3832/ak.jpg'
+      subtitle: 'Cemetery of the Beloved',
+      desc: 'Also known as Al-Hajun, this is the historical cemetery in Makkah. It is the resting place of many of the Prophet\'s (PBUH) ancestors, including his grandfather Abdul Muttalib, his uncle Abu Talib, and his beloved wife Khadija (RA).',
+      img: 'https://i.postimg.cc/VkQL0LnX/al.webp',
+      significance: 'Resting place of Khadija (RA)'
     }
   ],
   madinah: [
     {
       title: 'Masjid Quba',
-      desc: 'The first mosque in Islam. Offering 2 Rakat prayer here equals the reward of an Umrah.',
-      img: 'https://i.postimg.cc/RZ8BGSpf/aj.webp'
+      subtitle: 'The First Mosque of Islam',
+      desc: 'Masjid Quba occupies a unique place in Islamic history as the first mosque built by the Prophet (PBUH) upon his arrival in Madinah. The Prophet (PBUH) said: "Whoever purifies himself in his house, then comes to the mosque of Quba and prays two Rakats therein, will have a reward like that of an Umrah."',
+      img: 'https://i.postimg.cc/RZ8BGSpf/aj.webp',
+      significance: 'Reward of an Umrah'
     },
     {
       title: 'Mount Uhud',
-      desc: 'Site of the Battle of Uhud and the resting place of Hamza (RA) and other martyrs.',
-      img: 'https://i.postimg.cc/mD2wzRfY/hajj-b.jpg'
+      subtitle: 'Mountain of Paradise',
+      desc: 'Uhud is a mountain north of Madinah. It was the site of the Battle of Uhud. The Prophet (PBUH) declared, "Uhud is a mountain which loves us and which we love." It is also the resting place of 70 martyrs, including Hamza ibn Abdul-Muttalib (RA).',
+      img: 'https://i.postimg.cc/mD2wzRfY/hajj-b.jpg',
+      significance: 'Martyrs of Uhud'
     },
     {
       title: 'Masjid Al-Qiblatayn',
-      desc: 'The mosque where the direction of prayer (Qibla) was changed from Jerusalem to Makkah.',
-      img: 'https://i.postimg.cc/50rQG1f5/umrah-2.jpg'
-    },
-    {
-      title: 'The Seven Mosques',
-      desc: 'A complex of small historic mosques marking the location of the Battle of the Trench.',
-      img: 'https://i.postimg.cc/x1gn4TDd/ad.jpg'
+      subtitle: 'Mosque of Two Qiblas',
+      desc: 'This mosque is historically significant because it is where the revelation of the Quran came to change the direction of the Qibla from Bayt al-Maqdis in Jerusalem to the Kaaba in Makkah. It uniquely contained two prayer niches (mihrabs) in the past.',
+      img: 'https://i.postimg.cc/50rQG1f5/umrah-2.jpg',
+      significance: 'Change of Qibla'
     }
   ]
 };
-
-const FeatureItem: React.FC<{ icon: React.ReactNode; title: string; text: string }> = ({ icon, title, text }) => (
-    <div className="bg-[#1F2937] p-6 rounded-xl border border-gray-700 hover:border-[var(--color-primary)] transition-all duration-300 group">
-        <div className="w-14 h-14 bg-[var(--color-dark-bg)] rounded-full flex items-center justify-center text-[var(--color-primary)] mb-4 group-hover:scale-110 transition-transform border border-gray-600">
-            {icon}
-        </div>
-        <h4 className="text-xl font-display font-bold text-white mb-2">{title}</h4>
-        <p className="text-[var(--color-muted-text)] text-sm">{text}</p>
-    </div>
-);
 
 const ZiyaratPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'makkah' | 'madinah'>('makkah');
 
   return (
-    <div className="pt-20 bg-[var(--color-dark-bg)] min-h-screen">
-      <PageBanner 
-        title="Historical Ziyarat Tours" 
-        subtitle="Walk in the footsteps of the Prophet (PBUH) and his companions."
-        backgroundImage="https://i.postimg.cc/RZ8BGSpf/aj.webp"
-      />
+    <div className="bg-[#0B0F19] min-h-screen pt-20">
       
-      {/* Intro Section */}
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center relative">
-         <div className="max-w-4xl mx-auto">
-            <span className="text-[var(--color-primary)] font-bold tracking-widest uppercase text-sm mb-2 block">Connect with History</span>
-            <h2 className="text-3xl md:text-5xl font-display font-bold text-[var(--color-light-text)] mb-6">Why Ziyarat is Important?</h2>
-            <p className="text-lg text-[var(--color-muted-text)] leading-relaxed">
-                Performing Ziyarat allows pilgrims to connect deeply with Islamic history. 
-                It is a profound opportunity to witness the places where the Prophet Muhammad (PBUH) and his companions lived, prayed, and strove for Islam. 
-                Our guided Ziyarat tours ensure you not only see these places but understand their spiritual significance with the help of expert scholars.
-            </p>
-         </div>
+      {/* --- Cinematic Hero --- */}
+      <div className="relative h-[70vh] flex items-center justify-center overflow-hidden">
+           <div className="absolute inset-0">
+             <img 
+                src="https://i.postimg.cc/jSKtdnQ4/HD-wallpaper-mecca-madina-during-evening-time-ramzan.jpg" 
+                alt="Islamic Heritage" 
+                className="w-full h-full object-cover opacity-50 scale-110 animate-[kenBurns_20s_ease-out_infinite_alternate]"
+             />
+             <div className="absolute inset-0 bg-gradient-to-t from-[#0B0F19] via-[#0B0F19]/40 to-transparent"></div>
+           </div>
+           <div className="relative z-10 text-center max-w-5xl px-4">
+               <div className="inline-block border border-[var(--color-primary)]/30 px-6 py-2 rounded-full bg-black/30 backdrop-blur-sm mb-6">
+                    <span className="text-[var(--color-primary)] text-sm tracking-[0.3em] uppercase font-bold">Historical Ziyarat Tours</span>
+               </div>
+               <h1 className="text-6xl md:text-8xl font-display font-bold text-white mb-6 drop-shadow-2xl animate-fade-in-up">
+                   Echoes of History
+               </h1>
+               <p className="text-xl md:text-2xl text-gray-300 font-light max-w-3xl mx-auto leading-relaxed">
+                   Walk in the footsteps of the Prophet (PBUH) and his companions. Witness the sacred landmarks that shaped the history of Islam.
+               </p>
+           </div>
+           <style>{`
+             @keyframes kenBurns {
+               0% { transform: scale(1); }
+               100% { transform: scale(1.1); }
+             }
+           `}</style>
       </div>
 
-      {/* Interactive Map Section */}
-      <div className="border-t border-gray-800">
-        <InteractiveMap />
+      {/* --- Intro Quote --- */}
+      <div className="py-20 container mx-auto px-4 text-center">
+          <div className="inline-block p-10 border-y border-[var(--color-primary)]/20 relative max-w-4xl mx-auto">
+              <div className="text-3xl md:text-4xl font-display text-gray-300 italic">
+                  "Do not undertake a journey except to three Mosques: Al-Masjid Al-Haram, the Mosque of the Messenger (PBUH), and Al-Masjid Al-Aqsa."
+              </div>
+              <div className="text-[var(--color-primary)] mt-4 font-bold uppercase tracking-widest text-sm">- Sahih Bukhari</div>
+          </div>
       </div>
 
-      {/* Detailed Itinerary List */}
-      <section className="py-16 bg-[#0d1117]">
+      {/* --- Interactive Map Section (Premium Frame) --- */}
+      <section className="py-16 bg-[#111827] relative">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+              <div className="mb-12 text-center">
+                   <h2 className="text-4xl font-display font-bold text-white">Interactive Exploration</h2>
+                   <div className="w-20 h-1 bg-[var(--color-primary)] mx-auto mt-4 rounded-full"></div>
+                   <p className="text-[var(--color-muted-text)] mt-4 text-lg">Click on the markers below to discover sacred locations.</p>
+              </div>
+              
+              {/* Gold Frame Container for Map */}
+              <div className="p-[2px] bg-gradient-to-b from-[#C5A47E] via-[#8B6E4E] to-[#5D4037] rounded-xl shadow-2xl">
+                  <div className="bg-[#0B0F19] rounded-lg overflow-hidden p-1">
+                      <InteractiveMap />
+                  </div>
+              </div>
+          </div>
+      </section>
+
+      {/* --- Journey Through Time (List View) --- */}
+      <section className="py-24 bg-[#0B0F19]">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="text-center mb-12">
-                  <h2 className="text-3xl md:text-4xl font-display font-bold text-white mb-6">Places We Visit</h2>
+              <div className="text-center mb-20">
+                  <h2 className="text-4xl md:text-6xl font-display font-bold text-white mb-8">Sacred Landmarks</h2>
                   
-                  {/* Tabs */}
-                  <div className="inline-flex bg-[#1F2937] p-1 rounded-full">
+                  {/* Custom Tab Switcher */}
+                  <div className="inline-flex bg-[#1F2937] p-1.5 rounded-full border border-gray-700 shadow-lg">
                       <button 
                         onClick={() => setActiveTab('makkah')}
-                        className={`px-8 py-3 rounded-full font-bold text-sm transition-all ${activeTab === 'makkah' ? 'bg-[var(--color-primary)] text-white shadow-lg' : 'text-gray-400 hover:text-white'}`}
+                        className={`px-8 md:px-12 py-3 rounded-full font-bold text-lg transition-all duration-500 ${activeTab === 'makkah' ? 'bg-[var(--color-primary)] text-white shadow-[0_0_20px_rgba(197,164,126,0.4)]' : 'text-gray-400 hover:text-white'}`}
                       >
-                          Makkah Ziyarat
+                          Makkah
                       </button>
                       <button 
                         onClick={() => setActiveTab('madinah')}
-                        className={`px-8 py-3 rounded-full font-bold text-sm transition-all ${activeTab === 'madinah' ? 'bg-[var(--color-secondary)] text-black shadow-lg' : 'text-gray-400 hover:text-white'}`}
+                        className={`px-8 md:px-12 py-3 rounded-full font-bold text-lg transition-all duration-500 ${activeTab === 'madinah' ? 'bg-[var(--color-secondary)] text-black shadow-[0_0_20px_rgba(76,175,80,0.4)]' : 'text-gray-400 hover:text-white'}`}
                       >
-                          Madinah Ziyarat
+                          Madinah
                       </button>
                   </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                  {ziyaratSites[activeTab].map((site, index) => (
-                      <div key={index} className="bg-[#1F2937] rounded-lg overflow-hidden shadow-lg hover:-translate-y-2 transition-transform duration-300 group">
-                          <div className="h-48 overflow-hidden relative">
-                              <img src={site.img} alt={site.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
-                              <div className="absolute inset-0 bg-gradient-to-t from-[#1F2937] to-transparent opacity-60"></div>
+              <div className="space-y-24">
+                  {siteDetails[activeTab].map((site, index) => (
+                      <div key={index} className={`flex flex-col ${index % 2 === 0 ? 'lg:flex-row' : 'lg:flex-row-reverse'} gap-12 items-center group`} data-aos="fade-up">
+                          
+                          {/* Image Card */}
+                          <div className="lg:w-1/2 w-full">
+                              <div className="relative h-[400px] w-full rounded-lg overflow-hidden shadow-2xl border border-gray-800 group-hover:border-[var(--color-primary)]/50 transition-colors duration-500">
+                                  <img src={site.img} alt={site.title} className="w-full h-full object-cover transform transition-transform duration-1000 group-hover:scale-110" />
+                                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
+                                  <div className="absolute top-4 right-4">
+                                      <span className="px-4 py-1.5 bg-[var(--color-primary)] text-white text-xs font-bold uppercase tracking-wider rounded-full shadow-lg">
+                                          {site.significance}
+                                      </span>
+                                  </div>
+                              </div>
                           </div>
-                          <div className="p-5">
-                              <h3 className="text-xl font-display font-bold text-white mb-2">{site.title}</h3>
-                              <p className="text-[var(--color-muted-text)] text-sm">{site.desc}</p>
+
+                          {/* Text Content */}
+                          <div className="lg:w-1/2 w-full">
+                              <h3 className="text-4xl font-display font-bold text-white mb-2">{site.title}</h3>
+                              <h4 className="text-xl text-[var(--color-primary)] font-serif italic mb-6">{site.subtitle}</h4>
+                              <p className="text-lg text-gray-400 leading-relaxed mb-8 border-l-2 border-[var(--color-primary)] pl-6">
+                                  {site.desc}
+                              </p>
+                              <a href="#contact?subject=Ziyarat Inquiry" className="inline-flex items-center space-x-2 text-white font-bold hover:text-[var(--color-primary)] transition-colors group/btn">
+                                  <span>Book a Guided Visit</span>
+                                  <svg className="w-5 h-5 transform transition-transform group-hover/btn:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+                              </a>
                           </div>
                       </div>
                   ))}
@@ -130,46 +173,23 @@ const ZiyaratPage: React.FC = () => {
           </div>
       </section>
 
-      {/* Features / Inclusions */}
-      <section className="py-16 bg-[var(--color-dark-bg)]">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="text-center mb-12">
-                  <h2 className="text-3xl md:text-4xl font-display font-bold text-white">Tour Inclusions</h2>
-                  <p className="text-[var(--color-muted-text)] mt-2">We provide a comfortable and educational experience.</p>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <FeatureItem 
-                    icon={<svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" /></svg>}
-                    title="Expert Scholar Guide"
-                    text="Each bus is accompanied by a knowledgeable scholar (Muallim) who explains the history and significance of every site in Bangla."
-                  />
-                   <FeatureItem 
-                    icon={<svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" /></svg>}
-                    title="Luxury Transport"
-                    text="Travel in comfort with our private, air-conditioned luxury buses designated exclusively for your group."
-                  />
-                   <FeatureItem 
-                    icon={<svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v11.494m-9-5.747h18" /></svg>}
-                    title="Refreshments"
-                    text="Complimentary snacks and drinks are provided during the tour to keep you refreshed."
-                  />
-              </div>
+      {/* --- CTA Section --- */}
+      <section className="py-20 bg-[var(--color-primary)] relative overflow-hidden">
+          <div className="absolute inset-0 bg-[url('https://www.toptal.com/designers/subtlepatterns/uploads/arabesque.png')] opacity-10"></div>
+          <div className="container mx-auto px-4 text-center relative z-10">
+              <h2 className="text-3xl md:text-5xl font-display font-bold text-white mb-6">Experience History Firsthand</h2>
+              <p className="text-xl text-white/90 mb-10 max-w-2xl mx-auto">
+                  Join our guided Ziyarat tours led by knowledgeable scholars who bring these historical sites to life.
+              </p>
+              <a 
+                href="#contact?subject=Book Ziyarat Tour" 
+                className="inline-block bg-white text-[var(--color-primary)] font-bold py-4 px-12 rounded-full hover:bg-gray-100 transition-all duration-300 shadow-xl transform hover:-translate-y-1"
+              >
+                  Reserve Your Seat
+              </a>
           </div>
       </section>
 
-      {/* Final CTA */}
-      <div className="py-20 bg-gradient-to-b from-[#0d1117] to-[#111827]">
-         <div className="container mx-auto px-4 text-center">
-            <div className="bg-[#1F2937] rounded-2xl p-8 md:p-12 border border-gray-700 shadow-2xl max-w-4xl mx-auto">
-                <h2 className="text-3xl md:text-5xl font-display font-bold text-[var(--color-primary)] mb-4">Book Your Ziyarat Tour Today</h2>
-                <p className="text-lg text-[var(--color-muted-text)] mb-8">Don't miss out on this spiritual educational journey. Seats fill up fast during the season.</p>
-                <a href="#contact?subject=Book Ziyarat Tour" className="inline-block bg-[var(--color-primary)] text-white font-bold py-4 px-12 rounded-full hover:bg-[var(--color-primary-dark)] transition-all duration-300 shadow-[0_10px_30px_rgba(197,164,126,0.3)] transform hover:-translate-y-1 hover:scale-105 text-lg">
-                    Request Booking
-                </a>
-            </div>
-         </div>
-      </div>
     </div>
   );
 };
