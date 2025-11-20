@@ -38,14 +38,13 @@ const ExclusivePackageEditor: React.FC<{
                 <AdminInput label="Image URL" name="image" value={pkg.image} onChange={e => onChange(path, index, e.target.name, e.target.value)} />
                 <AdminInput label="PDF Flyer Link (Optional)" name="pdfLink" value={pkg.pdfLink} onChange={e => onChange(path, index, e.target.name, e.target.value)} />
                 <div className="md:col-span-2">
-                    <AdminTextarea 
-                        label="Features (One per line)" 
-                        name="features" 
-                        value={pkg.features.join('\n')} 
-                        onChange={e => onChange(path, index, 'features', e.target.value.split('\n').map(s => s.trim()).filter(s => s))} 
-                        rows={5}
+                    <label className="block text-sm font-medium text-[var(--color-muted-text)] mb-1">Features (Comma Separated)</label>
+                    <input 
+                        type="text" 
+                        value={pkg.features.join(', ')} 
+                        onChange={e => onChange(path, index, 'features', e.target.value.split(',').map(s => s.trim()))} 
+                        className="w-full bg-[var(--color-dark-bg)] border border-gray-600 rounded-md py-2 px-3 text-[var(--color-light-text)] focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]"
                     />
-                    <p className="text-xs text-[var(--color-muted-text)] mt-1">Enter each feature on a new line for proper list formatting.</p>
                 </div>
             </div>
         </div>

@@ -2,22 +2,16 @@
 import React, { useContext, useState } from 'react';
 import { DataContext } from '../contexts/DataContext';
 
-const SocialIcon: React.FC<{ href: string; icon: string; name: string }> = ({ href, icon, name }) => (
-  <a 
-    href={href} 
-    target="_blank" 
-    rel="noopener noreferrer" 
-    aria-label={name}
-    className="text-[var(--color-muted-text)] hover:text-[var(--color-primary)] transition-colors duration-300"
-  >
-    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" dangerouslySetInnerHTML={{ __html: icon }} />
+const SocialIcon: React.FC<{ href: string; children: React.ReactNode }> = ({ href, children }) => (
+  <a href={href} target="_blank" rel="noopener noreferrer" className="text-[var(--color-muted-text)] hover:text-[var(--color-primary)] transition-colors duration-300">
+    {children}
   </a>
 );
 
 const Footer: React.FC = () => {
   const { appData } = useContext(DataContext);
-  const { footer, header } = appData; // Access header for social links
-  const { newsletter } = footer; 
+  const { footer } = appData;
+  const { newsletter } = footer; // Destructure newsletter config
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
 
@@ -39,6 +33,7 @@ const Footer: React.FC = () => {
 
         try {
             // Using no-cors mode to allow submission to Google Apps Script Web App without CORS errors
+            // Note: we cannot read the response status in no-cors mode, so we assume success if no network error occurs.
             await fetch(newsletter.googleSheetUrl, {
                 method: 'POST',
                 body: formData,
@@ -142,9 +137,15 @@ const Footer: React.FC = () => {
             <h3 className="text-xl font-display font-semibold text-white mb-4">{footer.followUs.title}</h3>
             <p className="text-[var(--color-muted-text)] mb-6">{footer.followUs.description}</p>
             <div className="flex space-x-4">
-                {header.socialLinks?.map(link => (
-                  <SocialIcon key={link.name} href={link.href} icon={link.icon} name={link.name} />
-                ))}
+                <SocialIcon href="https://facebook.com">
+                    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M22.675 0h-21.35C.59 0 0 .59 0 1.325v21.35C0 23.41.59 24 1.325 24H12.82v-9.29H9.692v-3.622h3.128V8.413c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.622h-3.12V24h6.116c.735 0 1.325-.59 1.325-1.325V1.325C24 .59 23.41 0 22.675 0z"/></svg>
+                </SocialIcon>
+                <SocialIcon href="https://instagram.com">
+                    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.85s-.011 3.584-.069 4.85c-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07s-3.584-.012-4.85-.07c-3.252-.148-4.771-1.691-4.919-4.919-.058-1.265-.069-1.645-.069-4.85s.011-3.584.069-4.85c.149-3.225 1.664 4.771 4.919-4.919C8.416 2.175 8.796 2.163 12 2.163zm0 1.802C9.042 3.965 8.718 3.977 7.545 4.029c-2.502.115-3.447.447-3.955 1.054C3.04 5.588 2.686 6.544 2.57 9.045c-.052 1.172-.064 1.496-.064 4.455s.012 3.283.064 4.455c.115 2.501.448 3.447 1.054 3.955.508.508 1.453.84 3.955 1.054 1.172.052 1.496.064 4.455.064s3.283-.012 4.455-.064c2.502-.115 3.447-.447 3.955-1.054.508-.508.84-1.453 1.054-3.955.052-1.172.064 1.496.064-4.455s-.012-3.283-.064-4.455c-.115-2.501-.448-3.447-1.054-3.955-.508-.508-1.453-.84-3.955-1.054C15.282 3.977 14.958 3.965 12 3.965zM12 7.218c-2.628 0-4.782 2.154-4.782 4.782s2.154 4.782 4.782 4.782 4.782-2.154 4.782-4.782S14.628 7.218 12 7.218zm0 7.764c-1.646 0-2.982-1.336-2.982-2.982S10.354 9.018 12 9.018s2.982 1.336 2.982 2.982-1.336 2.982-2.982 2.982zm4.965-7.764c-.786 0-1.425.64-1.425 1.425s.64 1.425 1.425 1.425 1.425-.64 1.425-1.425-.639-1.425-1.425-1.425z"/></svg>
+                </SocialIcon>
+                <SocialIcon href="https://twitter.com">
+                    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.223.085c.645 1.956 2.52 3.379 4.738 3.418-1.71 1.336-3.86 2.135-6.22 2.135-.404 0-.802-.023-1.19-.069a13.91 13.91 0 007.548 2.212c9.058 0 14.01-7.502 14.01-14.01 0-.213-.005-.426-.015-.637a10.02 10.02 0 002.46-2.548z"/></svg>
+                </SocialIcon>
             </div>
           </div>
         </div>
