@@ -1,4 +1,8 @@
 
+
+
+
+
 import React, { useState, useContext } from 'react';
 import PageBanner from '../components/PageBanner';
 import { DataContext } from '../contexts/DataContext';
@@ -78,7 +82,16 @@ const AdminPage: React.FC = () => {
         if (!mergedData.exclusiveUmrah) mergedData.exclusiveUmrah = JSON.parse(JSON.stringify(defaultData.exclusiveUmrah));
         
         if (!mergedData.pages.home.sections.islamicTools) {
-             mergedData.pages.home.sections.islamicTools = { enabled: true };
+             mergedData.pages.home.sections.islamicTools = JSON.parse(JSON.stringify(defaultData.pages.home.sections.islamicTools));
+        }
+        // Add specific checks for nested tools props if they are missing in existing db data
+        if (!mergedData.pages.home.sections.islamicTools.zakat) mergedData.pages.home.sections.islamicTools.zakat = { enabled: true, googleSheetUrl: '' };
+        if (!mergedData.pages.home.sections.islamicTools.tasbeeh) mergedData.pages.home.sections.islamicTools.tasbeeh = { enabled: true };
+        if (!mergedData.pages.home.sections.islamicTools.currency) mergedData.pages.home.sections.islamicTools.currency = { enabled: true };
+
+        // Ensure footer newsletter exists
+        if (!mergedData.footer.newsletter) {
+             mergedData.footer.newsletter = JSON.parse(JSON.stringify(defaultData.footer.newsletter));
         }
 
         setLocalData(mergedData);
@@ -223,12 +236,46 @@ const AdminPage: React.FC = () => {
                 {/* --- ISLAMIC TOOLS SECTION --- */}
                 <Section title="Islamic Utility Tools">
                     <div className="p-4 border border-gray-700 rounded-lg">
-                        <p className="text-[var(--color-muted-text)] mb-4">Toggle the visibility of the Islamic Utility Tools section (Zakat Calculator, Tasbeeh, Currency Converter) on the homepage.</p>
-                        <ToggleSwitch 
-                            label="Enable Islamic Tools Section" 
-                            enabled={localData.pages.home.sections.islamicTools?.enabled ?? true} 
-                            onChange={(val) => handleNestedChange('pages.home.sections.islamicTools.enabled', val)} 
-                        />
+                        <div className="mb-4">
+                            <ToggleSwitch
+                                label="Enable Main Button"
+                                enabled={localData.pages.home.sections.islamicTools?.enabled ?? true}
+                                onChange={(val) => handleNestedChange('pages.home.sections.islamicTools.enabled', val)}
+                            />
+                        </div>
+                        <p className="text-[var(--color-muted-text)] mb-4 text-sm">Customize the specific tools available within the Islamic Tools modal.</p>
+                        
+                        <div className="space-y-4 p-4 bg-[var(--color-dark-bg)] rounded-md border border-gray-600">
+                             <div className="flex flex-col space-y-2">
+                                <ToggleSwitch
+                                    label="Enable Zakat Calculator"
+                                    enabled={localData.pages.home.sections.islamicTools?.zakat?.enabled ?? true}
+                                    onChange={(val) => handleNestedChange('pages.home.sections.islamicTools.zakat.enabled', val)}
+                                />
+                                <div className="ml-4 pl-4 border-l-2 border-gray-600">
+                                     <AdminInput
+                                        label="Google Apps Script URL (for saving Zakat data)"
+                                        name="pages.home.sections.islamicTools.zakat.googleSheetUrl"
+                                        value={localData.pages.home.sections.islamicTools?.zakat?.googleSheetUrl}
+                                        onChange={e => handleNestedChange(e.target.name, e.target.value)}
+                                        placeholder="https://script.google.com/macros/s/..."
+                                    />
+                                    <p className="text-xs text-[var(--color-muted-text)] mt-1">Deploy your Google Sheet script as a Web App and paste the URL here to allow users to save calculations.</p>
+                                </div>
+                             </div>
+
+                             <ToggleSwitch
+                                label="Enable Digital Tasbeeh"
+                                enabled={localData.pages.home.sections.islamicTools?.tasbeeh?.enabled ?? true}
+                                onChange={(val) => handleNestedChange('pages.home.sections.islamicTools.tasbeeh.enabled', val)}
+                            />
+
+                             <ToggleSwitch
+                                label="Enable Currency Converter"
+                                enabled={localData.pages.home.sections.islamicTools?.currency?.enabled ?? true}
+                                onChange={(val) => handleNestedChange('pages.home.sections.islamicTools.currency.enabled', val)}
+                            />
+                        </div>
                     </div>
                 </Section>
 
@@ -473,6 +520,55 @@ const AdminPage: React.FC = () => {
                     </div>
                 </Section>
                 
+                <Section title="Footer Newsletter">
+                    <div className="p-4 border border-gray-700 rounded-lg">
+                        <p className="text-[var(--color-muted-text)] mb-4">Customize the "Subscribe to Our Newsletter" section in the footer.</p>
+                        <div className="mb-4">
+                            <ToggleSwitch
+                                label="Enable Newsletter Section"
+                                enabled={localData.footer.newsletter?.enabled ?? true}
+                                onChange={(val) => handleNestedChange('footer.newsletter.enabled', val)}
+                            />
+                        </div>
+                        <AdminInput
+                            label="Title"
+                            name="footer.newsletter.title"
+                            value={localData.footer.newsletter?.title}
+                            onChange={e => handleNestedChange(e.target.name, e.target.value)}
+                        />
+                        <AdminTextarea
+                            label="Subtitle"
+                            name="footer.newsletter.subtitle"
+                            value={localData.footer.newsletter?.subtitle}
+                            onChange={e => handleNestedChange(e.target.name, e.target.value)}
+                            className="mt-2"
+                        />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+                            <AdminInput
+                                label="Placeholder Text"
+                                name="footer.newsletter.placeholder"
+                                value={localData.footer.newsletter?.placeholder}
+                                onChange={e => handleNestedChange(e.target.name, e.target.value)}
+                            />
+                             <AdminInput
+                                label="Button Text"
+                                name="footer.newsletter.buttonText"
+                                value={localData.footer.newsletter?.buttonText}
+                                onChange={e => handleNestedChange(e.target.name, e.target.value)}
+                            />
+                        </div>
+                         <AdminInput
+                            label="Google Apps Script URL (for saving emails)"
+                            name="footer.newsletter.googleSheetUrl"
+                            value={localData.footer.newsletter?.googleSheetUrl}
+                            onChange={e => handleNestedChange(e.target.name, e.target.value)}
+                            className="mt-4"
+                            placeholder="https://script.google.com/macros/s/..."
+                        />
+                        <p className="text-xs text-[var(--color-muted-text)] mt-1">Deploy your Google Sheet script as a Web App and paste the URL here to save subscriber emails.</p>
+                    </div>
+                </Section>
+
                 <Section title="Partners & Affiliations">
                     <div className="p-4 border border-gray-700 rounded-lg">
                         <div className="mb-4">

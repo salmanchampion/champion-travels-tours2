@@ -95,6 +95,14 @@ export const siteConfig: Pick<AppData, 'site' | 'header' | 'floatingButton' | 'p
         ]
     },
     footer: {
+        newsletter: {
+            enabled: true,
+            title: 'Subscribe to Our Newsletter',
+            subtitle: 'Get exclusive offers, Hajj & Umrah updates, and travel tips delivered directly to your inbox.',
+            placeholder: 'Enter your email address',
+            buttonText: 'Subscribe',
+            googleSheetUrl: ''
+        },
         about: {
             title: ['Champion', 'Travels & Tours'],
             description: 'Your trusted partner for Hajj, Umrah, and worldwide travel. We are committed to providing exceptional service and unforgettable experiences.'

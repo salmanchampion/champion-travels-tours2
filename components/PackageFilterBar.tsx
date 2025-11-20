@@ -1,3 +1,4 @@
+
 import React, { useContext } from 'react';
 import { DataContext } from '../contexts/DataContext';
 
@@ -17,7 +18,7 @@ const PackageFilterBar: React.FC = () => {
   } = packageFilter;
 
   return (
-    <div className="bg-[var(--color-light-bg)] -mt-16 relative z-30 shadow-[var(--ui-shadow)] container mx-auto p-6 rounded-[var(--ui-border-radius)]">
+    <div className="bg-[var(--color-light-bg)] mt-8 relative z-30 shadow-[var(--ui-shadow)] container mx-auto p-6 rounded-[var(--ui-border-radius)]">
       <h2 className="text-2xl font-bold text-center text-[var(--color-primary)] mb-4 font-display">{title}</h2>
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
         <div>

@@ -11,18 +11,50 @@ const SocialIcon: React.FC<{ href: string; children: React.ReactNode }> = ({ hre
 const Footer: React.FC = () => {
   const { appData } = useContext(DataContext);
   const { footer } = appData;
+  const { newsletter } = footer; // Destructure newsletter config
   const [email, setEmail] = useState('');
-  const [subscribed, setSubscribed] = useState(false);
+  const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
 
   const visibleQuickLinks = footer.quickLinks.links.filter(link => link.enabled);
   const visibleMainServices = footer.mainServices.links.filter(link => link.enabled);
 
-  const handleSubscribe = (e: React.FormEvent) => {
+  const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
-    if(email) {
-        setSubscribed(true);
-        setTimeout(() => setSubscribed(false), 3000);
-        setEmail('');
+    if (!email) return;
+
+    setStatus('submitting');
+
+    // If Google Sheet URL is provided, send data there
+    if (newsletter.googleSheetUrl) {
+        const formData = new FormData();
+        formData.append('email', email);
+        formData.append('timestamp', new Date().toISOString());
+        formData.append('type', 'Newsletter Subscription');
+
+        try {
+            // Using no-cors mode to allow submission to Google Apps Script Web App without CORS errors
+            // Note: we cannot read the response status in no-cors mode, so we assume success if no network error occurs.
+            await fetch(newsletter.googleSheetUrl, {
+                method: 'POST',
+                body: formData,
+                mode: 'no-cors' 
+            });
+            
+            setStatus('success');
+            setEmail('');
+            setTimeout(() => setStatus('idle'), 3000);
+        } catch (error) {
+            console.error("Subscription error:", error);
+            setStatus('error');
+            setTimeout(() => setStatus('idle'), 3000);
+        }
+    } else {
+        // Fallback simulation if no URL is configured
+        setTimeout(() => {
+            setStatus('success');
+            setEmail('');
+            setTimeout(() => setStatus('idle'), 3000);
+        }, 1000);
     }
   }
 
@@ -31,31 +63,40 @@ const Footer: React.FC = () => {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
         
         {/* Newsletter Section */}
-        <div className="mb-16 p-8 bg-[var(--color-dark-bg)] rounded-[var(--ui-border-radius)] border border-gray-700/50 relative overflow-hidden shadow-lg" data-aos="fade-up">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-[var(--color-primary)]/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
-            <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-8">
-                <div className="text-center lg:text-left">
-                    <h3 className="text-2xl font-display font-bold text-white mb-2 flex items-center justify-center lg:justify-start gap-2">
-                         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-[var(--color-primary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-                         Subscribe to Our Newsletter
-                    </h3>
-                    <p className="text-[var(--color-muted-text)] max-w-xl">Get exclusive offers, Hajj & Umrah updates, and travel tips delivered directly to your inbox.</p>
+        {newsletter && newsletter.enabled && (
+            <div className="mb-16 p-8 bg-[var(--color-dark-bg)] rounded-[var(--ui-border-radius)] border border-gray-700/50 relative overflow-hidden shadow-lg" data-aos="fade-up">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-[var(--color-primary)]/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+                <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-8">
+                    <div className="text-center lg:text-left">
+                        <h3 className="text-2xl font-display font-bold text-white mb-2 flex items-center justify-center lg:justify-start gap-2">
+                             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-[var(--color-primary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                             {newsletter.title}
+                        </h3>
+                        <p className="text-[var(--color-muted-text)] max-w-xl">{newsletter.subtitle}</p>
+                    </div>
+                    <form onSubmit={handleSubscribe} className="w-full lg:w-auto flex flex-col sm:flex-row gap-3">
+                        <div className="flex-1 min-w-[280px]">
+                            <input 
+                                type="email" 
+                                placeholder={newsletter.placeholder} 
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                required
+                                disabled={status === 'submitting'}
+                                className="w-full px-4 py-3 bg-[var(--color-light-bg)] border border-gray-600 rounded-[var(--ui-border-radius)] text-white focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)] transition-all disabled:opacity-50"
+                            />
+                        </div>
+                        <button 
+                            type="submit" 
+                            disabled={status === 'submitting'}
+                            className="bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] text-white font-bold px-8 py-3 rounded-[var(--ui-border-radius)] hover:shadow-[0_0_20px_rgba(197,164,126,0.4)] transition-all duration-300 transform hover:-translate-y-1 disabled:opacity-70 disabled:cursor-not-allowed whitespace-nowrap"
+                        >
+                            {status === 'submitting' ? 'Submitting...' : status === 'success' ? 'Subscribed!' : status === 'error' ? 'Failed' : newsletter.buttonText}
+                        </button>
+                    </form>
                 </div>
-                <form onSubmit={handleSubscribe} className="w-full lg:w-auto flex flex-col sm:flex-row gap-3">
-                    <input 
-                        type="email" 
-                        placeholder="Enter your email address" 
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                        className="flex-1 px-4 py-3 bg-[var(--color-light-bg)] border border-gray-600 rounded-[var(--ui-border-radius)] text-white focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)] min-w-[280px] transition-all"
-                    />
-                    <button type="submit" className="bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] text-white font-bold px-8 py-3 rounded-[var(--ui-border-radius)] hover:shadow-[0_0_20px_rgba(197,164,126,0.4)] transition-all duration-300 transform hover:-translate-y-1">
-                        {subscribed ? 'Subscribed!' : 'Subscribe'}
-                    </button>
-                </form>
             </div>
-        </div>
+        )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* About Section */}

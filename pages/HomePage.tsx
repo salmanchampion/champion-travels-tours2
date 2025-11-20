@@ -18,6 +18,10 @@ const HomePage: React.FC = () => {
   return (
     <>
       <Hero />
+      
+      {/* Islamic Utility Tools Button (Floating over filter bar area) */}
+      {home.sections.islamicTools?.enabled !== false && <IslamicTools />}
+
       <PackageFilterBar />
       
       {/* Special Offer Countdown */}
@@ -26,9 +30,6 @@ const HomePage: React.FC = () => {
       {home.sections.services.enabled && <Services showTitle={true} />}
       {home.sections.packages.enabled && <FeaturedPackages showHajjFilters={false} showUmrahFilters={false} showTitle={true} />}
       
-      {/* Islamic Utility Tools Section */}
-      {home.sections.islamicTools?.enabled !== false && <IslamicTools />}
-
       {home.sections.whyChooseUs.enabled && <WhyChooseChampion />}
       {home.sections.testimonials.enabled && <Testimonials showTitle={true} />}
       {home.sections.contact.enabled && <Contact showTitle={true} />}

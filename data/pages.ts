@@ -1,5 +1,6 @@
 
 
+
 import { AppData, CustomPage } from '../types';
 
 export const pagesData: AppData['pages'] = {
@@ -34,7 +35,12 @@ export const pagesData: AppData['pages'] = {
             whyChooseUs: { enabled: true },
             testimonials: { enabled: true, title: 'Words From Our Clients', subtitle: 'We are proud to have served thousands of satisfied clients.' },
             contact: { enabled: true, title: 'Get In Touch', subtitle: 'Have questions or ready to book your next journey? Contact us today!' },
-            islamicTools: { enabled: true }
+            islamicTools: { 
+                enabled: true,
+                zakat: { enabled: true, googleSheetUrl: '' },
+                tasbeeh: { enabled: true },
+                currency: { enabled: true }
+            }
         },
             hero: {
             title: 'Champion Travels & Tours',

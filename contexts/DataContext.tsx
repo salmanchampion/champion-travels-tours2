@@ -225,6 +225,11 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
                     dbData.pages.home.sections.islamicTools = JSON.parse(JSON.stringify(defaultData.pages.home.sections.islamicTools));
                 }
 
+                 // Patch: Ensure footer newsletter exists
+                if (!dbData.footer.newsletter) {
+                    dbData.footer.newsletter = JSON.parse(JSON.stringify(defaultData.footer.newsletter));
+                }
+
                 setAppData(deepMerge(defaultData, dbData));
             } else {
                 // If no data exists in Firestore, initialize it with the default data

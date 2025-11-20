@@ -394,6 +394,21 @@ export interface SpecialOfferConfig {
     buttonLink: string;
 }
 
+// --- New Islamic Tools Interface ---
+export interface IslamicToolsConfig {
+    enabled: boolean;
+    zakat: {
+        enabled: boolean;
+        googleSheetUrl: string;
+    };
+    tasbeeh: {
+        enabled: boolean;
+    };
+    currency: {
+        enabled: boolean;
+    };
+}
+
 export interface AppData {
     site: {
         logoUrl: string;
@@ -411,6 +426,14 @@ export interface AppData {
     floatingButton: FloatingButtonConfig;
     prayerTimes: PrayerTimesConfig;
     footer: {
+        newsletter: {
+            enabled: boolean;
+            title: string;
+            subtitle: string;
+            placeholder: string;
+            buttonText: string;
+            googleSheetUrl: string;
+        };
         about: {
             title: string[];
             description: string;
@@ -488,7 +511,7 @@ export interface AppData {
                 whyChooseUs: { enabled: boolean; };
                 testimonials: { enabled: boolean; title: string; subtitle: string; };
                 contact: { enabled: boolean; title: string; subtitle: string; };
-                islamicTools: { enabled: boolean; }; // Added Islamic Tools
+                islamicTools: IslamicToolsConfig; // Updated from just { enabled: boolean }
             };
             hero: {
                 title: string;
