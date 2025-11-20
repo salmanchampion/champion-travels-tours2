@@ -1,10 +1,11 @@
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Champion Travels & Tours</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
     <link id="google-fonts-link" rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <!-- The href for fonts will be dynamically updated by App.tsx -->
@@ -50,6 +51,12 @@
        .prose strong {
         color: var(--color-light-text, #F3F4F6);
       }
+      /* Image fallbacks within prose */
+      .prose img {
+        background-color: #1F2937;
+        border-radius: 0.5rem;
+      }
+      
       /* Slider animation styles */
       .hero-slide-content {
         transform: translateY(20px);

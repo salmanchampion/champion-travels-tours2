@@ -3,7 +3,9 @@
 
 
 
-import React, { useState, useContext } from 'react';
+
+
+import React, { useState, useContext, useMemo } from 'react';
 import PageBanner from '../components/PageBanner';
 import { DataContext } from '../contexts/DataContext';
 import { defaultData, AppData, ExclusivePackage } from '../data';
@@ -61,6 +63,7 @@ const AdminPage: React.FC = () => {
     const [localData, setLocalData] = useState<AppData>(JSON.parse(JSON.stringify(appData)));
     const [activePackageTab, setActivePackageTab] = useState<'hajj' | 'umrah'>('hajj');
     const [activeExclusiveTab, setActiveExclusiveTab] = useState<'hajj' | 'umrah'>('hajj');
+    const [legacyCategoryFilter, setLegacyCategoryFilter] = useState('All');
     const [isSaving, setIsSaving] = useState(false);
 
     const coreServiceIds = ['#hotel-booking', '#ziyarat-tours', '#umrah-training'];
@@ -164,6 +167,30 @@ const AdminPage: React.FC = () => {
     const handleReset = async () => {
         await resetAppData();
     }
+
+    const handlePackageTabChange = (tab: 'hajj' | 'umrah') => {
+        setActivePackageTab(tab);
+        setLegacyCategoryFilter('All');
+    };
+
+    // Legacy Package Filtering Logic
+    const currentLegacyPackages = activePackageTab === 'hajj' ? localData.hajjPackages : localData.umrahPackages;
+    
+    // Get Unique Categories
+    const legacyCategories = useMemo(() => {
+        const cats = new Set(currentLegacyPackages.map(p => p.category || 'Uncategorized'));
+        return ['All', ...Array.from(cats)];
+    }, [currentLegacyPackages]);
+
+    // Filter Packages and preserve original index
+    const filteredLegacyPackages = useMemo(() => {
+        // We attach original index to ensure we edit the right item in the main array
+        const withIndex = currentLegacyPackages.map((pkg, idx) => ({ ...pkg, originalIndex: idx }));
+        
+        if (legacyCategoryFilter === 'All') return withIndex;
+        return withIndex.filter(p => (p.category || 'Uncategorized') === legacyCategoryFilter);
+    }, [currentLegacyPackages, legacyCategoryFilter]);
+
 
     const phoneIndex = localData.header.contactInfo?.findIndex(c => c.label === 'Phone');
     const emailIndex = localData.header.contactInfo?.findIndex(c => c.label === 'Email');
@@ -1088,47 +1115,70 @@ const AdminPage: React.FC = () => {
                     <div className="flex space-x-4 mb-6">
                         <button
                             className={`px-4 py-2 rounded-md font-bold ${activePackageTab === 'hajj' ? 'bg-[var(--color-primary)] text-white' : 'bg-gray-700 text-gray-300'}`}
-                            onClick={() => setActivePackageTab('hajj')}
+                            onClick={() => handlePackageTabChange('hajj')}
                         >
                             Hajj Packages
                         </button>
                         <button
                             className={`px-4 py-2 rounded-md font-bold ${activePackageTab === 'umrah' ? 'bg-[var(--color-primary)] text-white' : 'bg-gray-700 text-gray-300'}`}
-                            onClick={() => setActivePackageTab('umrah')}
+                            onClick={() => handlePackageTabChange('umrah')}
                         >
                             Umrah Packages
                         </button>
                     </div>
+                    
+                    {/* Category Filter Bar */}
+                    <div className="mb-6 overflow-x-auto pb-2">
+                        <div className="flex gap-2">
+                            {legacyCategories.map(cat => (
+                                <button
+                                    key={cat}
+                                    onClick={() => setLegacyCategoryFilter(cat)}
+                                    className={`px-3 py-1 rounded-full text-sm whitespace-nowrap transition-colors ${
+                                        legacyCategoryFilter === cat 
+                                            ? 'bg-[var(--color-secondary)] text-[var(--color-dark-bg)] font-bold' 
+                                            : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                                    }`}
+                                >
+                                    {cat}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
 
                     {activePackageTab === 'hajj' && (
                         <div>
-                            {localData.hajjPackages.map((pkg, index) => (
+                            {filteredLegacyPackages.map((pkg) => (
                                 <PackageEditor 
-                                    key={index} 
+                                    key={pkg.originalIndex} // Key should be unique, using original index is safe here as it's unique per list
                                     pkg={pkg} 
-                                    index={index} 
+                                    index={pkg.originalIndex} 
                                     packageType="hajj" 
                                     onChange={handleListChange} 
                                     onDelete={deleteListItem} 
                                 />
                             ))}
-                            <button onClick={() => addListItem('hajjPackages', { name: 'New Hajj Package', price: '', enabled: true })} className="bg-green-600 text-white font-bold py-2 px-4 rounded">Add Hajj Package</button>
+                            {legacyCategoryFilter === 'All' && (
+                                <button onClick={() => addListItem('hajjPackages', { name: 'New Hajj Package', price: '', enabled: true })} className="bg-green-600 text-white font-bold py-2 px-4 rounded">Add Hajj Package</button>
+                            )}
                         </div>
                     )}
 
                     {activePackageTab === 'umrah' && (
                          <div>
-                            {localData.umrahPackages.map((pkg, index) => (
+                            {filteredLegacyPackages.map((pkg) => (
                                 <PackageEditor 
-                                    key={index} 
+                                    key={pkg.originalIndex}
                                     pkg={pkg} 
-                                    index={index} 
+                                    index={pkg.originalIndex} 
                                     packageType="umrah" 
                                     onChange={handleListChange} 
                                     onDelete={deleteListItem} 
                                 />
                             ))}
-                            <button onClick={() => addListItem('umrahPackages', { name: 'New Umrah Package', price: '', enabled: true })} className="bg-green-600 text-white font-bold py-2 px-4 rounded">Add Umrah Package</button>
+                             {legacyCategoryFilter === 'All' && (
+                                <button onClick={() => addListItem('umrahPackages', { name: 'New Umrah Package', price: '', enabled: true })} className="bg-green-600 text-white font-bold py-2 px-4 rounded">Add Umrah Package</button>
+                             )}
                         </div>
                     )}
                 </Section>

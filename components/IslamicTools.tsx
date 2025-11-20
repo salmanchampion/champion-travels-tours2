@@ -274,8 +274,8 @@ const IslamicTools: React.FC = () => {
 
     return (
         <>
-            {/* Trigger Button - Centered and floating above the filter bar */}
-            <div className="relative z-40 -mt-48 md:-mt-64 h-0 flex justify-center items-start pointer-events-none">
+            {/* Trigger Button - Centered and floating way above the filter bar */}
+            <div className="relative z-40 -mt-56 md:-mt-72 h-0 flex justify-center items-start pointer-events-none">
                  <button
                     onClick={() => setIsOpen(true)}
                     className="pointer-events-auto group relative inline-flex items-center justify-center p-0.5 mb-2 mr-2 overflow-hidden text-sm font-medium rounded-full hover:text-white focus:ring-4 focus:outline-none focus:ring-[var(--color-primary)]/50 shadow-[0_0_30px_rgba(197,164,126,0.6)] hover:shadow-[0_0_50px_rgba(197,164,126,0.9)] transition-all duration-300 transform hover:-translate-y-1 animate-bounce-slow"
@@ -350,4 +350,3 @@ const IslamicTools: React.FC = () => {
 };
 
 export default IslamicTools;
-    
