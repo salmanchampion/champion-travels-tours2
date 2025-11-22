@@ -37,8 +37,8 @@ const Hero: React.FC = () => {
   }
 
   return (
-    <section className="relative h-screen w-full overflow-hidden text-white">
-      <div className="absolute inset-0 bg-black opacity-60 z-10"></div>
+    <section className="relative h-[85vh] md:h-screen w-full overflow-hidden text-white">
+      <div className="absolute inset-0 bg-black opacity-50 md:opacity-60 z-10"></div>
       
       {hero.images.map((src, index) => (
         <div
@@ -55,24 +55,24 @@ const Hero: React.FC = () => {
         </div>
       ))}
       
-      <div className="relative z-20 container mx-auto px-4 h-full flex flex-col justify-center text-center">
-          <div className="hero-slide-content">
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold tracking-wide mb-2" data-aos="fade-up" data-aos-delay="200">
+      <div className="relative z-20 container mx-auto px-4 h-full flex flex-col justify-center text-center pt-20 md:pt-0">
+          <div className="hero-slide-content max-w-4xl mx-auto">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-bold tracking-wide mb-3 leading-tight" data-aos="fade-up" data-aos-delay="200">
               {hero.title}
               </h1>
-              <p className="text-base md:text-lg font-sans text-[var(--color-primary)] mb-6" data-aos="fade-up" data-aos-delay="400">
+              <p className="text-xs md:text-lg font-sans text-[var(--color-primary)] mb-4 md:mb-6 font-medium tracking-wider uppercase" data-aos="fade-up" data-aos-delay="400">
               {hero.licenseInfo}
               </p>
-              <h2 className="text-5xl md:text-6xl lg:text-7xl font-display font-extrabold text-[var(--color-light-text)] mb-6" data-aos="fade-up" data-aos-delay="600">
+              <h2 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-display font-extrabold text-[var(--color-light-text)] mb-6 leading-tight" data-aos="fade-up" data-aos-delay="600">
               {hero.subtitle}
               </h2>
-              <p className="text-lg md:text-xl max-w-3xl mx-auto mb-8 text-[var(--color-light-text)]/90" data-aos="fade-up" data-aos-delay="800">
+              <p className="text-sm sm:text-lg md:text-xl max-w-3xl mx-auto mb-8 text-[var(--color-light-text)]/90 px-2 leading-relaxed" data-aos="fade-up" data-aos-delay="800">
               {hero.description}
               </p>
               <div data-aos="zoom-in" data-aos-delay="1000">
                   <a
                   href="#packages"
-                  className="bg-[var(--color-primary)] text-white font-bold py-4 px-10 rounded-[var(--ui-button-radius)] text-lg hover:bg-[var(--color-primary-dark)] transition-transform duration-300 hover:scale-105 inline-block"
+                  className="bg-[var(--color-primary)] text-white font-bold py-3 px-8 md:py-4 md:px-10 rounded-[var(--ui-button-radius)] text-base md:text-lg hover:bg-[var(--color-primary-dark)] transition-transform duration-300 hover:scale-105 inline-block shadow-lg hover:shadow-[var(--color-primary)]/30"
                   >
                   {hero.buttonText}
                   </a>
@@ -80,30 +80,30 @@ const Hero: React.FC = () => {
           </div>
       </div>
 
-      {/* Slider Controls */}
+      {/* Slider Controls - Hidden on very small screens to avoid clutter */}
       {hero.images.length > 1 && (
         <>
         <button 
             onClick={prevSlide}
-            className="absolute top-1/2 left-4 -translate-y-1/2 z-30 p-2 bg-black/30 rounded-full hover:bg-black/50 transition-colors hidden sm:block"
+            className="absolute top-1/2 left-2 md:left-4 -translate-y-1/2 z-30 p-2 bg-black/20 backdrop-blur-sm rounded-full hover:bg-black/50 transition-colors hidden sm:block"
             aria-label="Previous Slide"
         >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
         </button>
         <button 
             onClick={nextSlide}
-            className="absolute top-1/2 right-4 -translate-y-1/2 z-30 p-2 bg-black/30 rounded-full hover:bg-black/50 transition-colors hidden sm:block"
+            className="absolute top-1/2 right-2 md:right-4 -translate-y-1/2 z-30 p-2 bg-black/20 backdrop-blur-sm rounded-full hover:bg-black/50 transition-colors hidden sm:block"
             aria-label="Next Slide"
         >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
         </button>
 
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-30 flex space-x-2">
+        <div className="absolute bottom-6 md:bottom-8 left-1/2 -translate-x-1/2 z-30 flex space-x-2">
             {hero.images.map((_, index) => (
                 <button 
                     key={index}
                     onClick={() => goToSlide(index)}
-                    className={`w-3 h-3 rounded-full transition-colors ${currentSlide === index ? 'bg-[var(--color-primary)]' : 'bg-white/50 hover:bg-white/80'}`}
+                    className={`w-2.5 h-2.5 md:w-3 md:h-3 rounded-full transition-all duration-300 ${currentSlide === index ? 'bg-[var(--color-primary)] w-6 md:w-8' : 'bg-white/50 hover:bg-white/80'}`}
                     aria-label={`Go to slide ${index + 1}`}
                 />
             ))}

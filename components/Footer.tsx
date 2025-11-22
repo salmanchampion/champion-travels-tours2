@@ -64,18 +64,18 @@ const Footer: React.FC = () => {
         
         {/* Newsletter Section */}
         {newsletter && newsletter.enabled && (
-            <div className="mb-16 p-8 bg-[var(--color-dark-bg)] rounded-[var(--ui-border-radius)] border border-gray-700/50 relative overflow-hidden shadow-lg" data-aos="fade-up">
+            <div className="mb-16 p-6 md:p-8 bg-[var(--color-dark-bg)] rounded-[var(--ui-border-radius)] border border-gray-700/50 relative overflow-hidden shadow-lg" data-aos="fade-up">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-[var(--color-primary)]/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
-                <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-8">
-                    <div className="text-center lg:text-left">
-                        <h3 className="text-2xl font-display font-bold text-white mb-2 flex items-center justify-center lg:justify-start gap-2">
+                <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-6 md:gap-8">
+                    <div className="text-center lg:text-left w-full lg:w-auto">
+                        <h3 className="text-xl md:text-2xl font-display font-bold text-white mb-2 flex items-center justify-center lg:justify-start gap-2">
                              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-[var(--color-primary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
                              {newsletter.title}
                         </h3>
-                        <p className="text-[var(--color-muted-text)] max-w-xl">{newsletter.subtitle}</p>
+                        <p className="text-[var(--color-muted-text)] max-w-xl text-sm md:text-base">{newsletter.subtitle}</p>
                     </div>
                     <form onSubmit={handleSubscribe} className="w-full lg:w-auto flex flex-col sm:flex-row gap-3">
-                        <div className="flex-1 min-w-[280px]">
+                        <div className="flex-1 min-w-[200px] w-full">
                             <input 
                                 type="email" 
                                 placeholder={newsletter.placeholder} 
@@ -89,7 +89,7 @@ const Footer: React.FC = () => {
                         <button 
                             type="submit" 
                             disabled={status === 'submitting'}
-                            className="bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] text-white font-bold px-8 py-3 rounded-[var(--ui-border-radius)] hover:shadow-[0_0_20px_rgba(197,164,126,0.4)] transition-all duration-300 transform hover:-translate-y-1 disabled:opacity-70 disabled:cursor-not-allowed whitespace-nowrap"
+                            className="w-full sm:w-auto bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] text-white font-bold px-8 py-3 rounded-[var(--ui-border-radius)] hover:shadow-[0_0_20px_rgba(197,164,126,0.4)] transition-all duration-300 transform hover:-translate-y-1 disabled:opacity-70 disabled:cursor-not-allowed whitespace-nowrap"
                         >
                             {status === 'submitting' ? 'Submitting...' : status === 'success' ? 'Subscribed!' : status === 'error' ? 'Failed' : newsletter.buttonText}
                         </button>
@@ -98,45 +98,54 @@ const Footer: React.FC = () => {
             </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 md:gap-12">
           {/* About Section */}
-          <div className="md:col-span-2 lg:col-span-1">
+          <div className="sm:col-span-2 lg:col-span-1 text-center sm:text-left">
              <a href="#home" className="block mb-4">
                 <span className="font-display text-3xl font-bold tracking-tight">
                     <span className="text-[var(--color-light-text)]">{footer.about.title[0]}</span>
                     <span className="text-[var(--color-primary)]"> {footer.about.title[1]}</span>
                 </span>
             </a>
-            <p className="text-[var(--color-muted-text)] leading-relaxed">
+            <p className="text-[var(--color-muted-text)] leading-relaxed text-sm md:text-base">
               {footer.about.description}
             </p>
           </div>
 
           {/* Quick Links */}
-          <div>
-            <h3 className="text-xl font-display font-semibold text-white mb-4">{footer.quickLinks.title}</h3>
-            <ul className="space-y-2">
+          <div className="text-center sm:text-left">
+            <h3 className="text-xl font-display font-semibold text-white mb-4 relative inline-block">
+                {footer.quickLinks.title}
+                <span className="absolute bottom-0 left-0 w-1/2 h-0.5 bg-[var(--color-primary)]"></span>
+            </h3>
+            <ul className="space-y-3">
               {visibleQuickLinks.map(link => (
-                  <li key={link.href}><a href={link.href} className="text-[var(--color-muted-text)] hover:text-[var(--color-primary)] transition-colors block py-1">{link.label}</a></li>
+                  <li key={link.href}><a href={link.href} className="text-[var(--color-muted-text)] hover:text-[var(--color-primary)] transition-colors block py-1 text-sm md:text-base">{link.label}</a></li>
               ))}
             </ul>
           </div>
 
           {/* Main Services */}
-          <div>
-            <h3 className="text-xl font-display font-semibold text-white mb-4">{footer.mainServices.title}</h3>
-            <ul className="space-y-2">
+          <div className="text-center sm:text-left">
+            <h3 className="text-xl font-display font-semibold text-white mb-4 relative inline-block">
+                {footer.mainServices.title}
+                <span className="absolute bottom-0 left-0 w-1/2 h-0.5 bg-[var(--color-primary)]"></span>
+            </h3>
+            <ul className="space-y-3">
               {visibleMainServices.map(link => (
-                <li key={link.href}><a href={link.href} className="text-[var(--color-muted-text)] hover:text-[var(--color-primary)] transition-colors block py-1">{link.label}</a></li>
+                <li key={link.href}><a href={link.href} className="text-[var(--color-muted-text)] hover:text-[var(--color-primary)] transition-colors block py-1 text-sm md:text-base">{link.label}</a></li>
               ))}
             </ul>
           </div>
 
           {/* Follow Us */}
-          <div>
-            <h3 className="text-xl font-display font-semibold text-white mb-4">{footer.followUs.title}</h3>
-            <p className="text-[var(--color-muted-text)] mb-6">{footer.followUs.description}</p>
-            <div className="flex space-x-4">
+          <div className="text-center sm:text-left">
+            <h3 className="text-xl font-display font-semibold text-white mb-4 relative inline-block">
+                {footer.followUs.title}
+                <span className="absolute bottom-0 left-0 w-1/2 h-0.5 bg-[var(--color-primary)]"></span>
+            </h3>
+            <p className="text-[var(--color-muted-text)] mb-6 text-sm md:text-base">{footer.followUs.description}</p>
+            <div className="flex space-x-4 justify-center sm:justify-start">
                 <SocialIcon href="https://facebook.com">
                     <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M22.675 0h-21.35C.59 0 0 .59 0 1.325v21.35C0 23.41.59 24 1.325 24H12.82v-9.29H9.692v-3.622h3.128V8.413c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.622h-3.12V24h6.116c.735 0 1.325-.59 1.325-1.325V1.325C24 .59 23.41 0 22.675 0z"/></svg>
                 </SocialIcon>
@@ -151,9 +160,9 @@ const Footer: React.FC = () => {
         </div>
       </div>
       <div className="bg-[var(--color-dark-bg)] border-t border-gray-700 py-6">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center text-sm text-[var(--color-muted-text)]">
-          <p className="mb-2 md:mb-0">&copy; {new Date().getFullYear()} {footer.copyrightText}</p>
-          <div className="flex space-x-4">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center text-sm text-[var(--color-muted-text)] text-center md:text-left">
+          <p className="mb-4 md:mb-0">&copy; {new Date().getFullYear()} {footer.copyrightText}</p>
+          <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-6">
               <a href="#privacy-policy" className="hover:text-[var(--color-primary)] transition-colors">Privacy Policy</a>
               <a href="#contact" className="hover:text-[var(--color-primary)] transition-colors">Terms of Service</a>
           </div>

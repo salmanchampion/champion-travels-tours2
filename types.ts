@@ -409,10 +409,88 @@ export interface IslamicToolsConfig {
     };
 }
 
+// --- Interactive Map Types ---
+export interface MapLocation {
+  id: number;
+  title: string;
+  description: string;
+  image: string;
+  top: string;
+  left: string;
+}
+
+export interface MapCity {
+    name: string;
+    mapImage: string;
+    locations: MapLocation[];
+}
+
+export interface InteractiveMapConfig {
+    enabled: boolean;
+    cities: {
+        Makkah: MapCity;
+        Madinah: MapCity;
+    };
+}
+
+// --- Marketing Popup Types ---
+export interface MarketingPopupConfig {
+    enabled: boolean;
+    title: string;
+    content: string;
+    image?: string;
+    buttonText?: string;
+    buttonLink?: string;
+    delaySeconds: number;
+    showOncePerSession: boolean;
+}
+
+// --- Static Labels Manager ---
+export interface TextLabelsConfig {
+    bookNow: string;
+    viewDetails: string;
+    readMore: string;
+    contactUs: string;
+    sendQuery: string;
+    viewPackages: string;
+}
+
+// --- GLOBAL CONFIG FOR TOTAL CONTROL ---
+export interface GlobalConfig {
+    announcementBar: {
+        enabled: boolean;
+        text: string;
+        link?: string;
+        backgroundColor: string;
+        textColor: string;
+    };
+    siteIdentity: {
+        siteName: string;
+        faviconUrl: string; // For total branding control
+        metaDescription: string; // Global SEO fallback
+    };
+    marketingPopup?: MarketingPopupConfig;
+    textLabels?: TextLabelsConfig;
+    advanced: {
+        customCss: string; // The ultimate "small details" control
+        headScripts: string; // Google Analytics, Pixel etc.
+        footerScripts: string; // Chatbots etc.
+        typography?: {
+            h1Size: string;
+            h2Size: string;
+            bodySize: string;
+            sectionPadding: string;
+        };
+    };
+}
+
 export interface AppData {
     site: {
         logoUrl: string;
     };
+    // Added Global Config Here
+    globalConfig?: GlobalConfig;
+    
     header: {
         taglines?: string[];
         contactInfo?: { label: string; value: string; }[];
@@ -422,6 +500,7 @@ export interface AppData {
             text: string;
             href: string;
         };
+        showThemeSwitcher?: boolean;
     };
     floatingButton: FloatingButtonConfig;
     prayerTimes: PrayerTimesConfig;
@@ -481,7 +560,6 @@ export interface AppData {
     };
     hajjPackages: HajjPackage[];
     umrahPackages: UmrahPackage[];
-    // --- NEW FIELDS ---
     exclusiveHajj: {
         pageData: ExclusivePageData;
         packages: ExclusivePackage[];
@@ -490,7 +568,6 @@ export interface AppData {
         pageData: ExclusivePageData;
         packages: ExclusivePackage[];
     };
-    // ------------------
     pages: {
         home: {
             seo: SeoMetadata;
@@ -503,15 +580,15 @@ export interface AppData {
                 packageTypeLabel: string;
                 buttonText: string;
             };
-            // --- Added Special Offer ---
             specialOffer: SpecialOfferConfig;
+            interactiveMap: InteractiveMapConfig; 
             sections: {
                 services: { enabled: boolean; title: string; subtitle: string; };
                 packages: { enabled: boolean; title: string; subtitle: string; };
                 whyChooseUs: { enabled: boolean; };
                 testimonials: { enabled: boolean; title: string; subtitle: string; };
                 contact: { enabled: boolean; title: string; subtitle: string; };
-                islamicTools: IslamicToolsConfig; // Updated from just { enabled: boolean }
+                islamicTools: IslamicToolsConfig;
             };
             hero: {
                 title: string;

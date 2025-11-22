@@ -1,17 +1,21 @@
 
-
-
-
-
 import React, { createContext, useState, useEffect, ReactNode } from 'react';
 import { defaultData, AppData } from '../data';
 import { db } from '../firebase';
+
+// --- Theme Types ---
+export interface UserTheme {
+    mode: 'light' | 'dark';
+    primaryColor: string;
+}
 
 interface DataContextType {
   appData: AppData;
   isLoading: boolean;
   updateAppData: (newData: Partial<AppData>) => Promise<void>;
   resetAppData: () => Promise<void>;
+  userTheme: UserTheme;
+  setUserTheme: (theme: UserTheme) => void;
 }
 
 const initialContextValue: DataContextType = {
@@ -19,6 +23,8 @@ const initialContextValue: DataContextType = {
     isLoading: true,
     updateAppData: async () => {},
     resetAppData: async () => {},
+    userTheme: { mode: 'dark', primaryColor: '' },
+    setUserTheme: () => {},
 };
 
 export const DataContext = createContext<DataContextType>(initialContextValue);
@@ -52,6 +58,21 @@ interface DataProviderProps {
 export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
   const [appData, setAppData] = useState<AppData>(defaultData);
   const [isLoading, setIsLoading] = useState(true);
+  
+  // Initialize User Theme from LocalStorage
+  const [userTheme, setUserThemeState] = useState<UserTheme>(() => {
+      try {
+          const saved = localStorage.getItem('userTheme');
+          return saved ? JSON.parse(saved) : { mode: 'dark', primaryColor: '' };
+      } catch (e) {
+          return { mode: 'dark', primaryColor: '' };
+      }
+  });
+
+  const setUserTheme = (theme: UserTheme) => {
+      setUserThemeState(theme);
+      localStorage.setItem('userTheme', JSON.stringify(theme));
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -240,6 +261,11 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
                     dbData.footer.newsletter = JSON.parse(JSON.stringify(defaultData.footer.newsletter));
                 }
 
+                // Patch: Ensure Interactive Map Data Exists
+                if (!dbData.pages.home.interactiveMap) {
+                    dbData.pages.home.interactiveMap = JSON.parse(JSON.stringify(defaultData.pages.home.interactiveMap));
+                }
+
                 setAppData(deepMerge(defaultData, dbData));
             } else {
                 // If no data exists in Firestore, initialize it with the default data
@@ -284,7 +310,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
   }
 
   return (
-    <DataContext.Provider value={{ appData, isLoading, updateAppData, resetAppData }}>
+    <DataContext.Provider value={{ appData, isLoading, updateAppData, resetAppData, userTheme, setUserTheme }}>
       {children}
     </DataContext.Provider>
   );

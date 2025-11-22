@@ -10,6 +10,7 @@ import WhyChooseChampion from '../components/WhyChooseChampion';
 import PackageFilterBar from '../components/PackageFilterBar';
 import CountdownTimer from '../components/CountdownTimer';
 import IslamicTools from '../components/IslamicTools';
+import InteractiveMap from '../components/InteractiveMap';
 
 const HomePage: React.FC = () => {
   const { appData } = useContext(DataContext);
@@ -29,6 +30,9 @@ const HomePage: React.FC = () => {
       
       {home.sections.services.enabled && <Services showTitle={true} />}
       {home.sections.packages.enabled && <FeaturedPackages showHajjFilters={false} showUmrahFilters={false} showTitle={true} />}
+      
+      {/* Interactive Map Section */}
+      <InteractiveMap />
       
       {home.sections.whyChooseUs.enabled && <WhyChooseChampion />}
       {home.sections.testimonials.enabled && <Testimonials showTitle={true} />}

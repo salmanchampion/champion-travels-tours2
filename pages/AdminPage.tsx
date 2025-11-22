@@ -1,8 +1,4 @@
 
-
-
-
-
 import React, { useState, useContext, useMemo } from 'react';
 import PageBanner from '../components/PageBanner';
 import { DataContext } from '../contexts/DataContext';
@@ -10,6 +6,24 @@ import { defaultData, AppData, ExclusivePackage } from '../data';
 import { AdminInput, AdminTextarea, ToggleSwitch, Section } from '../components/admin/AdminUI';
 import { SeoEditor, PackageEditor, ExpertGuideEditor, CustomPageEditor, BlogEditor } from '../components/admin/AdminEditors';
 
+
+// --- Helper Component: Page ID Display ---
+const PageIdDisplay: React.FC<{ id: string; label?: string }> = ({ id, label = "Page ID" }) => (
+    <div className="flex items-center gap-3 mb-6 p-3 bg-blue-900/20 border border-blue-800 rounded-md">
+        <div className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-600 text-white">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+            </svg>
+        </div>
+        <div>
+            <span className="text-xs text-blue-300 font-bold uppercase tracking-wider block">{label}</span>
+            <div className="flex items-center gap-2">
+                <code className="text-white font-mono bg-black/40 px-2 py-0.5 rounded select-all text-sm border border-blue-900/50">{id}</code>
+                <span className="text-[10px] text-gray-400 hidden sm:inline">(Copy this ID to link in Header/Footer)</span>
+            </div>
+        </div>
+    </div>
+);
 
 // --- Helper Editor for Exclusive Packages ---
 const ExclusivePackageEditor: React.FC<{
@@ -60,17 +74,19 @@ const AdminPage: React.FC = () => {
     const { appData, updateAppData, resetAppData } = useContext(DataContext);
     const [localData, setLocalData] = useState<AppData>(JSON.parse(JSON.stringify(appData)));
     const [activePackageTab, setActivePackageTab] = useState<'hajj' | 'umrah'>('hajj');
+    const [activeListingTab, setActiveListingTab] = useState<'hajj' | 'umrah'>('umrah');
     const [activeExclusiveTab, setActiveExclusiveTab] = useState<'hajj' | 'umrah'>('hajj');
+    const [activeMapCityTab, setActiveMapCityTab] = useState<'Makkah' | 'Madinah'>('Makkah');
     const [legacyCategoryFilter, setLegacyCategoryFilter] = useState('All');
     const [isSaving, setIsSaving] = useState(false);
 
     const coreServiceIds = ['#hotel-booking', '#umrah-training'];
     const companyPageIds = ['#about-us', '#privacy-policy'];
-    // Removed #ziyarat-tours from coreServiceIds as it is now a premium hardcoded page
 
     // Sync local state if appData from context changes
     React.useEffect(() => {
         const mergedData = JSON.parse(JSON.stringify(appData));
+        // Apply defaults for robust editing if missing
         if (!mergedData.floatingButton) mergedData.floatingButton = JSON.parse(JSON.stringify(defaultData.floatingButton));
         if (!mergedData.prayerTimes) mergedData.prayerTimes = JSON.parse(JSON.stringify(defaultData.prayerTimes));
         if (!mergedData.footer.partners) mergedData.footer.partners = JSON.parse(JSON.stringify(defaultData.footer.partners));
@@ -83,17 +99,37 @@ const AdminPage: React.FC = () => {
         if (!mergedData.exclusiveHajj) mergedData.exclusiveHajj = JSON.parse(JSON.stringify(defaultData.exclusiveHajj));
         if (!mergedData.exclusiveUmrah) mergedData.exclusiveUmrah = JSON.parse(JSON.stringify(defaultData.exclusiveUmrah));
         
+        if (!mergedData.pages.hajj) mergedData.pages.hajj = JSON.parse(JSON.stringify(defaultData.pages.hajj));
+        if (!mergedData.pages.umrah) mergedData.pages.umrah = JSON.parse(JSON.stringify(defaultData.pages.umrah));
+
+        if (!mergedData.pages.home.interactiveMap) {
+             mergedData.pages.home.interactiveMap = JSON.parse(JSON.stringify(defaultData.pages.home.interactiveMap));
+        }
+
         if (!mergedData.pages.home.sections.islamicTools) {
              mergedData.pages.home.sections.islamicTools = JSON.parse(JSON.stringify(defaultData.pages.home.sections.islamicTools));
         }
-        // Add specific checks for nested tools props if they are missing in existing db data
         if (!mergedData.pages.home.sections.islamicTools.zakat) mergedData.pages.home.sections.islamicTools.zakat = { enabled: true, googleSheetUrl: '' };
         if (!mergedData.pages.home.sections.islamicTools.tasbeeh) mergedData.pages.home.sections.islamicTools.tasbeeh = { enabled: true };
         if (!mergedData.pages.home.sections.islamicTools.currency) mergedData.pages.home.sections.islamicTools.currency = { enabled: true };
 
-        // Ensure footer newsletter exists
         if (!mergedData.footer.newsletter) {
              mergedData.footer.newsletter = JSON.parse(JSON.stringify(defaultData.footer.newsletter));
+        }
+        
+        // Robust Check for Global Config
+        if (!mergedData.globalConfig) {
+             // Fallback defaults if DB doesn't have them yet
+             mergedData.globalConfig = JSON.parse(JSON.stringify(defaultData.globalConfig));
+        }
+        if (!mergedData.globalConfig.textLabels) {
+            mergedData.globalConfig.textLabels = JSON.parse(JSON.stringify(defaultData.globalConfig?.textLabels));
+        }
+        if (!mergedData.globalConfig.marketingPopup) {
+            mergedData.globalConfig.marketingPopup = JSON.parse(JSON.stringify(defaultData.globalConfig?.marketingPopup));
+        }
+        if (!mergedData.globalConfig.advanced.typography) {
+            mergedData.globalConfig.advanced.typography = JSON.parse(JSON.stringify(defaultData.globalConfig?.advanced.typography));
         }
 
         setLocalData(mergedData);
@@ -105,6 +141,8 @@ const AdminPage: React.FC = () => {
         let currentLevel = newState;
 
         for (let i = 0; i < keys.length - 1; i++) {
+            // Auto-create objects if missing (deep linking safety)
+            if (!currentLevel[keys[i]]) currentLevel[keys[i]] = {};
             currentLevel = currentLevel[keys[i]];
         }
         
@@ -192,6 +230,12 @@ const AdminPage: React.FC = () => {
         return withIndex.filter(p => (p.category ? p.category.trim() : 'Uncategorized') === legacyCategoryFilter);
     }, [localData, activePackageTab, legacyCategoryFilter]);
 
+    // Helper to count linked packages for a filter
+    const getLinkedPackageCount = (category: string, type: 'hajj' | 'umrah') => {
+        const packages = type === 'hajj' ? localData.hajjPackages : localData.umrahPackages;
+        if (!packages) return 0;
+        return packages.filter(p => p.category === category).length;
+    }
 
     const phoneIndex = localData.header.contactInfo?.findIndex(c => c.label === 'Phone');
     const emailIndex = localData.header.contactInfo?.findIndex(c => c.label === 'Email');
@@ -205,6 +249,345 @@ const AdminPage: React.FC = () => {
             />
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
                 
+                {/* --- NEW GENERAL SETTINGS SECTION --- */}
+                <Section title="General & Advanced Settings (Control Everything)">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        
+                        {/* Site Identity */}
+                        <div className="p-4 border border-gray-700 rounded-lg bg-[var(--color-dark-bg)]">
+                            <h4 className="font-bold text-lg text-[var(--color-primary)] mb-3">Site Identity & Global SEO</h4>
+                            <AdminInput 
+                                label="Website Name (Appears in Header & Browser Tab)" 
+                                name="globalConfig.siteIdentity.siteName" 
+                                value={localData.globalConfig?.siteIdentity?.siteName} 
+                                onChange={e => handleNestedChange(e.target.name, e.target.value)} 
+                            />
+                            <p className="text-xs text-[var(--color-muted-text)] mb-2 mt-1">
+                                Note: The first word of the name will appear in white, and the rest in gold in the website header.
+                            </p>
+                            <AdminInput 
+                                label="Favicon URL (Browser Tab Icon)" 
+                                name="globalConfig.siteIdentity.faviconUrl" 
+                                value={localData.globalConfig?.siteIdentity?.faviconUrl} 
+                                onChange={e => handleNestedChange(e.target.name, e.target.value)} 
+                                className="mt-3"
+                                placeholder="https://..."
+                            />
+                            <div className="mt-2 mb-2 flex justify-center p-2 bg-black/20 rounded">
+                                {localData.globalConfig?.siteIdentity?.faviconUrl ? (
+                                    <img src={localData.globalConfig.siteIdentity.faviconUrl} alt="Favicon Preview" className="w-8 h-8" />
+                                ) : (
+                                    <span className="text-xs text-gray-500">No Favicon Set</span>
+                                )}
+                            </div>
+                            <AdminTextarea 
+                                label="Website Description (SEO Meta Description)" 
+                                name="globalConfig.siteIdentity.metaDescription" 
+                                value={localData.globalConfig?.siteIdentity?.metaDescription} 
+                                onChange={e => handleNestedChange(e.target.name, e.target.value)} 
+                                className="mt-3"
+                            />
+                            <p className="text-xs text-[var(--color-muted-text)] mt-1">This description is used if a specific page doesn't have its own SEO description.</p>
+                        </div>
+
+                        {/* Top Announcement Bar */}
+                        <div className="p-4 border border-gray-700 rounded-lg bg-[var(--color-dark-bg)]">
+                            <div className="flex justify-between items-center mb-3">
+                                <h4 className="font-bold text-lg text-[var(--color-secondary)]">Top Announcement Bar</h4>
+                                <ToggleSwitch 
+                                    label="Enabled" 
+                                    enabled={localData.globalConfig?.announcementBar?.enabled ?? false} 
+                                    onChange={(val) => handleNestedChange('globalConfig.announcementBar.enabled', val)} 
+                                />
+                            </div>
+                            <AdminTextarea 
+                                label="Announcement Text" 
+                                name="globalConfig.announcementBar.text" 
+                                value={localData.globalConfig?.announcementBar?.text} 
+                                onChange={e => handleNestedChange(e.target.name, e.target.value)} 
+                                rows={2}
+                            />
+                            <AdminInput 
+                                label="Link URL (Optional)" 
+                                name="globalConfig.announcementBar.link" 
+                                value={localData.globalConfig?.announcementBar?.link} 
+                                onChange={e => handleNestedChange(e.target.name, e.target.value)} 
+                                className="mt-3"
+                            />
+                            <div className="grid grid-cols-2 gap-4 mt-3">
+                                <AdminInput label="Background Color" name="globalConfig.announcementBar.backgroundColor" value={localData.globalConfig?.announcementBar?.backgroundColor} onChange={e => handleNestedChange(e.target.name, e.target.value)} type="color" />
+                                <AdminInput label="Text Color" name="globalConfig.announcementBar.textColor" value={localData.globalConfig?.announcementBar?.textColor} onChange={e => handleNestedChange(e.target.name, e.target.value)} type="color" />
+                            </div>
+                        </div>
+
+                        {/* Custom Scripts & CSS */}
+                        <div className="col-span-1 md:col-span-2 p-4 border border-gray-700 rounded-lg bg-[var(--color-dark-bg)]">
+                            <h4 className="font-bold text-lg text-red-400 mb-1">Custom Scripts (Header/Footer)</h4>
+                            <p className="text-sm text-[var(--color-muted-text)] mb-4">Add code for Google Analytics, Facebook Pixel, Chatbots, or custom styling.</p>
+                            
+                            <div className="mb-4">
+                                <label className="block text-sm font-medium text-white mb-1">Custom CSS (Styles)</label>
+                                <textarea 
+                                    className="w-full bg-[#0d1117] border border-gray-600 rounded-md p-3 text-green-400 font-mono text-sm h-32 focus:ring-1 focus:ring-green-500 outline-none"
+                                    value={localData.globalConfig?.advanced?.customCss || ''}
+                                    onChange={e => handleNestedChange('globalConfig.advanced.customCss', e.target.value)}
+                                    placeholder=".my-class { color: red; } /* Override any style here */"
+                                />
+                            </div>
+                            
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label className="block text-sm font-medium text-white mb-1">Header Scripts (Inside &lt;head&gt;)</label>
+                                    <p className="text-xs text-gray-500 mb-2">For: Google Analytics, FB Pixel, Search Console verification.</p>
+                                    <textarea 
+                                        className="w-full bg-[#0d1117] border border-gray-600 rounded-md p-3 text-yellow-400 font-mono text-sm h-48 focus:ring-1 focus:ring-yellow-500 outline-none"
+                                        value={localData.globalConfig?.advanced?.headScripts || ''}
+                                        onChange={e => handleNestedChange('globalConfig.advanced.headScripts', e.target.value)}
+                                        placeholder="<script>...</script>"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-white mb-1">Footer Scripts (Before &lt;/body&gt;)</label>
+                                    <p className="text-xs text-gray-500 mb-2">For: Chatbots (Tawk.to, WhatsApp Widget), Tracking codes.</p>
+                                    <textarea 
+                                        className="w-full bg-[#0d1117] border border-gray-600 rounded-md p-3 text-yellow-400 font-mono text-sm h-48 focus:ring-1 focus:ring-yellow-500 outline-none"
+                                        value={localData.globalConfig?.advanced?.footerScripts || ''}
+                                        onChange={e => handleNestedChange('globalConfig.advanced.footerScripts', e.target.value)}
+                                        placeholder="<script>...</script>"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </Section>
+
+                {/* --- NEW: Marketing Popup --- */}
+                <Section title="Marketing & Promotional Popup">
+                    <div className="p-4 border border-gray-700 rounded-lg bg-[var(--color-dark-bg)]">
+                        <div className="flex justify-between items-center mb-4">
+                            <h4 className="font-bold text-lg text-[var(--color-primary)]">Entry Popup Modal</h4>
+                            <ToggleSwitch
+                                label="Enable Popup"
+                                enabled={localData.globalConfig?.marketingPopup?.enabled ?? false}
+                                onChange={(val) => handleNestedChange('globalConfig.marketingPopup.enabled', val)}
+                            />
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <AdminInput 
+                                label="Popup Title" 
+                                name="globalConfig.marketingPopup.title" 
+                                value={localData.globalConfig?.marketingPopup?.title} 
+                                onChange={e => handleNestedChange(e.target.name, e.target.value)} 
+                            />
+                            <AdminInput 
+                                label="Image URL (Optional)" 
+                                name="globalConfig.marketingPopup.image" 
+                                value={localData.globalConfig?.marketingPopup?.image} 
+                                onChange={e => handleNestedChange(e.target.name, e.target.value)} 
+                            />
+                            <AdminTextarea 
+                                label="Content/Message" 
+                                name="globalConfig.marketingPopup.content" 
+                                value={localData.globalConfig?.marketingPopup?.content} 
+                                onChange={e => handleNestedChange(e.target.name, e.target.value)} 
+                                className="md:col-span-2"
+                            />
+                            <AdminInput 
+                                label="Button Text" 
+                                name="globalConfig.marketingPopup.buttonText" 
+                                value={localData.globalConfig?.marketingPopup?.buttonText} 
+                                onChange={e => handleNestedChange(e.target.name, e.target.value)} 
+                            />
+                            <AdminInput 
+                                label="Button Link" 
+                                name="globalConfig.marketingPopup.buttonLink" 
+                                value={localData.globalConfig?.marketingPopup?.buttonLink} 
+                                onChange={e => handleNestedChange(e.target.name, e.target.value)} 
+                            />
+                            <div className="flex items-center space-x-4">
+                                <AdminInput 
+                                    label="Delay (Seconds)" 
+                                    name="globalConfig.marketingPopup.delaySeconds" 
+                                    type="number"
+                                    value={localData.globalConfig?.marketingPopup?.delaySeconds} 
+                                    onChange={e => handleNestedChange(e.target.name, parseFloat(e.target.value))} 
+                                />
+                                <div className="pt-6">
+                                    <ToggleSwitch
+                                        label="Show Once Per Visit?"
+                                        enabled={localData.globalConfig?.marketingPopup?.showOncePerSession ?? true}
+                                        onChange={(val) => handleNestedChange('globalConfig.marketingPopup.showOncePerSession', val)}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </Section>
+
+                {/* --- NEW: Advanced Visual Control --- */}
+                <Section title="Advanced Visual Control (Typography & Layout)">
+                    <div className="p-4 border border-gray-700 rounded-lg bg-[var(--color-dark-bg)]">
+                        <p className="text-[var(--color-muted-text)] mb-4 text-sm">
+                            Fine-tune the font sizes and spacing for the entire website. 
+                            (Use valid CSS units like 'rem', 'px', or 'em')
+                        </p>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <AdminInput 
+                                label="Heading 1 (Page Titles) Size" 
+                                name="globalConfig.advanced.typography.h1Size" 
+                                value={localData.globalConfig?.advanced?.typography?.h1Size || '3.5rem'} 
+                                onChange={e => handleNestedChange(e.target.name, e.target.value)} 
+                                placeholder="e.g., 3.5rem"
+                            />
+                            <AdminInput 
+                                label="Heading 2 (Section Titles) Size" 
+                                name="globalConfig.advanced.typography.h2Size" 
+                                value={localData.globalConfig?.advanced?.typography?.h2Size || '2.5rem'} 
+                                onChange={e => handleNestedChange(e.target.name, e.target.value)} 
+                                placeholder="e.g., 2.5rem"
+                            />
+                            <AdminInput 
+                                label="Body Text Size" 
+                                name="globalConfig.advanced.typography.bodySize" 
+                                value={localData.globalConfig?.advanced?.typography?.bodySize || '1rem'} 
+                                onChange={e => handleNestedChange(e.target.name, e.target.value)} 
+                                placeholder="e.g., 1rem"
+                            />
+                            <AdminInput 
+                                label="Section Spacing (Padding)" 
+                                name="globalConfig.advanced.typography.sectionPadding" 
+                                value={localData.globalConfig?.advanced?.typography?.sectionPadding || '5rem'} 
+                                onChange={e => handleNestedChange(e.target.name, e.target.value)} 
+                                placeholder="e.g., 5rem"
+                            />
+                        </div>
+                    </div>
+                </Section>
+
+                {/* --- NEW: Text Label Manager --- */}
+                <Section title="Text & Label Manager">
+                    <div className="p-4 border border-gray-700 rounded-lg bg-[var(--color-dark-bg)]">
+                        <p className="text-[var(--color-muted-text)] mb-4 text-sm">
+                            Edit the static text labels used on buttons and common areas across the site.
+                        </p>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {localData.globalConfig?.textLabels && Object.keys(localData.globalConfig.textLabels).map((key) => (
+                                <AdminInput
+                                    key={key}
+                                    label={key.replace(/([A-Z])/g, ' $1').trim().replace(/^./, str => str.toUpperCase())} // Convert camelCase to readable
+                                    name={`globalConfig.textLabels.${key}`}
+                                    value={(localData.globalConfig!.textLabels as any)[key]}
+                                    onChange={e => handleNestedChange(e.target.name, e.target.value)}
+                                />
+                            ))}
+                        </div>
+                    </div>
+                </Section>
+
+                <Section title="Interactive Map Management">
+                    <PageIdDisplay id="#ziyarat-tours" label="Page ID (For Ziyarat Page)" />
+                    <div className="p-4 border border-gray-700 rounded-lg">
+                        <div className="mb-4">
+                            <ToggleSwitch 
+                                label="Enable Interactive Map Section" 
+                                enabled={localData.pages.home.interactiveMap?.enabled ?? true} 
+                                onChange={(val) => handleNestedChange('pages.home.interactiveMap.enabled', val)} 
+                            />
+                        </div>
+                        <p className="text-[var(--color-muted-text)] mb-6">Manage the locations and content of the interactive map on the homepage.</p>
+                        
+                        <div className="flex space-x-4 mb-6">
+                            <button
+                                className={`px-4 py-2 rounded-md font-bold ${activeMapCityTab === 'Makkah' ? 'bg-[var(--color-primary)] text-white' : 'bg-gray-700 text-gray-300'}`}
+                                onClick={() => setActiveMapCityTab('Makkah')}
+                            >
+                                Makkah Map
+                            </button>
+                            <button
+                                className={`px-4 py-2 rounded-md font-bold ${activeMapCityTab === 'Madinah' ? 'bg-[var(--color-secondary)] text-[var(--color-dark-bg)]' : 'bg-gray-700 text-gray-300'}`}
+                                onClick={() => setActiveMapCityTab('Madinah')}
+                            >
+                                Madinah Map
+                            </button>
+                        </div>
+
+                        <div className="bg-[var(--color-dark-bg)] p-4 rounded-md border border-gray-600">
+                            <h4 className="font-bold text-xl text-white mb-4">{activeMapCityTab} Settings</h4>
+                            
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                                <AdminInput 
+                                    label="City Display Name" 
+                                    name={`pages.home.interactiveMap.cities.${activeMapCityTab}.name`} 
+                                    value={localData.pages.home.interactiveMap.cities[activeMapCityTab]?.name} 
+                                    onChange={e => handleNestedChange(e.target.name, e.target.value)} 
+                                />
+                                <AdminInput 
+                                    label="Map Background Image URL" 
+                                    name={`pages.home.interactiveMap.cities.${activeMapCityTab}.mapImage`} 
+                                    value={localData.pages.home.interactiveMap.cities[activeMapCityTab]?.mapImage} 
+                                    onChange={e => handleNestedChange(e.target.name, e.target.value)} 
+                                />
+                            </div>
+
+                            <h5 className="font-semibold text-lg text-white mb-4">Hotspots / Locations</h5>
+                            {localData.pages.home.interactiveMap.cities[activeMapCityTab]?.locations.map((loc, index) => (
+                                <div key={loc.id} className="mb-4 p-4 border border-gray-500 rounded bg-[var(--color-light-bg)]">
+                                    <div className="flex justify-between items-center mb-4">
+                                        <span className="font-bold text-[var(--color-primary)]">Location {index + 1}</span>
+                                        <button 
+                                            onClick={() => deleteListItem(`pages.home.interactiveMap.cities.${activeMapCityTab}.locations`, index)} 
+                                            className="bg-red-600 text-white px-3 py-1 rounded text-sm"
+                                        >
+                                            Delete
+                                        </button>
+                                    </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                        <AdminInput 
+                                            label="Title" 
+                                            name="title"
+                                            value={loc.title} 
+                                            onChange={e => handleListChange(`pages.home.interactiveMap.cities.${activeMapCityTab}.locations`, index, 'title', e.target.value)} 
+                                        />
+                                        <AdminInput 
+                                            label="Image URL" 
+                                            name="image"
+                                            value={loc.image} 
+                                            onChange={e => handleListChange(`pages.home.interactiveMap.cities.${activeMapCityTab}.locations`, index, 'image', e.target.value)} 
+                                        />
+                                        <AdminInput 
+                                            label="Top Position (%)" 
+                                            name="top"
+                                            value={loc.top} 
+                                            onChange={e => handleListChange(`pages.home.interactiveMap.cities.${activeMapCityTab}.locations`, index, 'top', e.target.value)} 
+                                            placeholder="e.g. 50%"
+                                        />
+                                        <AdminInput 
+                                            label="Left Position (%)" 
+                                            name="left"
+                                            value={loc.left} 
+                                            onChange={e => handleListChange(`pages.home.interactiveMap.cities.${activeMapCityTab}.locations`, index, 'left', e.target.value)} 
+                                            placeholder="e.g. 50%"
+                                        />
+                                    </div>
+                                    <AdminTextarea 
+                                        label="Description" 
+                                        name="description"
+                                        value={loc.description} 
+                                        onChange={e => handleListChange(`pages.home.interactiveMap.cities.${activeMapCityTab}.locations`, index, 'description', e.target.value)} 
+                                        rows={3}
+                                    />
+                                </div>
+                            ))}
+                            <button 
+                                onClick={() => addListItem(`pages.home.interactiveMap.cities.${activeMapCityTab}.locations`, { id: Date.now(), title: 'New Location', description: '', image: '', top: '50%', left: '50%' })} 
+                                className="bg-green-600 text-white font-bold py-2 px-4 rounded"
+                            >
+                                Add New Location
+                            </button>
+                        </div>
+                    </div>
+                </Section>
+
                 {/* --- NEW SPECIAL OFFER SECTION --- */}
                 <Section title="Special Offer Timer">
                     <div className="p-4 border border-gray-700 rounded-lg">
@@ -326,6 +709,7 @@ const AdminPage: React.FC = () => {
 
                     {activeExclusiveTab === 'hajj' && (
                         <div>
+                            <PageIdDisplay id="#exclusive-hajj" label="Page ID (New Hajj Page)" />
                             <h4 className="font-bold text-xl mb-4 text-[var(--color-primary)]">Page Settings</h4>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8 p-4 border border-gray-700 rounded-lg">
                                 <AdminInput label="Page Title" name="exclusiveHajj.pageData.pageBanner.title" value={localData.exclusiveHajj.pageData.pageBanner.title} onChange={e => handleNestedChange(e.target.name, e.target.value)} />
@@ -359,6 +743,7 @@ const AdminPage: React.FC = () => {
 
                     {activeExclusiveTab === 'umrah' && (
                         <div>
+                            <PageIdDisplay id="#exclusive-umrah" label="Page ID (New Umrah Page)" />
                             <h4 className="font-bold text-xl mb-4 text-[var(--color-secondary)]">Page Settings</h4>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8 p-4 border border-gray-700 rounded-lg">
                                 <AdminInput label="Page Title" name="exclusiveUmrah.pageData.pageBanner.title" value={localData.exclusiveUmrah.pageData.pageBanner.title} onChange={e => handleNestedChange(e.target.name, e.target.value)} />
@@ -782,6 +1167,13 @@ const AdminPage: React.FC = () => {
                             value={localData.site.logoUrl}
                             onChange={e => handleNestedChange(e.target.name, e.target.value)}
                         />
+                        <div className="flex items-center pt-6">
+                            <ToggleSwitch 
+                                label="Show Theme Settings Icon in Header" 
+                                enabled={localData.header.showThemeSwitcher !== false} 
+                                onChange={(val) => handleNestedChange('header.showThemeSwitcher', val)} 
+                            />
+                        </div>
                         <AdminInput
                             label="'Book Now' Button Text"
                             name="header.bookNowButton.text"
@@ -1011,6 +1403,7 @@ const AdminPage: React.FC = () => {
                 </Section>
 
                 <Section title="Homepage">
+                     <PageIdDisplay id="#home" label="Page ID" />
                      <SeoEditor pageName="Homepage SEO" seoPath="pages.home.seo" localData={localData} onChange={handleNestedChange} />
                      
                      <h4 className="font-bold text-xl mt-8 mb-4 text-[var(--color-secondary)]">Hero Section</h4>
@@ -1045,6 +1438,7 @@ const AdminPage: React.FC = () => {
                 
                 <Section title="Hajj & Umrah Details Pages (Old)">
                     <h4 className="font-bold text-xl mb-4 text-[var(--color-secondary)]">Hajj Details Page</h4>
+                    <PageIdDisplay id="#hajj-details" label="Page ID" />
                     <AdminInput label="Page Title" name="pages.hajjDetails.pageBanner.title" value={localData.pages.hajjDetails.pageBanner.title} onChange={e => handleNestedChange(e.target.name, e.target.value)} />
                     <AdminInput label="Banner Image" name="pages.hajjDetails.pageBanner.backgroundImage" value={localData.pages.hajjDetails.pageBanner.backgroundImage} onChange={e => handleNestedChange(e.target.name, e.target.value)} className="mt-2" />
                      {localData.pages.hajjDetails.sections.map((section, index) => (
@@ -1056,6 +1450,7 @@ const AdminPage: React.FC = () => {
                     ))}
 
                     <h4 className="font-bold text-xl mt-8 mb-4 text-[var(--color-secondary)]">Umrah Details Page</h4>
+                    <PageIdDisplay id="#umrah-details" label="Page ID" />
                     <AdminInput label="Page Title" name="pages.umrahDetails.pageBanner.title" value={localData.pages.umrahDetails.pageBanner.title} onChange={e => handleNestedChange(e.target.name, e.target.value)} />
                     <AdminInput label="Banner Image" name="pages.umrahDetails.pageBanner.backgroundImage" value={localData.pages.umrahDetails.pageBanner.backgroundImage} onChange={e => handleNestedChange(e.target.name, e.target.value)} className="mt-2" />
                      {localData.pages.umrahDetails.sections.map((section, index) => (
@@ -1068,6 +1463,7 @@ const AdminPage: React.FC = () => {
                 </Section>
 
                 <Section title="Blog Management">
+                    <PageIdDisplay id="#blog" label="Page ID" />
                     <SeoEditor pageName="Blog Page SEO" seoPath="pages.blog.seo" localData={localData} onChange={handleNestedChange} />
                     
                     <h4 className="font-bold text-xl mt-8 mb-4 text-[var(--color-secondary)]">Blog Page Banner</h4>
@@ -1094,6 +1490,7 @@ const AdminPage: React.FC = () => {
                 </Section>
 
                 <Section title="Services Page">
+                    <PageIdDisplay id="#services" label="Page ID" />
                     <AdminInput label="Page Title" name="pages.services.pageBanner.title" value={localData.pages.services.pageBanner.title} onChange={e => handleNestedChange(e.target.name, e.target.value)} />
                     <AdminTextarea label="Page Subtitle" name="pages.services.pageBanner.subtitle" value={localData.pages.services.pageBanner.subtitle} onChange={e => handleNestedChange(e.target.name, e.target.value)} className="mt-2" />
                     
@@ -1112,6 +1509,127 @@ const AdminPage: React.FC = () => {
                     <button onClick={() => addListItem('pages.services.list', { icon: 'Default', title: 'New Service', description: '', details: [], enabled: true })} className="mt-2 bg-green-600 text-white font-bold py-2 px-4 rounded">Add Service</button>
                 </Section>
 
+                <Section title="Hajj & Umrah Listing Pages (Banner & Filters)">
+                    <div className="flex space-x-4 mb-6">
+                        <button
+                            className={`px-4 py-2 rounded-md font-bold ${activeListingTab === 'hajj' ? 'bg-[var(--color-primary)] text-white' : 'bg-gray-700 text-gray-300'}`}
+                            onClick={() => setActiveListingTab('hajj')}
+                        >
+                            Hajj Listing Page
+                        </button>
+                        <button
+                            className={`px-4 py-2 rounded-md font-bold ${activeListingTab === 'umrah' ? 'bg-[var(--color-secondary)] text-[var(--color-dark-bg)]' : 'bg-gray-700 text-gray-300'}`}
+                            onClick={() => setActiveListingTab('umrah')}
+                        >
+                            Umrah Listing Page
+                        </button>
+                    </div>
+
+                    {activeListingTab === 'umrah' && (
+                        <div>
+                            <PageIdDisplay id="#umrah" label="Page ID" />
+                            <p className="text-[var(--color-muted-text)] mb-4">Configure the main Umrah packages listing page (banner, filters).</p>
+                            
+                            <SeoEditor pageName="Umrah Page SEO" seoPath="pages.umrah.seo" localData={localData} onChange={handleNestedChange} />
+
+                            <h4 className="font-bold text-xl mt-8 mb-4 text-[var(--color-secondary)]">Page Banner</h4>
+                            <AdminInput label="Title" name="pages.umrah.pageBanner.title" value={localData.pages.umrah.pageBanner.title} onChange={e => handleNestedChange(e.target.name, e.target.value)} />
+                            <AdminTextarea label="Subtitle" name="pages.umrah.pageBanner.subtitle" value={localData.pages.umrah.pageBanner.subtitle} onChange={e => handleNestedChange(e.target.name, e.target.value)} className="mt-2" />
+                            <AdminInput label="Background Image URL" name="pages.umrah.pageBanner.backgroundImage" value={localData.pages.umrah.pageBanner.backgroundImage} onChange={e => handleNestedChange(e.target.name, e.target.value)} className="mt-2" />
+
+                            <h4 className="font-bold text-xl mt-8 mb-4 text-[var(--color-secondary)]">Category Filters</h4>
+                            <p className="text-xs text-[var(--color-muted-text)] mb-4">These filters appear as buttons at the top of the list. The 'Category' must match the category assigned to individual packages in the 'Legacy Packages' section.</p>
+                            
+                            {localData.pages.umrah.filters.map((filter, index) => (
+                                <div key={index} className="mb-4 p-3 border border-gray-600 rounded-md bg-[var(--color-dark-bg)]">
+                                    <div className="flex justify-between items-center mb-2">
+                                        <span className="font-bold text-white">Filter {index + 1}</span>
+                                        <button 
+                                            onClick={() => deleteListItem('pages.umrah.filters', index)} 
+                                            className="bg-red-600 text-white px-3 py-1 rounded text-sm"
+                                        >
+                                            Delete
+                                        </button>
+                                    </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <AdminInput label="Label (Display Name)" name="label" value={filter.label} onChange={e => handleListChange('pages.umrah.filters', index, e.target.name, e.target.value)} />
+                                        <AdminInput label="Category (Exact Match)" name="category" value={filter.category} onChange={e => handleListChange('pages.umrah.filters', index, e.target.name, e.target.value)} />
+                                    </div>
+                                    <div className="text-xs text-green-400 mt-1">
+                                        Linked Packages: {getLinkedPackageCount(filter.category, activeListingTab)}
+                                    </div>
+                                    <div className="mt-2">
+                                        <label className="block text-sm font-medium text-[var(--color-muted-text)] mb-1">Icon (SVG Path)</label>
+                                        <textarea 
+                                            value={filter.icon} 
+                                            onChange={e => handleListChange('pages.umrah.filters', index, 'icon', e.target.value)} 
+                                            rows={2}
+                                            className="w-full bg-[var(--color-dark-bg)] border border-gray-600 rounded-md py-2 px-3 text-[var(--color-light-text)] font-mono text-xs focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]"
+                                        />
+                                    </div>
+                                </div>
+                            ))}
+                            <button 
+                                onClick={() => addListItem('pages.umrah.filters', { label: 'New Filter', category: 'Category Name', icon: '<path d="..." />' })} 
+                                className="mt-2 bg-green-600 text-white font-bold py-2 px-4 rounded"
+                            >
+                                Add New Filter
+                            </button>
+                        </div>
+                    )}
+
+                    {activeListingTab === 'hajj' && (
+                        <div>
+                            <PageIdDisplay id="#hajj" label="Page ID" />
+                            <p className="text-[var(--color-muted-text)] mb-4">Configure the main Hajj packages listing page.</p>
+                            
+                            <SeoEditor pageName="Hajj Page SEO" seoPath="pages.hajj.seo" localData={localData} onChange={handleNestedChange} />
+
+                            <h4 className="font-bold text-xl mt-8 mb-4 text-[var(--color-secondary)]">Page Banner</h4>
+                            <AdminInput label="Title" name="pages.hajj.pageBanner.title" value={localData.pages.hajj.pageBanner.title} onChange={e => handleNestedChange(e.target.name, e.target.value)} />
+                            <AdminTextarea label="Subtitle" name="pages.hajj.pageBanner.subtitle" value={localData.pages.hajj.pageBanner.subtitle} onChange={e => handleNestedChange(e.target.name, e.target.value)} className="mt-2" />
+                            <AdminInput label="Background Image URL" name="pages.hajj.pageBanner.backgroundImage" value={localData.pages.hajj.pageBanner.backgroundImage} onChange={e => handleNestedChange(e.target.name, e.target.value)} className="mt-2" />
+
+                            <h4 className="font-bold text-xl mt-8 mb-4 text-[var(--color-secondary)]">Category Filters</h4>
+                             {localData.pages.hajj.filters.map((filter, index) => (
+                                <div key={index} className="mb-4 p-3 border border-gray-600 rounded-md bg-[var(--color-dark-bg)]">
+                                    <div className="flex justify-between items-center mb-2">
+                                        <span className="font-bold text-white">Filter {index + 1}</span>
+                                        <button 
+                                            onClick={() => deleteListItem('pages.hajj.filters', index)} 
+                                            className="bg-red-600 text-white px-3 py-1 rounded text-sm"
+                                        >
+                                            Delete
+                                        </button>
+                                    </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <AdminInput label="Label (Display Name)" name="label" value={filter.label} onChange={e => handleListChange('pages.hajj.filters', index, e.target.name, e.target.value)} />
+                                        <AdminInput label="Category (Exact Match)" name="category" value={filter.category} onChange={e => handleListChange('pages.hajj.filters', index, e.target.name, e.target.value)} />
+                                    </div>
+                                    <div className="text-xs text-green-400 mt-1">
+                                        Linked Packages: {getLinkedPackageCount(filter.category, activeListingTab)}
+                                    </div>
+                                    <div className="mt-2">
+                                        <label className="block text-sm font-medium text-[var(--color-muted-text)] mb-1">Icon (SVG Path)</label>
+                                        <textarea 
+                                            value={filter.icon} 
+                                            onChange={e => handleListChange('pages.hajj.filters', index, 'icon', e.target.value)} 
+                                            rows={2}
+                                            className="w-full bg-[var(--color-dark-bg)] border border-gray-600 rounded-md py-2 px-3 text-[var(--color-light-text)] font-mono text-xs focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]"
+                                        />
+                                    </div>
+                                </div>
+                            ))}
+                            <button 
+                                onClick={() => addListItem('pages.hajj.filters', { label: 'New Filter', category: 'Category Name', icon: '<path d="..." />' })} 
+                                className="mt-2 bg-green-600 text-white font-bold py-2 px-4 rounded"
+                            >
+                                Add New Filter
+                            </button>
+                        </div>
+                    )}
+                </Section>
+
                 <Section title="Legacy Packages (Old Layout)">
                     <div className="flex space-x-4 mb-6">
                         <button
@@ -1128,6 +1646,9 @@ const AdminPage: React.FC = () => {
                         </button>
                     </div>
                     
+                    {activePackageTab === 'hajj' && <PageIdDisplay id="#hajj" label="Page ID (Legacy Hajj)" />}
+                    {activePackageTab === 'umrah' && <PageIdDisplay id="#umrah" label="Page ID (Legacy Umrah)" />}
+
                     {/* Category Filter Bar */}
                     <div className="mb-6 overflow-x-auto pb-2">
                         <div className="flex flex-wrap gap-2">
@@ -1160,6 +1681,7 @@ const AdminPage: React.FC = () => {
                                         packageType="hajj" 
                                         onChange={handleListChange} 
                                         onDelete={deleteListItem} 
+                                        availableCategories={localData.pages.hajj.filters.map(f => f.category)}
                                     />
                                 ))
                             )}
@@ -1182,6 +1704,7 @@ const AdminPage: React.FC = () => {
                                         packageType="umrah" 
                                         onChange={handleListChange} 
                                         onDelete={deleteListItem} 
+                                        availableCategories={localData.pages.umrah.filters.map(f => f.category)}
                                     />
                                 ))
                             )}
@@ -1193,6 +1716,7 @@ const AdminPage: React.FC = () => {
                 </Section>
 
                 <Section title="Hajj Guide (Bangla)">
+                    <PageIdDisplay id="#hajj-guide-in-bangla" label="Page ID" />
                     <AdminInput label="Page Title" name="pages.hajjGuide.pageBanner.title" value={localData.pages.hajjGuide.pageBanner.title} onChange={e => handleNestedChange(e.target.name, e.target.value)} />
                     <AdminTextarea label="Banner Subtitle" name="pages.hajjGuide.pageBanner.subtitle" value={localData.pages.hajjGuide.pageBanner.subtitle} onChange={e => handleNestedChange(e.target.name, e.target.value)} className="mt-2" />
                     
@@ -1207,6 +1731,7 @@ const AdminPage: React.FC = () => {
                 </Section>
 
                 <Section title="Umrah Guide (Bangla)">
+                    <PageIdDisplay id="#umrah-guide-in-bangla" label="Page ID" />
                     <AdminInput label="Page Title" name="pages.umrahGuide.pageBanner.title" value={localData.pages.umrahGuide.pageBanner.title} onChange={e => handleNestedChange(e.target.name, e.target.value)} />
                     <AdminTextarea label="Banner Subtitle" name="pages.umrahGuide.pageBanner.subtitle" value={localData.pages.umrahGuide.pageBanner.subtitle} onChange={e => handleNestedChange(e.target.name, e.target.value)} className="mt-2" />
                     
@@ -1227,10 +1752,12 @@ const AdminPage: React.FC = () => {
                 </Section>
 
                 <Section title="Why Choose Us (Umrah)">
+                    <PageIdDisplay id="#why-us" label="Page ID" />
                     <ExpertGuideEditor pageKey="whyChooseUs" localData={localData} handleNestedChange={handleNestedChange} />
                 </Section>
 
                 <Section title="Expert Hajj Guides">
+                    <PageIdDisplay id="#expert-hajj-guides" label="Page ID" />
                     <ExpertGuideEditor pageKey="expertHajjGuides" localData={localData} handleNestedChange={handleNestedChange} />
                 </Section>
                 
@@ -1306,6 +1833,7 @@ const AdminPage: React.FC = () => {
                 </Section>
 
                 <Section title="Testimonials Page">
+                    <PageIdDisplay id="#testimonials" label="Page ID" />
                     <AdminInput label="Page Title" name="pages.testimonials.pageBanner.title" value={localData.pages.testimonials.pageBanner.title} onChange={e => handleNestedChange(e.target.name, e.target.value)} />
                     <div className="mt-2">
                         <AdminTextarea label="Page Subtitle" name="pages.testimonials.pageBanner.subtitle" value={localData.pages.testimonials.pageBanner.subtitle} onChange={e => handleNestedChange(e.target.name, e.target.value)} />
@@ -1327,6 +1855,7 @@ const AdminPage: React.FC = () => {
                 </Section>
 
                 <Section title="Visa Processing Page">
+                    <PageIdDisplay id="#visa-processing" label="Page ID" />
                     <AdminInput label="Page Title" name="pages.visaProcessing.pageBanner.title" value={localData.pages.visaProcessing.pageBanner.title} onChange={e => handleNestedChange(e.target.name, e.target.value)} />
                     <AdminTextarea label="Page Subtitle" name="pages.visaProcessing.pageBanner.subtitle" value={localData.pages.visaProcessing.pageBanner.subtitle} onChange={e => handleNestedChange(e.target.name, e.target.value)} />
                     
@@ -1389,6 +1918,7 @@ const AdminPage: React.FC = () => {
                 </Section>
                 
                 <Section title="Air Ticketing Page">
+                     <PageIdDisplay id="#air-ticketing" label="Page ID" />
                      <AdminInput label="Page Title" name="pages.airTicketing.pageBanner.title" value={localData.pages.airTicketing.pageBanner.title} onChange={e => handleNestedChange(e.target.name, e.target.value)} />
                     <AdminTextarea label="Page Subtitle" name="pages.airTicketing.pageBanner.subtitle" value={localData.pages.airTicketing.pageBanner.subtitle} onChange={e => handleNestedChange(e.target.name, e.target.value)} className="mt-2" />
                     <div className="mt-6">

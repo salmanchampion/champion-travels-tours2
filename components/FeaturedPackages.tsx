@@ -1,12 +1,12 @@
 
 import React, { useState, useMemo, useEffect, useContext } from 'react';
 import { DataContext } from '../contexts/DataContext';
-import { HajjPackage, UmrahPackage } from '../data';
+import { HajjPackage, UmrahPackage, defaultData } from '../data';
 
 // --- Icon Components ---
 const PriceIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5a2 2 0 012 2v5a2 2 0 002 2h5a2 2 0 012 2v5a2 2 0 01-2 2h-5a2 2 0 01-2-2v-5a2 2 0 00-2-2H7a2 2 0 01-2-2V5a2 2 0 012-2z" /></svg>;
 const DurationIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>;
-const HotelIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M5 7h14" /></svg>;
+const HotelIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>;
 const FlightIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>;
 const FoodIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h18M3 7h18M3 11h18M3 15h18M3 19h18" /></svg>;
 const SpecialIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.293 2.293a1 1 0 010 1.414L10 16l-4 1 1-4 6.293-6.293a1 1 0 011.414 0z" /></svg>;
@@ -45,20 +45,20 @@ const SkeletonCard: React.FC = () => (
 const DetailRow: React.FC<{ icon: React.ReactNode; label: string; value: any; }> = ({ icon, label, value }) => (
     <div className="flex items-start space-x-3 py-2 border-b border-gray-700 last:border-b-0">
         <div className="flex-shrink-0 pt-1">{icon}</div>
-        <div className="flex-grow">
-            <p className="text-sm font-semibold text-[var(--color-light-text)]">{label}</p>
-            <p className="text-sm text-[var(--color-muted-text)]">{String(value || '')}</p>
+        <div className="flex-grow min-w-0">
+            <p className="text-sm font-semibold text-[var(--color-light-text)] truncate">{label}</p>
+            <p className="text-sm text-[var(--color-muted-text)] truncate">{String(value || '')}</p>
         </div>
     </div>
 );
 
 // Helper for the new Hajj Card grid layout
 const GridDetail: React.FC<{ icon: React.ReactNode; label: string; value: string; }> = ({ icon, label, value }) => (
-    <div className="flex items-start space-x-2">
+    <div className="flex items-start space-x-2 overflow-hidden">
         <div className="flex-shrink-0 text-[var(--color-primary)] pt-1">{icon}</div>
-        <div>
-            <p className="text-xs font-bold text-[var(--color-muted-text)] uppercase tracking-wider">{label}</p>
-            <p className="text-sm text-[var(--color-light-text)] font-medium">{value}</p>
+        <div className="min-w-0">
+            <p className="text-[10px] font-bold text-[var(--color-muted-text)] uppercase tracking-wider truncate">{label}</p>
+            <p className="text-xs md:text-sm text-[var(--color-light-text)] font-medium truncate">{value}</p>
         </div>
     </div>
 );
@@ -68,25 +68,25 @@ const GridDetail: React.FC<{ icon: React.ReactNode; label: string; value: string
 const HajjPackageCard: React.FC<{ pkg: HajjPackage }> = ({ pkg }) => (
     <div data-aos="fade-up" className="bg-[var(--color-light-bg)] rounded-[var(--ui-border-radius)] shadow-[var(--ui-shadow)] border border-transparent hover:border-[var(--color-primary)] flex flex-col h-full text-[var(--color-light-text)] overflow-hidden transition-all duration-500 hover:shadow-xl transform hover:-translate-y-1">
         <div className="relative group">
-            <img src={pkg.image} alt={pkg.name} className="w-full h-48 object-cover transition-transform duration-700 group-hover:scale-110" />
-            <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/90 to-transparent">
-                <h3 className="text-xl font-bold font-display text-white">{pkg.name}</h3>
+            <img src={pkg.image} alt={pkg.name} className="w-full h-40 md:h-48 object-cover transition-transform duration-700 group-hover:scale-110" />
+            <div className="absolute bottom-0 left-0 right-0 p-3 md:p-4 bg-gradient-to-t from-black/90 to-transparent">
+                <h3 className="text-lg md:text-xl font-bold font-display text-white truncate">{pkg.name}</h3>
             </div>
         </div>
         
-        <div className="p-6 flex-grow flex flex-col">
+        <div className="p-4 md:p-6 flex-grow flex flex-col">
             <div className="flex justify-between items-center border-b border-gray-700 pb-4 mb-4">
                 <div>
                     <p className="text-xs font-bold text-[var(--color-muted-text)] uppercase">Price</p>
-                    <p className="text-2xl font-bold text-[var(--color-primary)]">{pkg.price}</p>
+                    <p className="text-lg md:text-2xl font-bold text-[var(--color-primary)]">{pkg.price}</p>
                 </div>
                 <div className="text-right">
                     <p className="text-xs font-bold text-[var(--color-muted-text)] uppercase">Duration</p>
-                    <p className="text-lg font-semibold text-white">{pkg.duration}</p>
+                    <p className="text-sm md:text-lg font-semibold text-white">{pkg.duration}</p>
                 </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4 mb-4">
+            <div className="grid grid-cols-2 gap-3 md:gap-4 mb-4">
                 <GridDetail icon={<HotelIcon />} label="Makkah Hotel" value={pkg.hotelMakkah} />
                 <GridDetail icon={<HotelIcon />} label="Madinah Hotel" value={pkg.hotelMadinah} />
                 <GridDetail icon={<FlightIcon />} label="Flights Up" value={pkg.flightsUp} />
@@ -99,7 +99,7 @@ const HajjPackageCard: React.FC<{ pkg: HajjPackage }> = ({ pkg }) => (
                 <div className="mt-auto pt-4 border-t border-gray-700">
                      <div className="flex items-start space-x-2 text-[var(--color-muted-text)]">
                         <div className="flex-shrink-0 pt-1"><NoteIcon /></div>
-                        <p className="text-xs italic">{pkg.note}</p>
+                        <p className="text-xs italic line-clamp-2">{pkg.note}</p>
                     </div>
                 </div>
             )}
@@ -171,17 +171,17 @@ const KeyHighlights: React.FC = () => {
     return (
     <div data-aos="zoom-in" className="bg-[var(--color-light-bg)] rounded-[var(--ui-border-radius)] p-6 md:p-10 mt-16 shadow-inner">
         <div className="text-center">
-            <h3 className="text-3xl md:text-4xl font-display font-bold text-white mb-10">{keyHighlights.title}</h3>
+            <h3 className="text-2xl md:text-4xl font-display font-bold text-white mb-8">{keyHighlights.title}</h3>
             <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16">
                 <div className="flex flex-col items-center text-center max-w-xs">
-                     <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-[var(--color-primary)] mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.653-.284-1.255-.758-1.658M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.653.284-1.255.758-1.658m0 0A5.986 5.986 0 0112 13a5.986 5.986 0 014.242 1.758m0 0a3 3 0 01-5.356-1.857m0 0a3 3 0 00-5.356-1.857m0 0A5.986 5.986 0 017 13a5.986 5.986 0 01-4.242 1.758M12 13a5 5 0 015 5v2H7v-2a5 5 0 015-5z" /></svg>
-                    <p className="text-3xl sm:text-4xl font-bold text-[var(--color-primary)]">{keyHighlights.umrahStat}</p>
-                    <p className="text-[var(--color-muted-text)] mt-1">{keyHighlights.umrahStatLabel}</p>
+                     <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 md:h-12 md:w-12 text-[var(--color-primary)] mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.653-.284-1.255-.758-1.658M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.653.284-1.255.758-1.658m0 0A5.986 5.986 0 0112 13a5.986 5.986 0 014.242 1.758m0 0a3 3 0 01-5.356-1.857m0 0a3 3 0 00-5.356-1.857m0 0A5.986 5.986 0 017 13a5.986 5.986 0 01-4.242 1.758M12 13a5 5 0 015 5v2H7v-2a5 5 0 015-5z" /></svg>
+                    <p className="text-2xl md:text-4xl font-bold text-[var(--color-primary)]">{keyHighlights.umrahStat}</p>
+                    <p className="text-[var(--color-muted-text)] mt-1 text-sm md:text-base">{keyHighlights.umrahStatLabel}</p>
                 </div>
                 <div className="flex flex-col items-center text-center max-w-xs">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-[var(--color-primary)] mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 016-6h6a6 6 0 016 6v1h-3" /></svg>
-                    <p className="text-3xl sm:text-4xl font-bold text-[var(--color-primary)]">{keyHighlights.hajjStat}</p>
-                    <p className="text-[var(--color-muted-text)] mt-1">{keyHighlights.hajjStatLabel}</p>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 md:h-12 md:w-12 text-[var(--color-primary)] mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 016-6h6a6 6 0 016 6v1h-3" /></svg>
+                    <p className="text-2xl md:text-4xl font-bold text-[var(--color-primary)]">{keyHighlights.hajjStat}</p>
+                    <p className="text-[var(--color-muted-text)] mt-1 text-sm md:text-base">{keyHighlights.hajjStatLabel}</p>
                 </div>
             </div>
         </div>
@@ -198,10 +198,10 @@ const UmrahPackageCard: React.FC<{ pkg: EnhancedUmrahPackage }> = ({ pkg }) => {
     return (
     <div data-aos="fade-up" className="bg-[var(--color-light-bg)] rounded-[var(--ui-border-radius)] shadow-[var(--ui-shadow)] border border-gray-700 flex flex-col h-full text-[var(--color-light-text)] overflow-hidden hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300">
         <div className="bg-[var(--color-dark-bg)] p-4 flex items-center justify-between">
-            <h3 className="font-bold text-lg font-display text-[var(--color-secondary)]">{pkg.name}</h3>
-            <img src={logo} alt='Champion Travels & Tours Logo' className="h-10 w-auto" />
+            <h3 className="font-bold text-base md:text-lg font-display text-[var(--color-secondary)] truncate flex-1 pr-2">{pkg.name}</h3>
+            <img src={logo} alt='Champion Travels & Tours Logo' className="h-6 md:h-10 w-auto" />
         </div>
-        <div className="relative group overflow-hidden h-48">
+        <div className="relative group overflow-hidden h-40 md:h-48">
              <img src={pkg.image} alt={pkg.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
         </div>
         <div className="p-4 flex-grow">
@@ -231,8 +231,8 @@ const Gallery: React.FC = () => {
   return (
     <div className="bg-[var(--color-light-bg)] rounded-[var(--ui-border-radius)] p-6 md:p-10 mt-16 shadow-inner">
       <div className="text-center mb-12">
-        <h3 className="text-3xl md:text-4xl font-display font-bold text-white" data-aos="fade-up">{gallery.title}</h3>
-        <p className="mt-4 text-lg text-[var(--color-muted-text)] max-w-3xl mx-auto" data-aos="fade-up" data-aos-delay="100">{gallery.description}</p>
+        <h3 className="text-2xl md:text-4xl font-display font-bold text-white" data-aos="fade-up">{gallery.title}</h3>
+        <p className="mt-4 text-base md:text-lg text-[var(--color-muted-text)] max-w-3xl mx-auto" data-aos="fade-up" data-aos-delay="100">{gallery.description}</p>
       </div>
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {gallery.images.filter(img => img.enabled).map((image, index) => (
@@ -399,8 +399,18 @@ const FeaturedPackages: React.FC<FeaturedPackagesProps> = ({ showHajjFilters = f
     const [loading, setLoading] = useState(true);
     const { appData } = useContext(DataContext);
 
-    const visibleHajjPackages = useMemo(() => appData.hajjPackages.filter(p => p.enabled), [appData.hajjPackages]);
-    const visibleUmrahPackages = useMemo(() => appData.umrahPackages.filter(p => p.enabled), [appData.umrahPackages]);
+    // --- ROBUST FALLBACK LOGIC ---
+    // Use default data if the appData lists are empty (e.g., fresh DB) or don't exist
+    const rawHajjPackages = (appData.hajjPackages && appData.hajjPackages.length > 0) 
+        ? appData.hajjPackages 
+        : defaultData.hajjPackages;
+        
+    const rawUmrahPackages = (appData.umrahPackages && appData.umrahPackages.length > 0) 
+        ? appData.umrahPackages 
+        : defaultData.umrahPackages;
+
+    const visibleHajjPackages = useMemo(() => rawHajjPackages.filter(p => p.enabled), [rawHajjPackages]);
+    const visibleUmrahPackages = useMemo(() => rawUmrahPackages.filter(p => p.enabled), [rawUmrahPackages]);
 
     const homePageData = appData.pages.home.sections.packages;
     const packagesPageData = appData.pages.packages;
@@ -408,7 +418,7 @@ const FeaturedPackages: React.FC<FeaturedPackagesProps> = ({ showHajjFilters = f
     useEffect(() => {
         const timer = setTimeout(() => {
             setLoading(false);
-        }, 1500); // Simulate network delay
+        }, 1000); 
         return () => clearTimeout(timer);
     }, []);
 
@@ -486,20 +496,20 @@ const FeaturedPackages: React.FC<FeaturedPackagesProps> = ({ showHajjFilters = f
     };
 
     return (
-        <section className="py-20 bg-[var(--color-dark-bg)]">
+        <section className="py-16 md:py-20 bg-[var(--color-dark-bg)]">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 {showTitle && (
                     <div className="text-center mb-12">
-                        <h2 className="text-4xl md:text-5xl font-display font-bold text-[var(--color-primary)]" data-aos="fade-up">{homePageData.title}</h2>
-                        <p className="mt-4 text-lg text-[var(--color-muted-text)] max-w-3xl mx-auto" data-aos="fade-up" data-aos-delay="100">{homePageData.subtitle}</p>
+                        <h2 className="text-3xl md:text-5xl font-display font-bold text-[var(--color-primary)]" data-aos="fade-up">{homePageData.title}</h2>
+                        <p className="mt-4 text-base md:text-lg text-[var(--color-muted-text)] max-w-3xl mx-auto" data-aos="fade-up" data-aos-delay="100">{homePageData.subtitle}</p>
                     </div>
                 )}
 
                 {/* --- Hajj Packages Section --- */}
                 <div>
                     {showHajjFilters && (
-                        <div className="bg-[var(--color-light-bg)] p-6 rounded-[var(--ui-border-radius)] mb-10 shadow-[var(--ui-shadow)]">
-                             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 items-end">
+                        <div className="bg-[var(--color-light-bg)] p-4 md:p-6 rounded-[var(--ui-border-radius)] mb-10 shadow-[var(--ui-shadow)]">
+                             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 items-end">
                                 <FilterSelect label="Sort by" value={hajjSort} onChange={e => setHajjSort(e.target.value)}>
                                     <option value="default">Default</option>
                                     <option value="price-asc">Price: Low to High</option>
@@ -507,9 +517,9 @@ const FeaturedPackages: React.FC<FeaturedPackagesProps> = ({ showHajjFilters = f
                                 </FilterSelect>
                                 <FilterInput label="Min Price" type="number" value={hajjMinPrice} onChange={e => setHajjMinPrice(e.target.value)} placeholder="e.g. 500000" />
                                 <FilterInput label="Max Price" type="number" value={hajjMaxPrice} onChange={e => setHajjMaxPrice(e.target.value)} placeholder="e.g. 1500000" />
-                                <FilterInput label="Min Duration (Days)" type="number" value={hajjMinDuration} onChange={e => setHajjMinDuration(e.target.value)} placeholder="e.g. 15" />
-                                <FilterInput label="Max Duration (Days)" type="number" value={hajjMaxDuration} onChange={e => setHajjMaxDuration(e.target.value)} placeholder="e.g. 45" />
-                                <button onClick={resetHajjFilters} className="bg-[var(--color-primary)] text-white font-bold py-2 px-4 rounded-[var(--ui-button-radius)] hover:bg-[var(--color-primary-dark)] h-10">Reset</button>
+                                <FilterInput label="Min Days" type="number" value={hajjMinDuration} onChange={e => setHajjMinDuration(e.target.value)} placeholder="e.g. 15" />
+                                <FilterInput label="Max Days" type="number" value={hajjMaxDuration} onChange={e => setHajjMaxDuration(e.target.value)} placeholder="e.g. 45" />
+                                <button onClick={resetHajjFilters} className="bg-[var(--color-primary)] text-white font-bold py-2 px-4 rounded-[var(--ui-button-radius)] hover:bg-[var(--color-primary-dark)] h-10 w-full">Reset</button>
                             </div>
                              <div className="mt-4 pt-4 border-t border-gray-700">
                                 <h4 className="text-lg font-semibold text-white mb-2">Package Type</h4>
@@ -521,7 +531,7 @@ const FeaturedPackages: React.FC<FeaturedPackagesProps> = ({ showHajjFilters = f
                             </div>
                         </div>
                     )}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8">
                         {loading ? [...Array(3)].map((_, i) => <SkeletonCard key={i} />) : filteredHajjPackages.map(pkg => <HajjPackageCard key={pkg.name} pkg={pkg} />)}
                         <HajjPreRegistrationCard />
                     </div>
@@ -532,12 +542,12 @@ const FeaturedPackages: React.FC<FeaturedPackagesProps> = ({ showHajjFilters = f
                 {/* --- Umrah Packages Section --- */}
                 <div className="mt-20">
                     <div className="text-center mb-12">
-                        <h2 className="text-4xl md:text-5xl font-display font-bold text-[var(--color-primary)]" data-aos="fade-up">{packagesPageData.umrahSection.title}</h2>
-                        <p className="mt-4 text-lg text-[var(--color-muted-text)] max-w-3xl mx-auto" data-aos="fade-up" data-aos-delay="100">{packagesPageData.umrahSection.subtitle}</p>
+                        <h2 className="text-3xl md:text-5xl font-display font-bold text-[var(--color-primary)]" data-aos="fade-up">{packagesPageData.umrahSection.title}</h2>
+                        <p className="mt-4 text-base md:text-lg text-[var(--color-muted-text)] max-w-3xl mx-auto" data-aos="fade-up" data-aos-delay="100">{packagesPageData.umrahSection.subtitle}</p>
                     </div>
                      {showUmrahFilters && (
-                        <div className="bg-[var(--color-light-bg)] p-6 rounded-[var(--ui-border-radius)] mb-10 shadow-[var(--ui-shadow)]">
-                             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 items-end">
+                        <div className="bg-[var(--color-light-bg)] p-4 md:p-6 rounded-[var(--ui-border-radius)] mb-10 shadow-[var(--ui-shadow)]">
+                             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 items-end">
                                 <FilterSelect label="Sort by" value={umrahSort} onChange={e => setUmrahSort(e.target.value)}>
                                     <option value="default">Default</option>
                                     <option value="price-asc">Price: Low to High</option>
@@ -550,7 +560,7 @@ const FeaturedPackages: React.FC<FeaturedPackagesProps> = ({ showHajjFilters = f
                                     <option value="direct">Direct</option>
                                     <option value="transit">Transit</option>
                                 </FilterSelect>
-                                <button onClick={resetAllUmrahFilters} className="bg-[var(--color-primary)] text-white font-bold py-2 px-4 rounded-[var(--ui-button-radius)] hover:bg-[var(--color-primary-dark)] h-10">Reset</button>
+                                <button onClick={resetAllUmrahFilters} className="bg-[var(--color-primary)] text-white font-bold py-2 px-4 rounded-[var(--ui-button-radius)] hover:bg-[var(--color-primary-dark)] h-10 w-full">Reset</button>
                             </div>
                              <div className="mt-4 pt-4 border-t border-gray-700">
                                 <h4 className="text-lg font-semibold text-white mb-2">Package Type</h4>
@@ -562,7 +572,7 @@ const FeaturedPackages: React.FC<FeaturedPackagesProps> = ({ showHajjFilters = f
                             </div>
                         </div>
                     )}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
                         {loading ? [...Array(3)].map((_, i) => <SkeletonCard key={i} />) : finalFilteredUmrahPackages.map(pkg => <UmrahPackageCard key={pkg.name} pkg={pkg} />)}
                     </div>
                 </div>

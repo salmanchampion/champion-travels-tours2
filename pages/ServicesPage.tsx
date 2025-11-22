@@ -11,18 +11,18 @@ const ServiceSection: React.FC<{
     link: string;
     buttonText?: string;
 }> = ({ title, subtitle, description, features, image, align, link, buttonText = "Inquire About This Service" }) => (
-    <div className="py-24 border-b border-gray-800/50 last:border-0 relative overflow-hidden">
+    <div className="py-12 md:py-24 border-b border-gray-800/50 last:border-0 relative overflow-hidden">
         {/* Subtle background pattern */}
         <div className="absolute inset-0 opacity-5 pointer-events-none bg-[url('https://www.toptal.com/designers/subtlepatterns/uploads/arabesque.png')]"></div>
         
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div className={`flex flex-col lg:flex-row items-center gap-16 ${align === 'right' ? 'lg:flex-row-reverse' : ''}`}>
+            <div className={`flex flex-col lg:flex-row items-center gap-8 md:gap-16 ${align === 'right' ? 'lg:flex-row-reverse' : ''}`}>
                 
                 {/* Image Side */}
                 <div className="lg:w-1/2 w-full" data-aos={align === 'left' ? 'fade-right' : 'fade-left'}>
                     <div className="relative group">
                         <div className="absolute -inset-1 bg-gradient-to-r from-[var(--color-primary)] to-[#8B6E4E] rounded-xl blur opacity-25 group-hover:opacity-75 transition duration-1000"></div>
-                        <div className="relative overflow-hidden rounded-xl shadow-2xl h-[400px] lg:h-[500px]">
+                        <div className="relative overflow-hidden rounded-xl shadow-2xl h-[250px] sm:h-[350px] lg:h-[500px]">
                             <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition duration-500 z-10"></div>
                             <img 
                                 src={image} 
@@ -31,29 +31,29 @@ const ServiceSection: React.FC<{
                             />
                         </div>
                         {/* Decorative Box */}
-                        <div className={`absolute -bottom-6 ${align === 'left' ? '-right-6' : '-left-6'} w-24 h-24 border-2 border-[var(--color-primary)] hidden lg:block bg-transparent z-20`}></div>
+                        <div className={`absolute -bottom-4 -right-4 md:-bottom-6 ${align === 'left' ? 'md:-right-6' : 'md:-left-6'} w-16 h-16 md:w-24 md:h-24 border-2 border-[var(--color-primary)] hidden md:block bg-transparent z-20`}></div>
                     </div>
                 </div>
 
                 {/* Content Side */}
                 <div className="lg:w-1/2 w-full" data-aos="fade-up">
-                    <div className="flex items-center gap-4 mb-4">
-                        <div className="h-px w-12 bg-[var(--color-primary)]"></div>
-                        <span className="text-[var(--color-primary)] font-bold tracking-[0.2em] uppercase text-sm">{subtitle}</span>
+                    <div className="flex items-center gap-4 mb-3 md:mb-4">
+                        <div className="h-px w-8 md:w-12 bg-[var(--color-primary)]"></div>
+                        <span className="text-[var(--color-primary)] font-bold tracking-[0.2em] uppercase text-xs md:text-sm">{subtitle}</span>
                     </div>
                     
-                    <h2 className="text-4xl md:text-5xl font-display font-bold text-white mb-6 leading-tight">
+                    <h2 className="text-3xl md:text-5xl font-display font-bold text-white mb-4 md:mb-6 leading-tight">
                         {title}
                     </h2>
-                    <p className="text-lg text-[var(--color-muted-text)] leading-relaxed mb-8">
+                    <p className="text-base md:text-lg text-[var(--color-muted-text)] leading-relaxed mb-6 md:mb-8">
                         {description}
                     </p>
                     
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4 mb-8 md:mb-10">
                         {features.map((feature, idx) => (
                             <div key={idx} className="flex items-center space-x-3 group">
-                                <div className="w-1.5 h-1.5 rounded-full bg-[var(--color-primary)] group-hover:scale-150 transition-transform"></div>
-                                <span className="text-gray-300 group-hover:text-white transition-colors">{feature}</span>
+                                <div className="w-1.5 h-1.5 rounded-full bg-[var(--color-primary)] group-hover:scale-150 transition-transform shrink-0"></div>
+                                <span className="text-gray-300 group-hover:text-white transition-colors text-sm md:text-base">{feature}</span>
                             </div>
                         ))}
                     </div>
@@ -62,7 +62,7 @@ const ServiceSection: React.FC<{
                         href={link}
                         className="inline-flex items-center space-x-3 text-white font-bold group"
                     >
-                        <span className="border-b-2 border-[var(--color-primary)] pb-1 group-hover:text-[var(--color-primary)] transition-colors">{buttonText}</span>
+                        <span className="border-b-2 border-[var(--color-primary)] pb-1 group-hover:text-[var(--color-primary)] transition-colors text-sm md:text-base">{buttonText}</span>
                         <svg className="w-5 h-5 transform group-hover:translate-x-1 transition-transform text-[var(--color-primary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
                     </a>
                 </div>
@@ -75,7 +75,7 @@ const ServicesPage: React.FC = () => {
   return (
     <div className="bg-[#0B0F19] min-h-screen pt-20">
       {/* --- Hero Section --- */}
-      <section className="relative h-[60vh] flex items-center justify-center overflow-hidden">
+      <section className="relative h-[50vh] md:h-[60vh] flex items-center justify-center overflow-hidden">
           <div className="absolute inset-0">
               <img 
                 src="https://i.postimg.cc/R0N8Mv8X/as.jpg" 
@@ -85,11 +85,11 @@ const ServicesPage: React.FC = () => {
               <div className="absolute inset-0 bg-gradient-to-b from-[#0B0F19]/90 via-[#0B0F19]/60 to-[#0B0F19]"></div>
           </div>
           <div className="relative z-10 text-center px-4 max-w-4xl mx-auto" data-aos="fade-up">
-              <div className="w-24 h-1 bg-gradient-to-r from-transparent via-[var(--color-primary)] to-transparent mx-auto mb-8"></div>
-              <h1 className="text-5xl md:text-7xl font-display font-bold text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-400 tracking-wide mb-6">
+              <div className="w-24 h-1 bg-gradient-to-r from-transparent via-[var(--color-primary)] to-transparent mx-auto mb-6 md:mb-8"></div>
+              <h1 className="text-4xl md:text-7xl font-display font-bold text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-400 tracking-wide mb-4 md:mb-6">
                   World-Class Services
               </h1>
-              <p className="text-xl md:text-2xl text-[var(--color-muted-text)] font-light">
+              <p className="text-lg md:text-2xl text-[var(--color-muted-text)] font-light">
                   We don't just facilitate travel; we curate spiritual and global experiences with unmatched precision and luxury.
               </p>
           </div>
@@ -151,21 +151,21 @@ const ServicesPage: React.FC = () => {
       </div>
 
       {/* --- VIP Concierge Banner --- */}
-      <section className="py-24 relative overflow-hidden">
+      <section className="py-16 md:py-24 relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-r from-[var(--color-primary)] to-[#8B6E4E]">
                <div className="absolute inset-0 bg-[url('https://www.toptal.com/designers/subtlepatterns/uploads/geometric-leaves.png')] opacity-10 mix-blend-multiply"></div>
           </div>
           <div className="container mx-auto px-4 relative z-10 flex flex-col md:flex-row items-center justify-between">
-              <div className="md:w-2/3 text-white mb-8 md:mb-0">
-                  <h2 className="text-4xl font-display font-bold mb-4 text-[#0B0F19]">Need VIP Concierge Service?</h2>
-                  <p className="text-xl text-[#0B0F19]/80 font-medium max-w-2xl">
+              <div className="md:w-2/3 text-white mb-8 md:mb-0 text-center md:text-left">
+                  <h2 className="text-3xl md:text-4xl font-display font-bold mb-4 text-[#0B0F19]">Need VIP Concierge Service?</h2>
+                  <p className="text-lg md:text-xl text-[#0B0F19]/80 font-medium max-w-2xl">
                       For elite travelers requiring private jets, dedicated butlers, or custom security arrangements during Hajj/Umrah, our VIP desk is at your service.
                   </p>
               </div>
-              <div className="md:w-1/3 text-right">
+              <div className="md:w-1/3 text-center md:text-right">
                   <a 
                     href="#contact?subject=VIP Concierge Request" 
-                    className="inline-block bg-[#0B0F19] text-[var(--color-primary)] font-bold py-4 px-10 rounded-none hover:bg-white transition-all duration-300 shadow-2xl transform hover:-translate-y-1 border border-[#0B0F19]"
+                    className="inline-block bg-[#0B0F19] text-[var(--color-primary)] font-bold py-3 px-8 md:py-4 md:px-10 rounded-none hover:bg-white transition-all duration-300 shadow-2xl transform hover:-translate-y-1 border border-[#0B0F19]"
                   >
                       Contact VIP Desk
                   </a>

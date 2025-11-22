@@ -1,7 +1,9 @@
+
 import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../contexts/AuthContext';
 import { DataContext } from '../contexts/DataContext';
 import { NavLink } from '../data';
+import ThemeSettingsModal from './ThemeSettingsModal';
 
 interface HeaderProps {
   activePage: string;
@@ -15,10 +17,19 @@ const Header: React.FC<HeaderProps> = ({ activePage }) => {
   const [currentTagline, setCurrentTagline] = useState(0);
   const [visible, setVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   
   const { isAuthenticated, logout } = useContext(AuthContext);
   const { appData } = useContext(DataContext);
-  const { header, site } = appData;
+  const { header, site, globalConfig } = appData;
+
+  const showThemeSwitcher = header.showThemeSwitcher !== false; // Default to true if undefined
+
+  // Dynamic Site Name Logic
+  const siteName = globalConfig?.siteIdentity?.siteName || 'Champion Travels & Tours';
+  const siteNameParts = siteName.split(' ');
+  const siteNameFirst = siteNameParts[0];
+  const siteNameRest = siteNameParts.slice(1).join(' ');
 
   useEffect(() => {
     if (!header.taglines || header.taglines.length === 0) return;
@@ -58,6 +69,13 @@ const Header: React.FC<HeaderProps> = ({ activePage }) => {
     };
   }, [lastScrollY, isMenuOpen]);
 
+  // Close mobile menu when page changes
+  useEffect(() => {
+      if (isMenuOpen) {
+          setIsMenuOpen(false);
+      }
+  }, [activePage]);
+
   const isHomepage = activePage === '#home' || activePage === '';
 
   const getIsActive = (link: NavLink) => {
@@ -75,11 +93,12 @@ const Header: React.FC<HeaderProps> = ({ activePage }) => {
   const hasTaglines = header.taglines && header.taglines.length > 0;
 
   return (
+    <>
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-transform duration-300 ease-in-out ${visible ? 'translate-y-0' : '-translate-y-full'}`}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out ${visible ? 'translate-y-0' : '-translate-y-full'}`}
     >
-        {/* Top Bar */}
-        <div className="bg-[var(--color-dark-bg)]/80 backdrop-blur-sm text-[var(--color-muted-text)] py-2 text-sm border-b border-gray-800/50 hidden md:block">
+        {/* Top Bar - Hidden on Mobile for cleaner look */}
+        <div className="bg-[var(--color-dark-bg)]/95 backdrop-blur-md text-[var(--color-muted-text)] py-2 text-xs md:text-sm border-b border-gray-800/50 hidden md:block">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-8">
                 <div className="flex items-center space-x-6">
                     {header.contactInfo?.map(info => (
@@ -89,7 +108,7 @@ const Header: React.FC<HeaderProps> = ({ activePage }) => {
                     ))}
                 </div>
                 {hasTaglines && (
-                    <div className="flex-1 text-center relative h-full overflow-hidden">
+                    <div className="flex-1 text-center relative h-full overflow-hidden mx-4">
                         {header.taglines?.map((tagline, index) => (
                             <span
                                 key={index}
@@ -103,67 +122,70 @@ const Header: React.FC<HeaderProps> = ({ activePage }) => {
                 <div className="flex items-center space-x-4">
                     {header.socialLinks?.map(link => (
                     <a key={link.name} href={link.href} target="_blank" rel="noopener noreferrer" aria-label={link.name} className="hover:text-[var(--color-primary)] transition-colors">
-                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" dangerouslySetInnerHTML={{ __html: link.icon }} />
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" dangerouslySetInnerHTML={{ __html: link.icon }} />
                     </a>
                     ))}
                 </div>
             </div>
         </div>
 
-      <div className={`transition-all duration-300 ${(scrolled || isMenuOpen || !isHomepage) ? 'bg-[var(--color-light-bg)] shadow-[var(--ui-shadow)]' : 'bg-transparent'}`}>
+      <div className={`transition-all duration-300 border-b border-transparent ${
+          (scrolled || isMenuOpen || !isHomepage) 
+            ? 'bg-[var(--color-light-bg)]/95 backdrop-blur-xl shadow-[var(--ui-shadow)] border-gray-800/50' 
+            : 'bg-transparent'
+        }`}>
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between h-20">
-            <a href="#home" className="flex items-center">
-                {site.logoUrl ? (
-                    <img src={site.logoUrl} alt="Champion Travels & Tours Logo" className="h-12 w-auto" />
-                ) : (
-                    <span className="font-display text-2xl md:text-3xl font-bold tracking-tight">
-                        <span className="text-[var(--color-light-text)]">Champion</span>
-                        <span className="text-[var(--color-primary)]"> Travels & Tours</span>
-                    </span>
-                )}
+            <div className="flex items-center justify-between h-16 md:h-20">
+            {/* Logo Section: Shows full name text alongside logo if present */}
+            <a href="#home" className="flex items-center z-50 relative gap-3">
+                {site.logoUrl && <img src={site.logoUrl} alt={siteName} className="h-10 md:h-12 w-auto" />}
+                <span className="font-display text-xl md:text-2xl font-bold tracking-tight leading-none">
+                    <span className="text-[var(--color-light-text)]">{siteNameFirst}</span>
+                    {siteNameRest && <span className="text-[var(--color-primary)]"> {siteNameRest}</span>}
+                </span>
             </a>
 
-            <nav className="hidden md:flex items-center space-x-8">
+            {/* Desktop Navigation */}
+            <nav className="hidden md:flex items-center space-x-6 lg:space-x-8">
                 {visibleNavLinks.map((link) => (
                 link.subLinks ? (
                     <div 
                     key={link.label}
-                    className="relative"
+                    className="relative group"
                     onMouseEnter={() => setOpenDropdown(link.label)}
                     onMouseLeave={() => setOpenDropdown(null)}
                     >
                     <a
                         href={link.href === '#' ? undefined : link.href}
                         onClick={(e) => link.href === '#' && e.preventDefault()}
-                        className={`flex items-center hover:text-[var(--color-primary)] transition-colors duration-300 font-medium cursor-pointer ${
+                        className={`flex items-center hover:text-[var(--color-primary)] transition-colors duration-300 font-medium cursor-pointer py-2 ${
                         getIsActive(link) ? 'text-[var(--color-primary)]' : 'text-[var(--color-light-text)]'
                         }`}
                     >
                         {link.label}
-                        <svg className={`w-4 h-4 ml-1 transition-transform ${openDropdown === link.label ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                        <svg className={`w-4 h-4 ml-1 transition-transform duration-200 ${openDropdown === link.label ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
                     </a>
-                    {openDropdown === link.label && (
-                        <div className="absolute top-full left-0 mt-2 w-60 bg-[var(--color-light-bg)] rounded-[var(--ui-border-radius)] shadow-[var(--ui-shadow)] py-2">
-                        {link.subLinks.filter(sub => sub.enabled).map(subLink => (
-                            <a
-                            key={subLink.href}
-                            href={subLink.href}
-                            className={`block px-4 py-2 text-sm hover:bg-[var(--color-dark-bg)] hover:text-[var(--color-primary)] ${
-                                activePage === subLink.href ? 'text-[var(--color-primary)]' : 'text-[var(--color-light-text)]'
-                            }`}
-                            >
-                            {subLink.label}
-                            </a>
-                        ))}
+                    <div className={`absolute top-full left-0 w-60 pt-2 transition-all duration-200 transform origin-top-left ${openDropdown === link.label ? 'opacity-100 scale-100 visible' : 'opacity-0 scale-95 invisible'}`}>
+                        <div className="bg-[var(--color-light-bg)] rounded-[var(--ui-border-radius)] shadow-xl border border-gray-700 overflow-hidden">
+                            {link.subLinks.filter(sub => sub.enabled).map(subLink => (
+                                <a
+                                key={subLink.href}
+                                href={subLink.href}
+                                className={`block px-4 py-3 text-sm hover:bg-[var(--color-dark-bg)] hover:text-[var(--color-primary)] transition-colors border-b border-gray-800 last:border-0 ${
+                                    activePage === subLink.href ? 'text-[var(--color-primary)] bg-[var(--color-dark-bg)]' : 'text-[var(--color-light-text)]'
+                                }`}
+                                >
+                                {subLink.label}
+                                </a>
+                            ))}
                         </div>
-                    )}
+                    </div>
                     </div>
                 ) : (
                     <a
                     key={link.href}
                     href={link.href}
-                    className={`hover:text-[var(--color-primary)] transition-colors duration-300 font-medium ${
+                    className={`hover:text-[var(--color-primary)] transition-colors duration-300 font-medium text-sm lg:text-base ${
                         getIsActive(link) ? 'text-[var(--color-primary)]' : 'text-[var(--color-light-text)]'
                     }`}
                     >
@@ -180,83 +202,105 @@ const Header: React.FC<HeaderProps> = ({ activePage }) => {
                     <button onClick={logout} className="hover:text-[var(--color-secondary)] transition-colors duration-300 font-medium text-[var(--color-light-text)]">(Logout)</button>
                 </>
                 )}
+                
+                {/* Settings Button */}
+                {showThemeSwitcher && (
+                    <button 
+                        onClick={() => setIsSettingsOpen(true)}
+                        className="text-[var(--color-light-text)] hover:text-[var(--color-primary)] transition-colors p-2 rounded-full hover:bg-white/5"
+                        aria-label="Theme Settings"
+                    >
+                        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                    </button>
+                )}
             </nav>
             
-            <a href={header.bookNowButton.href} className="hidden md:inline-block bg-[var(--color-primary)] text-white font-bold py-2 px-6 rounded-[var(--ui-button-radius)] hover:bg-[var(--color-primary-dark)] transition-transform duration-300 hover:scale-105">
+            <a href={header.bookNowButton.href} className="hidden md:inline-block bg-[var(--color-primary)] text-white font-bold py-2 px-6 rounded-[var(--ui-button-radius)] hover:bg-[var(--color-primary-dark)] transition-transform duration-300 hover:scale-105 text-sm shadow-lg">
                 {header.bookNowButton.text}
             </a>
 
-            <div className="md:hidden">
+            {/* Mobile Menu Button */}
+            <div className="md:hidden flex items-center z-50">
                 <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="text-white focus:outline-none"
+                className="text-white focus:outline-none p-2 hover:text-[var(--color-primary)] transition-colors"
+                aria-label="Toggle Menu"
                 >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={isMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16m-7 6h7"}></path>
-                </svg>
+                    {isMenuOpen ? (
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    ) : (
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    )}
                 </button>
             </div>
             </div>
         </div>
 
-        {isMenuOpen && (
-            <div className="md:hidden bg-[var(--color-light-bg)]">
-            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 flex flex-col items-center">
-                {visibleNavLinks.map((link) => (
+        {/* Mobile Menu Overlay */}
+        <div 
+            className={`fixed inset-0 bg-[var(--color-dark-bg)] z-40 transition-all duration-300 md:hidden flex flex-col pt-24 px-6 overflow-y-auto h-screen ${isMenuOpen ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full pointer-events-none'}`}
+        >
+            <div className="flex flex-col space-y-1 pb-24">
+                {showThemeSwitcher && (
+                    <button 
+                        onClick={() => { setIsSettingsOpen(true); setIsMenuOpen(false); }}
+                        className="flex items-center justify-between py-4 text-lg font-medium border-b border-gray-800/50 hover:text-[var(--color-primary)] transition-colors text-[var(--color-light-text)]"
+                    >
+                        <span>Appearance Settings</span>
+                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                    </button>
+                )}
+
+                {visibleNavLinks.map((link, index) => (
                 link.subLinks ? (
-                    <div key={link.label} className="w-full text-center">
-                    <div className="flex w-full items-center justify-center">
-                        <a
-                        href={link.href}
-                        onClick={(e) => {
-                            if(link.href === '#') {
-                            e.preventDefault();
-                            handleMobileSubmenuToggle(link.label);
-                            } else {
-                            setIsMenuOpen(false);
-                            }
-                        }}
-                        className={`hover:text-[var(--color-primary)] px-3 py-2 rounded-[var(--ui-button-radius)] text-base font-medium ${
+                    <div key={link.label} className="w-full border-b border-gray-800/50 last:border-0" style={{ animationDelay: `${index * 50}ms` }}>
+                    <button
+                        onClick={() => handleMobileSubmenuToggle(link.label)}
+                        className={`flex w-full items-center justify-between py-4 text-lg font-medium transition-colors hover:text-[var(--color-primary)] ${
                             getIsActive(link) ? 'text-[var(--color-primary)]' : 'text-[var(--color-light-text)]'
                         }`}
-                        >
-                        {link.label}
-                        </a>
-                        <button
-                        onClick={() => handleMobileSubmenuToggle(link.label)}
-                        className={`ml-1 p-1 ${
-                            getIsActive(link) ? 'text-[var(--color-primary)]' : 'text-[var(--color-light-text)]'
-                        } hover:text-[var(--color-primary)]`}
-                        aria-label={`Toggle ${link.label} submenu`}
-                        >
-                        <svg className={`w-4 h-4 transition-transform ${mobileSubmenu === link.label ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
-                        </button>
-                    </div>
-                    {mobileSubmenu === link.label && (
-                        <div className="pl-4 bg-[var(--color-dark-bg)] rounded-[var(--ui-border-radius)]">
+                    >
+                        <span className="font-display tracking-wide text-xl">{link.label}</span>
+                        <svg className={`w-5 h-5 transition-transform duration-300 ${mobileSubmenu === link.label ? 'rotate-180 text-[var(--color-primary)]' : 'text-gray-500'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div className={`overflow-hidden transition-all duration-300 ease-in-out bg-black/20 rounded-lg ${mobileSubmenu === link.label ? 'max-h-[500px] opacity-100 mb-4 py-2' : 'max-h-0 opacity-0'}`}>
+                        <div className="flex flex-col space-y-1 px-2">
                         {link.subLinks.filter(sub => sub.enabled).map(subLink => (
                             <a
                             key={subLink.href}
                             href={subLink.href}
                             onClick={() => setIsMenuOpen(false)}
-                            className={`block hover:text-[var(--color-primary)] px-3 py-2 rounded-[var(--ui-button-radius)] text-base font-medium ${
-                                activePage === subLink.href ? 'text-[var(--color-primary)]' : 'text-[var(--color-light-text)]'
+                            className={`block py-3 px-4 rounded-md text-base transition-colors ${
+                                activePage === subLink.href 
+                                    ? 'text-[var(--color-primary)] bg-[var(--color-primary)]/10 font-semibold' 
+                                    : 'text-gray-400 hover:text-white hover:bg-white/5'
                             }`}
                             >
                             {subLink.label}
                             </a>
                         ))}
                         </div>
-                    )}
+                    </div>
                     </div>
                 ) : (
                     <a
                     key={link.href}
                     href={link.href}
                     onClick={() => setIsMenuOpen(false)}
-                    className={`hover:text-[var(--color-primary)] block px-3 py-2 rounded-[var(--ui-button-radius)] text-base font-medium ${
+                    className={`block py-4 text-lg font-medium border-b border-gray-800/50 hover:text-[var(--color-primary)] transition-colors font-display tracking-wide text-xl ${
                         getIsActive(link) ? 'text-[var(--color-primary)]' : 'text-[var(--color-light-text)]'
                     }`}
+                    style={{ animationDelay: `${index * 50}ms` }}
                     >
                     {link.label}
                     </a>
@@ -267,23 +311,24 @@ const Header: React.FC<HeaderProps> = ({ activePage }) => {
                         <a
                         href="#admin"
                         onClick={() => setIsMenuOpen(false)}
-                        className={`hover:text-[var(--color-secondary)] block px-3 py-2 rounded-[var(--ui-button-radius)] text-base font-medium ${
-                            activePage === '#admin' ? 'text-[var(--color-secondary)]' : 'text-[var(--color-light-text)]'
-                        }`}
+                        className={`block py-4 text-lg font-medium border-b border-gray-800 text-[var(--color-secondary)] font-display tracking-wide text-xl`}
                         >
                         Admin Panel
                         </a>
-                        <button onClick={() => { logout(); setIsMenuOpen(false); }} className="hover:text-[var(--color-secondary)] block px-3 py-2 rounded-[var(--ui-button-radius)] text-base font-medium text-[var(--color-light-text)]">(Logout)</button>
+                        <button onClick={() => { logout(); setIsMenuOpen(false); }} className="w-full text-left py-4 text-lg font-medium text-red-400 font-display tracking-wide text-xl">Logout</button>
                     </>
                 )}
-                <a href={header.bookNowButton.href} onClick={() => setIsMenuOpen(false)} className="mt-4 bg-[var(--color-primary)] text-white font-bold py-2 px-6 rounded-[var(--ui-button-radius)] hover:bg-[var(--color-primary-dark)] transition-transform duration-300 hover:scale-105">
-                {header.bookNowButton.text}
-                </a>
+                <div className="pt-8 pb-12">
+                    <a href={header.bookNowButton.href} onClick={() => setIsMenuOpen(false)} className="block w-full bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] text-white font-bold py-4 rounded-[var(--ui-button-radius)] hover:shadow-lg transition-all text-center text-xl font-display tracking-wider uppercase">
+                        {header.bookNowButton.text}
+                    </a>
+                </div>
             </div>
-            </div>
-        )}
+        </div>
       </div>
     </header>
+    <ThemeSettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
+    </>
   );
 };
 

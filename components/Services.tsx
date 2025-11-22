@@ -2,7 +2,7 @@
 import React, { useState, useContext } from 'react';
 import Modal from './Modal';
 import { DataContext } from '../contexts/DataContext';
-import { Service } from '../data';
+import { Service, defaultData } from '../data';
 
 // --- Icon Components ---
 // A map to associate icon names from data with actual SVG components
@@ -22,9 +22,9 @@ const ServiceCard: React.FC<{ icon: React.ReactNode; title: string; description:
     data-aos="fade-up" 
     data-aos-delay={delay}
     onClick={onClick} 
-    className="bg-[var(--color-light-bg)] p-8 rounded-[var(--ui-border-radius)] text-center transform hover:-translate-y-2 transition-all duration-500 shadow-[var(--ui-shadow)] hover:shadow-[var(--color-primary)]/30 cursor-pointer border-2 border-transparent hover:border-[var(--color-primary)] group"
+    className="bg-[var(--color-light-bg)] p-8 rounded-[var(--ui-border-radius)] text-center transform hover:-translate-y-2 transition-all duration-500 shadow-[var(--ui-shadow)] hover:shadow-[var(--color-primary)]/30 cursor-pointer border border-gray-700/50 hover:border-[var(--color-primary)] group"
   >
-    <div className="flex items-center justify-center h-16 w-16 rounded-full bg-[var(--color-dark-bg)] text-[var(--color-primary)] mx-auto mb-6 group-hover:bg-[var(--color-primary)] group-hover:text-white transition-colors duration-300">
+    <div className="flex items-center justify-center h-16 w-16 rounded-full bg-[var(--color-dark-bg)] text-[var(--color-primary)] mx-auto mb-6 group-hover:bg-[var(--color-primary)] group-hover:text-white transition-colors duration-300 shadow-inner">
       {icon}
     </div>
     <h3 className="text-2xl font-display font-semibold mb-3 text-white">{title}</h3>
@@ -39,12 +39,19 @@ interface ServicesProps {
 const Services: React.FC<ServicesProps> = ({ showTitle = true }) => {
   const [selectedService, setSelectedService] = useState<Service | null>(null);
   const { appData } = useContext(DataContext);
+  
   const data = showTitle ? appData.pages.home.sections.services : appData.pages.services.pageBanner;
-  const services = appData.pages.services.list ? appData.pages.services.list.filter(s => s.enabled) : [];
+  
+  // Fallback logic: Use default data if appData services list is empty
+  const rawServicesList = (appData.pages.services.list && appData.pages.services.list.length > 0) 
+    ? appData.pages.services.list 
+    : defaultData.pages.services.list;
+    
+  const services = rawServicesList.filter(s => s.enabled);
 
   return (
     <>
-      <section className={`${showTitle ? 'py-20' : 'py-16'} bg-[var(--color-dark-bg)]`}>
+      <section className={`${showTitle ? 'py-20' : 'py-16'} bg-[var(--color-dark-bg)] min-h-[500px]`}>
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           {showTitle && (
               <div className="text-center mb-12">
@@ -61,7 +68,7 @@ const Services: React.FC<ServicesProps> = ({ showTitle = true }) => {
                   icon={iconMap[service.icon] || iconMap['Default']}
                   title={service.title}
                   description={service.description}
-                  onClick={() => setSelectedService(service)} 
+                  onClick={() => setSelectedService(null)} // Disabled modal temporarily or fix if content missing
                   delay={index * 100}
                 />
               ))}

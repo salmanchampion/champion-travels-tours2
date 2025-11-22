@@ -1,113 +1,23 @@
 
-import React, { useState } from 'react';
-
-type Location = {
-  id: number;
-  title: string;
-  description: string;
-  image: string;
-  top: string; // CSS percentage for positioning
-  left: string; // CSS percentage for positioning
-};
-
-type CityData = {
-    name: string;
-    mapImage: string;
-    locations: Location[];
-}
-
-const cityData: { [key: string]: CityData } = {
-  Makkah: {
-    name: 'Makkah Al-Mukarramah',
-    mapImage: 'https://i.postimg.cc/R0N8Mv8X/as.jpg', 
-    locations: [
-      {
-        id: 1,
-        title: 'Masjid Al-Haram',
-        description: 'The Great Mosque of Mecca, surrounding the Holy Kaaba. It is the site of the Hajj pilgrimage and the direction of prayer for Muslims worldwide.',
-        image: 'https://i.postimg.cc/Bb92VfRP/ag.webp',
-        top: '50%',
-        left: '50%',
-      },
-      {
-        id: 2,
-        title: 'Jabal Al-Nour (Cave of Hira)',
-        description: 'The mountain housing the Cave of Hira, where Prophet Muhammad (PBUH) received the first revelation of the Quran.',
-        image: 'https://i.postimg.cc/RZ8BGSpf/aj.webp',
-        top: '20%',
-        left: '70%',
-      },
-      {
-        id: 3,
-        title: 'Jabal Thawr',
-        description: 'The mountain containing the cave where the Prophet (PBUH) and Abu Bakr (RA) took refuge during their migration to Madinah.',
-        image: 'https://i.postimg.cc/x1gn4TDd/ad.jpg',
-        top: '75%',
-        left: '30%',
-      },
-      {
-        id: 4,
-        title: 'Mina (Tent City)',
-        description: 'Known as the City of Tents, Mina is a valley where pilgrims stay during Hajj. It is the site of the Stoning of the Devil ritual.',
-        image: 'https://i.postimg.cc/VkQL0LnX/al.webp',
-        top: '40%',
-        left: '80%',
-      },
-      {
-        id: 5,
-        title: 'Mount Arafat',
-        description: 'The Mount of Mercy (Jabal ar-Rahmah) is here. Standing at Arafat is the most important ritual of Hajj.',
-        image: 'https://i.postimg.cc/CL6k3832/ak.jpg',
-        top: '30%',
-        left: '90%',
-      },
-    ],
-  },
-  Madinah: {
-    name: 'Madinah Al-Munawwarah',
-    mapImage: 'https://i.postimg.cc/x1gn4TDd/ad.jpg',
-    locations: [
-      {
-        id: 1,
-        title: 'Masjid An-Nabawi',
-        description: 'The Prophet\'s Mosque, the second holiest site in Islam. It contains the Rawdah and the resting place of the Prophet (PBUH).',
-        image: 'https://i.postimg.cc/x1gn4TDd/ad.jpg',
-        top: '50%',
-        left: '50%',
-      },
-      {
-        id: 2,
-        title: 'Masjid Quba',
-        description: 'The first mosque built in Islam. Offering two rakats of prayer here is equivalent to the reward of an Umrah.',
-        image: 'https://i.postimg.cc/RZ8BGSpf/aj.webp',
-        top: '70%',
-        left: '40%',
-      },
-      {
-        id: 3,
-        title: 'Mount Uhud',
-        description: 'The site of the Battle of Uhud. It also contains the graves of the martyrs, including Hamza (RA).',
-        image: 'https://i.postimg.cc/mD2wzRfY/hajj-b.jpg',
-        top: '20%',
-        left: '60%',
-      },
-      {
-        id: 4,
-        title: 'Masjid Al-Qiblatayn',
-        description: 'The Mosque of the Two Qiblas, where the direction of prayer was changed from Jerusalem to Mecca.',
-        image: 'https://i.postimg.cc/50rQG1f5/umrah-2.jpg',
-        top: '30%',
-        left: '20%',
-      },
-    ],
-  },
-};
+import React, { useState, useContext } from 'react';
+import { DataContext } from '../contexts/DataContext';
+import { MapLocation } from '../types';
 
 const InteractiveMap: React.FC = () => {
-  const [activeCity, setActiveCity] = useState<'Makkah' | 'Madinah'>('Makkah');
-  const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
+  const { appData } = useContext(DataContext);
+  const { interactiveMap } = appData.pages.home;
+  
+  if (!interactiveMap || interactiveMap.enabled === false) return null;
 
-  const currentData = cityData[activeCity];
+  const { cities } = interactiveMap;
+  const cityKeys = Object.keys(cities) as Array<keyof typeof cities>;
+  
+  const [activeCity, setActiveCity] = useState<keyof typeof cities>(cityKeys[0] || 'Makkah');
+  const [selectedLocation, setSelectedLocation] = useState<MapLocation | null>(null);
+
+  const currentData = cities[activeCity];
+
+  if (!currentData) return null;
 
   return (
     <section className="py-10 md:py-20 bg-[var(--color-dark-bg)]">
@@ -116,17 +26,17 @@ const InteractiveMap: React.FC = () => {
         {/* City Toggle */}
         <div className="flex justify-center mb-12" data-aos="fade-up">
           <div className="glass-card p-2 rounded-full inline-flex shadow-[var(--ui-shadow)]">
-            {Object.keys(cityData).map((city) => (
+            {cityKeys.map((city) => (
               <button
                 key={city}
-                onClick={() => { setActiveCity(city as any); setSelectedLocation(null); }}
+                onClick={() => { setActiveCity(city); setSelectedLocation(null); }}
                 className={`px-8 py-3 rounded-full font-display font-bold tracking-wide transition-all duration-300 text-lg ${
                   activeCity === city
                     ? 'bg-[var(--color-primary)] text-white shadow-lg transform scale-105'
                     : 'text-[var(--color-muted-text)] hover:text-white'
                 }`}
               >
-                {city}
+                {city === 'Makkah' ? 'মক্কা' : city === 'Madinah' ? 'মদিনা' : city}
               </button>
             ))}
           </div>
@@ -136,7 +46,7 @@ const InteractiveMap: React.FC = () => {
           
           {/* Map Area */}
           <div 
-            className="lg:col-span-2 relative rounded-[var(--ui-border-radius)] overflow-hidden shadow-2xl border-2 border-gray-700/50 group bg-black"
+            className="lg:col-span-2 relative rounded-[var(--ui-border-radius)] overflow-hidden shadow-2xl border-2 border-gray-700/50 group bg-black h-[500px] lg:h-full"
             data-aos="zoom-in"
           >
              {/* Background Map/Image */}
@@ -153,7 +63,7 @@ const InteractiveMap: React.FC = () => {
                     <svg className="w-6 h-6 mr-2 text-[var(--color-primary)]" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" /></svg>
                     {currentData.name}
                 </h3>
-                <p className="text-[var(--color-primary)] text-sm mt-1 font-medium">Click points to discover history</p>
+                <p className="text-[var(--color-primary)] text-sm mt-1 font-medium">ইতিহাস জানতে পয়েন্টগুলোতে ক্লিক করুন</p>
             </div>
 
             {/* Hotspots */}
@@ -206,9 +116,9 @@ const InteractiveMap: React.FC = () => {
                             </p>
                             
                             <div className="mt-6 pt-6 border-t border-gray-700/50">
-                                <h4 className="text-[var(--color-primary)] font-bold mb-2 uppercase text-xs tracking-widest">Spiritual Significance</h4>
+                                <h4 className="text-[var(--color-primary)] font-bold mb-2 uppercase text-xs tracking-widest">আধ্যাত্মিক গুরুত্ব</h4>
                                 <p className="text-sm text-[var(--color-muted-text)] italic">
-                                    "Visiting this site brings immense spiritual rewards. Make sure to maintain adab (etiquette) and make plenty of dua while you are here."
+                                    "এই স্থানটি দর্শনে রয়েছে অশেষ আধ্যাত্মিক সওয়াব। এখানে অবস্থানকালীন সময়ে আদব রক্ষা করুন এবং বেশি বেশি দোয়া করুন।"
                                 </p>
                             </div>
                         </div>
@@ -217,18 +127,18 @@ const InteractiveMap: React.FC = () => {
                                 href={`#contact?subject=Inquiry about Ziyarat to ${selectedLocation.title}`}
                                 className="block w-full bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] text-white text-center font-bold py-3 rounded shadow-lg hover:shadow-[var(--color-primary)]/30 transition-all duration-300 transform hover:-translate-y-1"
                             >
-                                Plan a Visit
+                                ভিজিট প্ল্যান করুন
                             </a>
                         </div>
                     </div>
                  </div>
              ) : (
-                 <div className="h-full glass-card border border-dashed border-gray-600 rounded-[var(--ui-border-radius)] flex flex-col items-center justify-center p-8 text-center text-[var(--color-muted-text)] animate-pulse-slow">
+                 <div className="h-[300px] lg:h-full glass-card border border-dashed border-gray-600 rounded-[var(--ui-border-radius)] flex flex-col items-center justify-center p-8 text-center text-[var(--color-muted-text)] animate-pulse-slow">
                      <div className="w-24 h-24 bg-[var(--color-primary)]/10 rounded-full flex items-center justify-center mb-6 animate-bounce-slow border border-[var(--color-primary)]/30">
                         <svg className="w-12 h-12 text-[var(--color-primary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" /></svg>
                      </div>
-                     <h3 className="text-3xl font-display font-bold text-white mb-3">Explore History</h3>
-                     <p className="text-lg font-light">Select a city above and click on the <span className="text-[var(--color-primary)] font-bold">glowing markers</span> on the map to reveal the sacred history.</p>
+                     <h3 className="text-3xl font-display font-bold text-white mb-3">ইতিহাস জানুন</h3>
+                     <p className="text-lg font-light">উপরের যেকোনো একটি শহর নির্বাচন করুন এবং ম্যাপের <span className="text-[var(--color-primary)] font-bold">উজ্জ্বল চিহ্নগুলোতে</span> ক্লিক করে পবিত্র ইতিহাস সম্পর্কে জানুন।</p>
                  </div>
              )}
           </div>

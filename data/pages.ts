@@ -1,8 +1,4 @@
 
-
-
-
-
 import { AppData, CustomPage } from '../types';
 
 export const pagesData: AppData['pages'] = {
@@ -21,16 +17,106 @@ export const pagesData: AppData['pages'] = {
             packageTypeLabel: 'Package Type',
             buttonText: 'Search'
         },
-        // --- NEW: Special Offer Defaults ---
         specialOffer: {
             enabled: true,
             title: 'Exclusive Ramadan Package 2025',
             subtitle: 'Limited time offer! Experience the spirituality of Ramadan in Makkah & Madinah with premium services.',
-            endDate: '2025-03-10T23:59', // Example future date
+            endDate: '2025-03-10T23:59', 
             backgroundImage: 'https://i.postimg.cc/jSKtdnQ4/HD-wallpaper-mecca-madina-during-evening-time-ramzan.jpg',
             buttonText: 'Book This Offer',
             buttonLink: '#contact?subject=Ramadan Package Inquiry'
         },
+        // --- NEW: Interactive Map Default Data ---
+        interactiveMap: {
+            enabled: true,
+            cities: {
+              Makkah: {
+                name: 'মক্কা আল-মুকাররমা',
+                mapImage: 'https://i.postimg.cc/R0N8Mv8X/as.jpg', 
+                locations: [
+                  {
+                    id: 1,
+                    title: 'মসজিদ আল-হারাম',
+                    description: 'মক্কার পবিত্র কাবা শরীফ ঘিরে অবস্থিত মহান মসজিদ। এটি হজ পালনের মূল স্থান এবং বিশ্বব্যাপী মুসলমানদের নামাজের কিবলা।',
+                    image: 'https://i.postimg.cc/Bb92VfRP/ag.webp',
+                    top: '50%',
+                    left: '50%',
+                  },
+                  {
+                    id: 2,
+                    title: 'জাবালে নূর (হেরা গুহা)',
+                    description: 'এই পাহাড়ে হেরা গুহা অবস্থিত, যেখানে নবী মুহাম্মদ (সাঃ) জিবরাঈল (আঃ)-এর মাধ্যমে পবিত্র কুরআনের প্রথম ওহী লাভ করেছিলেন।',
+                    image: 'https://i.postimg.cc/RZ8BGSpf/aj.webp',
+                    top: '20%',
+                    left: '70%',
+                  },
+                  {
+                    id: 3,
+                    title: 'জাবালে সওর',
+                    description: 'মদিনায় হিজরতের সময় নবী (সাঃ) এবং আবু বকর (রাঃ) এই পাহাড়ের গুহায় মক্কার কুরাইশদের হাত থেকে বাঁচতে তিন দিন আশ্রয় নিয়েছিলেন।',
+                    image: 'https://i.postimg.cc/x1gn4TDd/ad.jpg',
+                    top: '75%',
+                    left: '30%',
+                  },
+                  {
+                    id: 4,
+                    title: 'মিনা (তাঁবুর শহর)',
+                    description: 'তাঁবুর শহর হিসেবে পরিচিত মিনা হলো একটি উপত্যকা যেখানে হাজীরা হজের সময় অবস্থান করেন। এখানেই শয়তানকে পাথর মারার (রমি) স্থান অবস্থিত।',
+                    image: 'https://i.postimg.cc/VkQL0LnX/al.webp',
+                    top: '40%',
+                    left: '80%',
+                  },
+                  {
+                    id: 5,
+                    title: 'আরাফাত ময়দান',
+                    description: 'এখানে জাবালে রহমত (করুণার পাহাড়) অবস্থিত। আরাফাতের ময়দানে অবস্থান করা হজের সবচেয়ে গুরুত্বপূর্ণ রুকন।',
+                    image: 'https://i.postimg.cc/CL6k3832/ak.jpg',
+                    top: '30%',
+                    left: '90%',
+                  },
+                ],
+              },
+              Madinah: {
+                name: 'মদিনা আল-মুনাওয়ারা',
+                mapImage: 'https://i.postimg.cc/x1gn4TDd/ad.jpg',
+                locations: [
+                  {
+                    id: 1,
+                    title: 'মসজিদে নববী',
+                    description: 'নবীজীর মসজিদ, ইসলামের দ্বিতীয় পবিত্র স্থান। এখানে রওজা শরীফ এবং নবী (সাঃ)-এর কবর মোবারক অবস্থিত।',
+                    image: 'https://i.postimg.cc/x1gn4TDd/ad.jpg',
+                    top: '50%',
+                    left: '50%',
+                  },
+                  {
+                    id: 2,
+                    title: 'মসজিদে কুবা',
+                    description: 'ইসলামের ইতিহাসে নির্মিত প্রথম মসজিদ। এখানে দুই রাকাত নামাজ আদায় করলে একটি ওমরাহ পালনের সমান সওয়াব পাওয়া যায়।',
+                    image: 'https://i.postimg.cc/RZ8BGSpf/aj.webp',
+                    top: '70%',
+                    left: '40%',
+                  },
+                  {
+                    id: 3,
+                    title: 'উহুদ পাহাড়',
+                    description: 'ঐতিহাসিক উহুদ যুদ্ধের স্থান। নবীজী (সাঃ) এই পাহাড়কে ভালোবাসতেন। এখানে হামজা (রাঃ) সহ ৭০ জন শহীদের কবর রয়েছে।',
+                    image: 'https://i.postimg.cc/mD2wzRfY/hajj-b.jpg',
+                    top: '20%',
+                    left: '60%',
+                  },
+                  {
+                    id: 4,
+                    title: 'মসজিদ আল-কিবলাতাইন',
+                    description: 'দুই কিবলার মসজিদ, যেখানে নামাজের দিক পরিবর্তন করে জেরুজালেম থেকে মক্কার কাবার দিকে করার ওহী নাজিল হয়েছিল।',
+                    image: 'https://i.postimg.cc/50rQG1f5/umrah-2.jpg',
+                    top: '30%',
+                    left: '20%',
+                  },
+                ],
+              },
+            }
+        },
+        // --------------------------------
         sections: {
             services: { enabled: true, title: 'Our Services', subtitle: 'We offer a complete range of travel solutions with a commitment to quality and customer satisfaction.' },
             packages: { enabled: true, title: 'Our Hajj & Umrah Packages', subtitle: 'Explore our diverse range of Hajj and Umrah packages. Each is thoughtfully crafted to provide a spiritually rewarding, comfortable, and seamless pilgrimage experience.' },
@@ -673,7 +759,7 @@ export const pagesData: AppData['pages'] = {
             {
                 title: '১. ইহরাম বাঁধা',
                 description: 'মিকাত অতিক্রম করার আগেই ইহরামের কাপড় পরিধান করা এবং ওমরাহর নিয়ত করা।',
-                points: ['গোসল বা ওজু করে পরিষ্কার পরিচ্ছন্ন হন।', 'সেলাইবিহীন দুইটি সাদা কাপড় পরিধান করুন (পুরুষদের জন্য)।', 'দুই রাকাত নফল নামাজ পড়ুন।', 'ওমরাহর নিয়ত করুন এবং তালবিয়া পাঠ শুরু করুন।'],
+                points: ['গোসল বা ওজু করে পরিষ্কার পরিচ্ছন্ন হন।', 'সেলাইবিহীন দুইটি সাদা কাপড় পরিধান করুন (পুরুষদের জন্য)।', 'দুই রাকাত নামাজ পড়ুন।', 'ওমরাহর নিয়ত করুন এবং তালবিয়া পাঠ শুরু করুন।'],
                 arabicText: 'লাব্বাইক আল্লাহুম্মা ওমরাতান',
                 arabicMeaning: 'হে আল্লাহ! আমি ওমরাহর জন্য উপস্থিত হয়েছি।',
                 enabled: true
@@ -873,15 +959,23 @@ export const pagesData: AppData['pages'] = {
 export const customPagesData: CustomPage[] = [
     {
         id: '#about-us',
-        title: 'About Us',
-        bannerSubtitle: 'Learn more about our journey, mission, and values.',
+        title: 'About Champion Travels & Tours',
+        bannerSubtitle: 'Dedicated to serving the guests of Allah with integrity and excellence.',
         seo: {
             title: 'About Us | Champion Travels & Tours',
-            description: 'Learn about Champion Travels & Tours, a leading Hajj and Umrah agency in Bangladesh.',
-            keywords: 'About Champion Travels, Hajj agency profile, travel agency history'
+            description: 'Learn about Champion Travels & Tours, our mission, vision, and commitment to providing the best Hajj and Umrah services in Bangladesh.',
+            keywords: 'About Champion Travels, travel agency mission, best hajj agency'
         },
         contentBlocks: [
-            { type: 'html', content: `<h3>Our Story</h3><p>Champion Travels & Tours was founded with a singular mission: to serve the guests of Allah with integrity, comfort, and dedication. With over a decade of experience, we have established ourselves as a trusted name in the travel industry of Bangladesh.</p><h3>Our Mission</h3><p>To provide seamless and spiritually rewarding pilgrimage experiences for Hajj and Umrah performers, while also offering top-notch travel solutions for global travelers.</p>` },
+            {
+                type: 'html',
+                content: `
+<h3>Our Mission</h3>
+<p>To provide comprehensive and hassle-free travel solutions for Hajj, Umrah, and global tourism, ensuring comfort, spiritual satisfaction, and value for money for every client.</p>
+<h3>Who We Are</h3>
+<p>Champion Travels & Tours is a leading travel agency in Bangladesh, specializing in religious pilgrimage services. With over a decade of experience, we have successfully assisted thousands of pilgrims in fulfilling their spiritual obligations. Our team comprises experienced professionals and religious scholars dedicated to guiding you at every step.</p>
+`
+            }
         ],
         enabled: true
     },
@@ -891,41 +985,79 @@ export const customPagesData: CustomPage[] = [
         bannerSubtitle: 'Your privacy is important to us.',
         seo: {
             title: 'Privacy Policy | Champion Travels & Tours',
-            description: 'Read our privacy policy to understand how we handle your data.',
-            keywords: 'Privacy policy, data protection, travel agency terms'
+            description: 'Read our privacy policy to understand how we collect, use, and protect your personal information.',
+            keywords: 'privacy policy, data protection'
         },
         contentBlocks: [
-            { type: 'html', content: `<p>At Champion Travels & Tours, we are committed to protecting your privacy. This Privacy Policy explains how we collect, use, and safeguard your information when you use our services.</p><h4>Information Collection</h4><p>We collect information necessary to process your travel bookings, such as your name, contact details, passport information, and payment details.</p><h4>Use of Information</h4><p>Your information is used solely for the purpose of arranging your travel services, including visa processing, flight booking, and hotel reservations.</p>` },
+            {
+                type: 'html',
+                content: `
+<p>At Champion Travels & Tours, we are committed to protecting your privacy. This Privacy Policy explains how we collect, use, and safeguard your personal information.</p>
+<h4>Information We Collect</h4>
+<p>We may collect personal information such as your name, contact details, passport information, and payment details when you book a service with us.</p>
+<h4>How We Use Your Information</h4>
+<p>We use your information to process your bookings, facilitate visa applications, and communicate with you regarding your travel arrangements.</p>
+`
+            }
         ],
         enabled: true
     },
     {
         id: '#hotel-booking',
         title: 'Luxury Hotel Booking',
-        bannerSubtitle: 'Find the perfect stay for your journey.',
+        bannerSubtitle: 'Stay in comfort near the Haram.',
         seo: {
-            title: 'Hotel Booking | Champion Travels & Tours',
-            description: 'Book hotels in Makkah, Madinah, and worldwide.',
-            keywords: 'Hotel booking Makkah, Madinah hotels, cheap hotels'
+            title: 'Hotel Booking Service | Champion Travels',
+            description: 'Book luxury hotels in Makkah and Madinah. We offer competitive rates for 5-star, 4-star, and standard hotels.',
+            keywords: 'Makkah hotel booking, Madinah hotels, 5 star hotels Makkah'
         },
         contentBlocks: [
-            { type: 'html', content: `<p>We offer a wide range of hotel booking options in Makkah and Madinah, from economy to luxury 5-star hotels near the Haram. We also facilitate hotel bookings for other international destinations.</p><p>Contact us to get the best rates for your dates.</p>` },
-            { type: 'button', text: 'Inquire Now', href: '#contact?subject=Hotel Booking Inquiry' }
+            {
+                type: 'html',
+                content: `
+<p>We have established partnerships with leading hotels in Makkah and Madinah to offer you the best rates and convenient locations. Whether you prefer a room with a Kaaba view or a budget-friendly option near the Haram, we have you covered.</p>
+<ul>
+    <li><strong>Makkah Hotels:</strong> Fairmont Clock Tower, Swissotel, Pullman Zamzam, and more.</li>
+    <li><strong>Madinah Hotels:</strong> Anwar Al Madinah, Oberoi, Hilton, and more.</li>
+</ul>
+`
+            },
+            {
+                type: 'button',
+                text: 'Inquire for Hotel Booking',
+                href: '#contact?subject=Hotel Booking Inquiry'
+            }
         ],
         enabled: true
     },
     {
         id: '#umrah-training',
-        title: 'Pilgrim Training',
-        bannerSubtitle: 'Prepare for your spiritual journey.',
+        title: 'Umrah Training Program',
+        bannerSubtitle: 'Learn the rituals before you go.',
         seo: {
-            title: 'Umrah Training | Champion Travels & Tours',
-            description: 'Free Umrah training and seminars for pilgrims.',
-            keywords: 'Umrah training, Hajj seminar, pilgrim guide'
+            title: 'Umrah Training | Champion Travels',
+            description: 'Join our pre-departure Umrah training sessions to learn the correct procedures and rituals of Umrah.',
+            keywords: 'Umrah training, Hajj workshop, pilgrimage guide'
         },
         contentBlocks: [
-            { type: 'html', content: `<p>We conduct regular training sessions and seminars for pilgrims to educate them about the rituals of Umrah and Hajj. Our experienced scholars provide practical demonstrations and answer your questions.</p>` },
-            { type: 'button', text: 'Join Next Session', href: '#contact?subject=Umrah Training Registration' }
+            {
+                type: 'html',
+                content: `
+<p>Proper knowledge is essential for a valid Umrah. We conduct regular training workshops for our pilgrims to educate them about the rituals (Manasik) of Umrah.</p>
+<p>Our sessions cover:</p>
+<ul>
+    <li>How to wear Ihram.</li>
+    <li>Rules and prohibitions of Ihram.</li>
+    <li>Step-by-step guide to Tawaf and Sa'i.</li>
+    <li>Common mistakes to avoid.</li>
+</ul>
+`
+            },
+            {
+                type: 'button',
+                text: 'Register for Next Workshop',
+                href: '#contact?subject=Umrah Training Registration'
+            }
         ],
         enabled: true
     }

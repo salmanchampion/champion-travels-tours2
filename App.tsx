@@ -34,16 +34,63 @@ import ExclusiveHajjPage from './pages/ExclusiveHajjPage';
 import ExclusiveUmrahPage from './pages/ExclusiveUmrahPage';
 import ZiyaratPage from './pages/ZiyaratPage';
 import ScrollToTop from './components/ScrollToTop';
+import MarketingPopup from './components/MarketingPopup';
+
+// --- Announcement Bar Component ---
+const AnnouncementBar: React.FC = () => {
+    const { appData } = useContext(DataContext);
+    const config = appData.globalConfig?.announcementBar;
+
+    if (!config || !config.enabled) return null;
+
+    return (
+        <div 
+            style={{ backgroundColor: config.backgroundColor, color: config.textColor }}
+            className="py-2 text-center text-sm font-bold tracking-wide px-4 relative z-[60]"
+        >
+            {config.link ? (
+                <a href={config.link} className="hover:underline block w-full">
+                    {config.text}
+                </a>
+            ) : (
+                <span>{config.text}</span>
+            )}
+        </div>
+    );
+};
 
 // Theme Injector Component
 const ThemeInjector: React.FC = () => {
-    const { appData } = useContext(DataContext);
-    const { theme } = appData;
+    const { appData, userTheme } = useContext(DataContext);
+    const { theme, globalConfig } = appData;
 
     useEffect(() => {
         if (!theme) return;
 
         const { colors, fonts, ui } = theme;
+
+        // Determine active colors based on user preference or default
+        let activeColors = { ...colors };
+        
+        // Override primary color if user selected one
+        if (userTheme.primaryColor) {
+            activeColors.primary = userTheme.primaryColor;
+            activeColors.primaryDark = userTheme.primaryColor; 
+        }
+
+        // Handle Light/Dark Mode logic
+        if (userTheme.mode === 'light') {
+            activeColors.darkBg = '#F9FAFB'; // Light Gray for Page BG
+            activeColors.lightBg = '#FFFFFF'; // White for Card BG
+            activeColors.lightText = '#111827'; // Dark Text
+            activeColors.mutedText = '#4B5563'; // Gray Text
+        } else {
+            // Ensure defaults are enforced for Dark mode if coming back from light
+            activeColors.darkBg = colors.darkBg;
+            activeColors.lightBg = colors.lightBg;
+            activeColors.lightText = colors.lightText;
+            activeColors.mutedText = colors.mutedText;
+        }
 
         const shadowMap = {
             none: 'none',
@@ -59,16 +106,25 @@ const ThemeInjector: React.FC = () => {
             sharp: '0px'
         };
 
+        // Inject Custom CSS from Global Config
+        const customCss = globalConfig?.advanced?.customCss || '';
+        
+        // Advanced Typography Defaults
+        const h1Size = globalConfig?.advanced?.typography?.h1Size || '3.5rem';
+        const h2Size = globalConfig?.advanced?.typography?.h2Size || '2.5rem';
+        const bodySize = globalConfig?.advanced?.typography?.bodySize || '1rem';
+        const sectionPadding = globalConfig?.advanced?.typography?.sectionPadding || '5rem';
+
         const cssVariables = `
 :root {
-  --color-primary: ${colors.primary};
-  --color-primary-dark: ${colors.primaryDark};
-  --color-secondary: ${colors.secondary};
-  --color-secondary-dark: ${colors.secondaryDark};
-  --color-dark-bg: ${colors.darkBg};
-  --color-light-bg: ${colors.lightBg};
-  --color-light-text: ${colors.lightText};
-  --color-muted-text: ${colors.mutedText};
+  --color-primary: ${activeColors.primary};
+  --color-primary-dark: ${activeColors.primaryDark};
+  --color-secondary: ${activeColors.secondary};
+  --color-secondary-dark: ${activeColors.secondaryDark};
+  --color-dark-bg: ${activeColors.darkBg};
+  --color-light-bg: ${activeColors.lightBg};
+  --color-light-text: ${activeColors.lightText};
+  --color-muted-text: ${activeColors.mutedText};
   
   --font-sans: "${fonts.sans}";
   --font-display: "${fonts.display}";
@@ -76,14 +132,34 @@ const ThemeInjector: React.FC = () => {
   --ui-border-radius: ${ui.borderRadius};
   --ui-button-radius: ${buttonRadiusMap[ui.buttonStyle] || ui.borderRadius};
   --ui-shadow: ${shadowMap[ui.shadow] || 'none'};
+  
+  --font-size-h1: ${h1Size};
+  --font-size-h2: ${h2Size};
+  --font-size-body: ${bodySize};
+  --section-padding: ${sectionPadding};
 }
 body {
     background-color: var(--color-dark-bg);
     color: var(--color-light-text);
     font-family: var(--font-sans), 'Hind Siliguri', sans-serif;
+    font-size: var(--font-size-body);
 }
 .font-sans { font-family: var(--font-sans), 'Hind Siliguri', sans-serif; }
 .font-display { font-family: var(--font-display), sans-serif; }
+
+/* Apply dynamic typography to prose */
+.prose h1 { font-size: var(--font-size-h1); }
+.prose h2 { font-size: var(--font-size-h2); }
+
+/* AOS Failsafe style: injected if AOS fails */
+body.aos-force-visible [data-aos] {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+}
+
+/* Custom User CSS */
+${customCss}
 `;
         
         const styleElement = document.getElementById('dynamic-theme-styles');
@@ -99,7 +175,62 @@ body {
             fontsLink.href = `https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;700&family=${fontSans}:wght@400;500;700&family=${fontDisplay}:wght@400;500;600&display=swap`;
         }
 
-    }, [theme]);
+        // --- NEW: Dynamic Favicon Injection ---
+        if (globalConfig?.siteIdentity?.faviconUrl) {
+            let favicon = document.querySelector("link[rel~='icon']") as HTMLLinkElement;
+            if (!favicon) {
+                favicon = document.createElement('link');
+                favicon.rel = 'icon';
+                document.head.appendChild(favicon);
+            }
+            // Only update if changed to prevent flicker
+            if (favicon.href !== globalConfig.siteIdentity.faviconUrl) {
+                favicon.href = globalConfig.siteIdentity.faviconUrl;
+            }
+        }
+
+        // --- NEW: Advanced Script Injection ---
+        // Remove old injected scripts to prevent duplication/conflicts when config changes
+        document.querySelectorAll('.custom-injected-script').forEach(el => el.remove());
+
+        if (globalConfig?.advanced) {
+            const injectScripts = (content: string, location: 'head' | 'body') => {
+                if (!content) return;
+                const temp = document.createElement('div');
+                temp.innerHTML = content;
+                
+                Array.from(temp.childNodes).forEach(node => {
+                    // Mark injected elements for future removal
+                    // Note: text nodes don't support classList, so we wrap or ignore them if possible, 
+                    // but here we mainly care about Elements.
+                    if (node.nodeType === 1) { // Element Node
+                        (node as HTMLElement).classList.add('custom-injected-script');
+                    }
+
+                    if (node.nodeName === 'SCRIPT') {
+                        const s = document.createElement('script');
+                        const scriptNode = node as HTMLScriptElement;
+                        if (scriptNode.src) s.src = scriptNode.src;
+                        if (scriptNode.type) s.type = scriptNode.type;
+                        if (scriptNode.text) s.text = scriptNode.text;
+                        if (scriptNode.innerHTML) s.innerHTML = scriptNode.innerHTML;
+                        s.async = true; 
+                        s.className = 'custom-injected-script';
+                        
+                        if (location === 'head') document.head.appendChild(s);
+                        else document.body.appendChild(s);
+                    } else {
+                        if (location === 'head') document.head.appendChild(node.cloneNode(true));
+                        else document.body.appendChild(node.cloneNode(true));
+                    }
+                });
+            };
+
+            injectScripts(globalConfig.advanced.headScripts, 'head');
+            injectScripts(globalConfig.advanced.footerScripts, 'body');
+        }
+
+    }, [theme, userTheme, globalConfig]);
 
     return null;
 };
@@ -113,29 +244,58 @@ const AppContent: React.FC = () => {
   const keySequenceRef = useRef('');
   const secretCode = '045';
 
-  // --- AOS Initialization ---
+  // --- AOS Initialization & Robust Handling ---
   useEffect(() => {
-    const aos = (window as any).AOS;
-    if (aos) {
-        aos.init({
-            duration: 1000, // Duration of animation
-            once: true, // Whether animation should happen only once - while scrolling down
-            easing: 'ease-out-cubic',
-            offset: 50, // Offset (in px) from the original trigger point
-            mirror: false,
-        });
+    const initAOS = () => {
+        const aos = (window as any).AOS;
+        if (aos) {
+            aos.init({
+                duration: 800, 
+                once: true,
+                easing: 'ease-out-cubic',
+                offset: 0, 
+                mirror: false,
+            });
+            setTimeout(() => aos.refresh(), 500);
+        }
+    };
+
+    if ((window as any).AOS) {
+        initAOS();
+    } else {
+        const interval = setInterval(() => {
+            if ((window as any).AOS) {
+                initAOS();
+                clearInterval(interval);
+            }
+        }, 200);
+        setTimeout(() => clearInterval(interval), 3000); 
     }
+    
+    // Improved Visibility Failsafe: 
+    // If animations are stuck hidden, force them visible after a short delay (800ms)
+    const failsafeTimer = setTimeout(() => {
+        document.body.classList.add('aos-force-visible');
+    }, 800);
+
+    return () => clearTimeout(failsafeTimer);
   }, []);
   // -------------------------
 
-  // Refresh AOS whenever the page changes to ensure animations trigger correctly
+  // Refresh AOS whenever the page changes
   useEffect(() => {
     const aos = (window as any).AOS;
     if (aos) {
-        // Multiple refreshes to catch rendering timing issues
         setTimeout(() => aos.refresh(), 100);
-        setTimeout(() => aos.refresh(), 800);
+        setTimeout(() => aos.refresh(), 1000);
     }
+    // Reset the failsafe on page change to allow animations to run, but trigger backup quickly
+    document.body.classList.remove('aos-force-visible');
+    const failsafeTimer = setTimeout(() => {
+        document.body.classList.add('aos-force-visible');
+    }, 800);
+    
+    return () => clearTimeout(failsafeTimer);
   }, [page, appData]);
 
   useEffect(() => {
@@ -225,9 +385,13 @@ const AppContent: React.FC = () => {
     };
 
     const seo = getSeoData();
+    
+    // Use Global Site Identity fallback
+    const siteName = appData.globalConfig?.siteIdentity?.siteName || 'Champion Travels & Tours';
+    const globalDesc = appData.globalConfig?.siteIdentity?.metaDescription;
 
     if (seo) {
-      document.title = seo.title;
+      document.title = seo.title || siteName;
       
       let metaDesc = document.querySelector('meta[name="description"]');
       if (!metaDesc) {
@@ -235,7 +399,7 @@ const AppContent: React.FC = () => {
         metaDesc.setAttribute('name', 'description');
         document.head.appendChild(metaDesc);
       }
-      metaDesc.setAttribute('content', seo.description);
+      metaDesc.setAttribute('content', seo.description || globalDesc || '');
 
       let metaKeywords = document.querySelector('meta[name="keywords"]');
       if (!metaKeywords) {
@@ -244,6 +408,9 @@ const AppContent: React.FC = () => {
         document.head.appendChild(metaKeywords);
       }
       metaKeywords.setAttribute('content', seo.keywords);
+    } else {
+        // Fallback if SEO data is missing entirely
+        document.title = siteName;
     }
   }, [page, appData, isDataLoading]);
 
@@ -338,12 +505,15 @@ const AppContent: React.FC = () => {
   }
 
   return (
-    <div className="bg-[var(--color-dark-bg)]">
+    <div className="bg-[var(--color-dark-bg)] min-h-screen transition-colors duration-500">
       <ThemeInjector />
+      <AnnouncementBar />
       <Header activePage={page} />
       <main>
         {renderPage()}
       </main>
+      {/* New Marketing Popup Config */}
+      <MarketingPopup />
       <FloatingActionButton />
       <ScrollToTop />
       <PrayerTimesWidget />

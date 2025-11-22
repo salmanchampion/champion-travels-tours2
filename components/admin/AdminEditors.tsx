@@ -53,7 +53,8 @@ export const PackageEditor: React.FC<{
     packageType: 'hajj' | 'umrah';
     onChange: (path: string, index: number, field: string, value: any) => void;
     onDelete: (path: string, index: number) => void;
-}> = ({ pkg, index, packageType, onChange, onDelete }) => {
+    availableCategories?: string[];
+}> = ({ pkg, index, packageType, onChange, onDelete, availableCategories }) => {
     const path = packageType === 'hajj' ? 'hajjPackages' : 'umrahPackages';
 
     return (
@@ -75,6 +76,31 @@ export const PackageEditor: React.FC<{
                     
                     const label = packageFieldLabels[key] || key;
                     const value = (pkg as any)[key];
+
+                    // Special handling for Category to use datalist for suggestions
+                    if (key === 'category') {
+                         return (
+                            <div key={key}>
+                                <label htmlFor={`category-${packageType}-${index}`} className="block text-sm font-medium text-[var(--color-muted-text)] mb-1">{label}</label>
+                                <input
+                                    list={`categories-list-${packageType}`}
+                                    id={`category-${packageType}-${index}`}
+                                    name="category"
+                                    value={value}
+                                    onChange={e => onChange(path, index, 'category', e.target.value)}
+                                    className="w-full bg-[var(--color-dark-bg)] border border-gray-600 rounded-md py-2 px-3 text-[var(--color-light-text)] focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]"
+                                    placeholder="Select from filters or type new"
+                                />
+                                {availableCategories && availableCategories.length > 0 && (
+                                    <datalist id={`categories-list-${packageType}`}>
+                                        {availableCategories.map((cat, i) => (
+                                            <option key={i} value={cat} />
+                                        ))}
+                                    </datalist>
+                                )}
+                            </div>
+                         );
+                    }
                     
                     if (key === 'note' || key === 'shortDescription') {
                         return (
