@@ -51,7 +51,8 @@ const Services: React.FC<ServicesProps> = ({ showTitle = true }) => {
 
   return (
     <>
-      <section className={`${showTitle ? 'py-20' : 'py-16'} bg-[var(--color-dark-bg)] min-h-[500px]`}>
+      {/* Added relative z-20 and increased padding top (pt-32 md:pt-40) to push it down */}
+      <section className={`${showTitle ? 'pt-32 pb-20 md:pt-40' : 'py-16'} bg-[var(--color-dark-bg)] min-h-[500px] relative z-20`}>
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           {showTitle && (
               <div className="text-center mb-12">

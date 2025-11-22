@@ -266,6 +266,11 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
                     dbData.pages.home.interactiveMap = JSON.parse(JSON.stringify(defaultData.pages.home.interactiveMap));
                 }
 
+                // Patch: Ensure Ziyarat Data Exists (NEW)
+                if (!dbData.pages.ziyarat) {
+                    dbData.pages.ziyarat = JSON.parse(JSON.stringify(defaultData.pages.ziyarat));
+                }
+
                 setAppData(deepMerge(defaultData, dbData));
             } else {
                 // If no data exists in Firestore, initialize it with the default data

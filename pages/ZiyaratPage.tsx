@@ -1,58 +1,11 @@
 
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import InteractiveMap from '../components/InteractiveMap';
-
-// Detailed Site Data
-const siteDetails = {
-  makkah: [
-    {
-      title: 'Jabal Al-Nour (Cave Hira)',
-      subtitle: 'The Dawn of Revelation',
-      desc: 'Jabal Al-Nour, meaning "Mountain of Light", houses the Cave of Hira. It is here that the Prophet Muhammad (PBUH) spent time in seclusion and received the first revelation of the Holy Quran from Archangel Jibreel (AS). The climb offers a spiritual connection to the very beginning of Islam.',
-      img: 'https://i.postimg.cc/RZ8BGSpf/aj.webp',
-      significance: 'First Revelation'
-    },
-    {
-      title: 'Jabal Thawr',
-      subtitle: 'The Sanctuary of Migration',
-      desc: 'This mountain contains the Cave of Thawr, a small rocky opening where the Prophet (PBUH) and his companion Abu Bakr (RA) hid from the Quraish tribe for three days during the migration (Hijrah) to Madinah. It is a symbol of divine protection and trust in Allah.',
-      img: 'https://i.postimg.cc/x1gn4TDd/ad.jpg',
-      significance: 'Refuge during Hijrah'
-    },
-    {
-      title: 'Jannat al-Mualla',
-      subtitle: 'Cemetery of the Beloved',
-      desc: 'Also known as Al-Hajun, this is the historical cemetery in Makkah. It is the resting place of many of the Prophet\'s (PBUH) ancestors, including his grandfather Abdul Muttalib, his uncle Abu Talib, and his beloved wife Khadija (RA).',
-      img: 'https://i.postimg.cc/VkQL0LnX/al.webp',
-      significance: 'Resting place of Khadija (RA)'
-    }
-  ],
-  madinah: [
-    {
-      title: 'Masjid Quba',
-      subtitle: 'The First Mosque of Islam',
-      desc: 'Masjid Quba occupies a unique place in Islamic history as the first mosque built by the Prophet (PBUH) upon his arrival in Madinah. The Prophet (PBUH) said: "Whoever purifies himself in his house, then comes to the mosque of Quba and prays two Rakats therein, will have a reward like that of an Umrah."',
-      img: 'https://i.postimg.cc/RZ8BGSpf/aj.webp',
-      significance: 'Reward of an Umrah'
-    },
-    {
-      title: 'Mount Uhud',
-      subtitle: 'Mountain of Paradise',
-      desc: 'Uhud is a mountain north of Madinah. It was the site of the Battle of Uhud. The Prophet (PBUH) declared, "Uhud is a mountain which loves us and which we love." It is also the resting place of 70 martyrs, including Hamza ibn Abdul-Muttalib (RA).',
-      img: 'https://i.postimg.cc/mD2wzRfY/hajj-b.jpg',
-      significance: 'Martyrs of Uhud'
-    },
-    {
-      title: 'Masjid Al-Qiblatayn',
-      subtitle: 'Mosque of Two Qiblas',
-      desc: 'This mosque is historically significant because it is where the revelation of the Quran came to change the direction of the Qibla from Bayt al-Maqdis in Jerusalem to the Kaaba in Makkah. It uniquely contained two prayer niches (mihrabs) in the past.',
-      img: 'https://i.postimg.cc/50rQG1f5/umrah-2.jpg',
-      significance: 'Change of Qibla'
-    }
-  ]
-};
+import { DataContext } from '../contexts/DataContext';
 
 const ZiyaratPage: React.FC = () => {
+  const { appData } = useContext(DataContext);
+  const { ziyarat } = appData.pages;
   const [activeTab, setActiveTab] = useState<'makkah' | 'madinah'>('makkah');
 
   return (
@@ -62,7 +15,7 @@ const ZiyaratPage: React.FC = () => {
       <div className="relative h-[70vh] flex items-center justify-center overflow-hidden">
            <div className="absolute inset-0">
              <img 
-                src="https://i.postimg.cc/jSKtdnQ4/HD-wallpaper-mecca-madina-during-evening-time-ramzan.jpg" 
+                src={ziyarat.heroImage} 
                 alt="Islamic Heritage" 
                 className="w-full h-full object-cover opacity-50 scale-110 animate-[kenBurns_20s_ease-out_infinite_alternate]"
              />
@@ -73,10 +26,10 @@ const ZiyaratPage: React.FC = () => {
                     <span className="text-[var(--color-primary)] text-sm tracking-[0.3em] uppercase font-bold">Historical Ziyarat Tours</span>
                </div>
                <h1 className="text-6xl md:text-8xl font-display font-bold text-white mb-6 drop-shadow-2xl animate-fade-in-up">
-                   Echoes of History
+                   {ziyarat.heroTitle}
                </h1>
                <p className="text-xl md:text-2xl text-gray-300 font-light max-w-3xl mx-auto leading-relaxed">
-                   Walk in the footsteps of the Prophet (PBUH) and his companions. Witness the sacred landmarks that shaped the history of Islam.
+                   {ziyarat.heroSubtitle}
                </p>
            </div>
            <style>{`
@@ -91,9 +44,9 @@ const ZiyaratPage: React.FC = () => {
       <div className="py-20 container mx-auto px-4 text-center">
           <div className="inline-block p-10 border-y border-[var(--color-primary)]/20 relative max-w-4xl mx-auto">
               <div className="text-3xl md:text-4xl font-display text-gray-300 italic">
-                  "Do not undertake a journey except to three Mosques: Al-Masjid Al-Haram, the Mosque of the Messenger (PBUH), and Al-Masjid Al-Aqsa."
+                  "{ziyarat.introQuote}"
               </div>
-              <div className="text-[var(--color-primary)] mt-4 font-bold uppercase tracking-widest text-sm">- Sahih Bukhari</div>
+              <div className="text-[var(--color-primary)] mt-4 font-bold uppercase tracking-widest text-sm">{ziyarat.introQuoteSource}</div>
           </div>
       </div>
 
@@ -139,7 +92,7 @@ const ZiyaratPage: React.FC = () => {
               </div>
 
               <div className="space-y-24">
-                  {siteDetails[activeTab].map((site, index) => (
+                  {ziyarat.sites[activeTab].map((site, index) => (
                       <div key={index} className={`flex flex-col ${index % 2 === 0 ? 'lg:flex-row' : 'lg:flex-row-reverse'} gap-12 items-center group`} data-aos="fade-up">
                           
                           {/* Image Card */}

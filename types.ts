@@ -433,6 +433,28 @@ export interface InteractiveMapConfig {
     };
 }
 
+// --- Ziyarat Data Types ---
+export interface ZiyaratSite {
+    title: string;
+    subtitle: string;
+    desc: string;
+    img: string;
+    significance: string;
+}
+
+export interface ZiyaratData {
+    seo: SeoMetadata;
+    heroImage: string;
+    heroTitle: string;
+    heroSubtitle: string;
+    introQuote: string;
+    introQuoteSource: string;
+    sites: {
+        makkah: ZiyaratSite[];
+        madinah: ZiyaratSite[];
+    };
+}
+
 // --- Marketing Popup Types ---
 export interface MarketingPopupConfig {
     enabled: boolean;
@@ -611,6 +633,7 @@ export interface AppData {
         };
         hajjDetails: TopicDetailsData;
         umrahDetails: TopicDetailsData;
+        ziyarat: ZiyaratData; // Added Ziyarat Data Interface
         services: {
             seo: SeoMetadata;
             pageBanner: { title: string; subtitle: string; };

@@ -18,7 +18,7 @@ const PackageFilterBar: React.FC = () => {
   } = packageFilter;
 
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 -mt-8 md:-mt-16 relative z-30">
+    <div className="container mx-auto px-4 sm:px-6 lg:px-8 mt-16 md:mt-24 relative z-30">
         <div className="bg-[var(--color-light-bg)] shadow-2xl border border-gray-800/50 p-6 md:p-8 rounded-[var(--ui-border-radius)] backdrop-blur-sm">
             <h2 className="text-xl md:text-2xl font-bold text-center text-[var(--color-primary)] mb-6 font-display uppercase tracking-wide">{title}</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 items-end">
