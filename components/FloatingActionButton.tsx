@@ -45,7 +45,7 @@ const FloatingActionButton: React.FC = () => {
             href={href}
             target={type === 'whatsapp' ? '_blank' : undefined}
             rel={type === 'whatsapp' ? 'noopener noreferrer' : undefined}
-            className={`fixed bottom-6 right-6 z-[100] p-4 rounded-full text-white shadow-2xl transition-transform duration-300 hover:scale-110 animate-bounce-slow ${bgColor} ${hoverColor} flex items-center justify-center`}
+            className={`hidden md:flex fixed bottom-6 right-6 z-[100] p-4 rounded-full text-white shadow-2xl transition-transform duration-300 hover:scale-110 animate-bounce-slow ${bgColor} ${hoverColor} items-center justify-center`}
             aria-label={type === 'whatsapp' ? 'Chat on WhatsApp' : 'Call Us'}
         >
             <div className="absolute -inset-2 rounded-full bg-inherit opacity-30 animate-ping"></div>

@@ -2,6 +2,7 @@
 import React, { useState, useContext } from 'react';
 import Modal from './Modal';
 import { DataContext } from '../contexts/DataContext';
+import { useLanguage } from '../contexts/LanguageContext';
 import { Service, defaultData } from '../data';
 
 // --- Icon Components ---
@@ -39,6 +40,7 @@ interface ServicesProps {
 const Services: React.FC<ServicesProps> = ({ showTitle = true }) => {
   const [selectedService, setSelectedService] = useState<Service | null>(null);
   const { appData } = useContext(DataContext);
+  const { t } = useLanguage();
   
   const data = showTitle ? appData.pages.home.sections.services : appData.pages.services.pageBanner;
   
@@ -51,13 +53,12 @@ const Services: React.FC<ServicesProps> = ({ showTitle = true }) => {
 
   return (
     <>
-      {/* Added relative z-20 and increased padding top (pt-32 md:pt-40) to push it down */}
-      <section className={`${showTitle ? 'pt-32 pb-20 md:pt-40' : 'py-16'} bg-[var(--color-dark-bg)] min-h-[500px] relative z-20`}>
+      <section className={`${showTitle ? 'pt-24 pb-20 md:pt-32' : 'py-16'} bg-[var(--color-dark-bg)] min-h-[500px] relative z-20`}>
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           {showTitle && (
               <div className="text-center mb-12">
-              <h2 className="text-4xl md:text-5xl font-display font-bold text-[var(--color-primary)]" data-aos="fade-up">{data.title}</h2>
-              <p className="mt-4 text-lg text-[var(--color-muted-text)] max-w-2xl mx-auto" data-aos="fade-up" data-aos-delay="100">{data.subtitle}</p>
+              <h2 className="text-4xl md:text-5xl font-display font-bold text-[var(--color-primary)]" data-aos="fade-up">{t(data.title)}</h2>
+              <p className="mt-4 text-lg text-[var(--color-muted-text)] max-w-2xl mx-auto" data-aos="fade-up" data-aos-delay="100">{t(data.subtitle)}</p>
               </div>
           )}
           
@@ -67,8 +68,8 @@ const Services: React.FC<ServicesProps> = ({ showTitle = true }) => {
                 <ServiceCard 
                   key={index} 
                   icon={iconMap[service.icon] || iconMap['Default']}
-                  title={service.title}
-                  description={service.description}
+                  title={t(service.title)}
+                  description={t(service.description)}
                   onClick={() => setSelectedService(null)} // Disabled modal temporarily or fix if content missing
                   delay={index * 100}
                 />
@@ -93,15 +94,15 @@ const Services: React.FC<ServicesProps> = ({ showTitle = true }) => {
               {iconMap[selectedService.icon] || iconMap['Default']}
             </div>
             <div>
-              <h2 className="text-3xl font-display font-bold text-[var(--color-primary)]">{selectedService.title}</h2>
-              <p className="text-[var(--color-muted-text)]">{selectedService.description}</p>
+              <h2 className="text-3xl font-display font-bold text-[var(--color-primary)]">{t(selectedService.title)}</h2>
+              <p className="text-[var(--color-muted-text)]">{t(selectedService.description)}</p>
             </div>
           </div>
           <div className="border-t border-gray-700 pt-6">
             <h3 className="text-xl font-bold text-white mb-4">Key Features & Benefits:</h3>
             <ul className="list-disc list-inside space-y-2 text-[var(--color-light-text)]">
               {selectedService.details.map((detail, index) => (
-                <li key={index}>{detail}</li>
+                <li key={index}>{t(detail)}</li>
               ))}
             </ul>
           </div>

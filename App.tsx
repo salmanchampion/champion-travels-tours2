@@ -13,6 +13,7 @@ import LoginPage from './pages/LoginPage';
 import AdminPage from './pages/AdminPage';
 import { AuthProvider, AuthContext } from './contexts/AuthContext';
 import { DataProvider, DataContext } from './contexts/DataContext';
+import { LanguageProvider } from './contexts/LanguageContext';
 import WhyUsPage from './pages/WhyUsPage';
 import UmrahGuidePage from './pages/UmrahGuidePage';
 import { SeoMetadata } from './data';
@@ -35,6 +36,14 @@ import ExclusiveUmrahPage from './pages/ExclusiveUmrahPage';
 import ZiyaratPage from './pages/ZiyaratPage';
 import ScrollToTop from './components/ScrollToTop';
 import MarketingPopup from './components/MarketingPopup';
+import Preloader from './components/Preloader';
+import MobileBottomNav from './components/MobileBottomNav';
+import ScrollProgressBar from './components/ScrollProgressBar';
+import Breadcrumbs from './components/Breadcrumbs';
+import SchemaMarkup from './components/SEO/SchemaMarkup';
+import CompareFloatingWidget from './components/CompareFloatingWidget';
+import CompareModal from './components/CompareModal';
+import ChecklistModal from './components/ChecklistModal';
 
 // --- Announcement Bar Component ---
 const AnnouncementBar: React.FC = () => {
@@ -58,6 +67,60 @@ const AnnouncementBar: React.FC = () => {
         </div>
     );
 };
+
+// Analytics Injector Component
+const AnalyticsInjector: React.FC = () => {
+    const { appData } = useContext(DataContext);
+    const gaId = appData.globalConfig?.analytics?.googleAnalyticsId;
+    const pixelId = appData.globalConfig?.analytics?.facebookPixelId;
+
+    useEffect(() => {
+        // Google Analytics Injection
+        if (gaId) {
+            const script1 = document.createElement('script');
+            script1.async = true;
+            script1.src = `https://www.googletagmanager.com/gtag/js?id=${gaId}`;
+            script1.className = 'custom-analytics-script';
+            document.head.appendChild(script1);
+
+            const script2 = document.createElement('script');
+            script2.innerHTML = `
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', '${gaId}');
+            `;
+            script2.className = 'custom-analytics-script';
+            document.head.appendChild(script2);
+        }
+
+        // Facebook Pixel Injection
+        if (pixelId) {
+            const script3 = document.createElement('script');
+            script3.innerHTML = `
+                !function(f,b,e,v,n,t,s)
+                {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+                n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+                if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+                n.queue=[];t=b.createElement(e);t.async=!0;
+                t.src=v;s=b.getElementsByTagName(e)[0];
+                s.parentNode.insertBefore(t,s)}(window, document,'script',
+                'https://connect.facebook.net/en_US/fbevents.js');
+                fbq('init', '${pixelId}');
+                fbq('track', 'PageView');
+            `;
+            script3.className = 'custom-analytics-script';
+            document.head.appendChild(script3);
+        }
+
+        return () => {
+            // Cleanup scripts on unmount or ID change to avoid duplicates
+            document.querySelectorAll('.custom-analytics-script').forEach(el => el.remove());
+        };
+    }, [gaId, pixelId]);
+
+    return null;
+}
 
 // Theme Injector Component
 const ThemeInjector: React.FC = () => {
@@ -201,8 +264,6 @@ ${customCss}
                 
                 Array.from(temp.childNodes).forEach(node => {
                     // Mark injected elements for future removal
-                    // Note: text nodes don't support classList, so we wrap or ignore them if possible, 
-                    // but here we mainly care about Elements.
                     if (node.nodeType === 1) { // Element Node
                         (node as HTMLElement).classList.add('custom-injected-script');
                     }
@@ -240,7 +301,8 @@ const AppContent: React.FC = () => {
   const [page, setPage] = useState('');
   const [contactSubject, setContactSubject] = useState('');
   const { isAuthenticated, isLoading: isAuthLoading } = useContext(AuthContext);
-  const { appData, isLoading: isDataLoading } = useContext(DataContext);
+  const { appData, isLoading: isDataLoading, setChecklistOpen } = useContext(DataContext);
+  const [showPreloader, setShowPreloader] = useState(true); // Preloader State
   const keySequenceRef = useRef('');
   const secretCode = '045';
 
@@ -324,6 +386,17 @@ const AppContent: React.FC = () => {
       const hash = window.location.hash || '#home';
       const [path, queryString] = hash.split('?');
       
+      // Specific check for checklist modal trigger
+      if (path === '#checklist') {
+          setChecklistOpen(true);
+          // Optional: Reset hash to home or keep it to allow bookmarking behavior, 
+          // but often modals work better if they don't trap the back button too hard.
+          // For now, let's just open it.
+          // Ideally, we might want to switch back to the previous page URL so the background isn't empty if refreshed
+          // But simpler logic: just open modal.
+          // Since renderPage will fall through to default if '#checklist' isn't handled, let's handle it.
+      }
+
       setPage(path);
       window.scrollTo(0, 0);
 
@@ -378,6 +451,7 @@ const AppContent: React.FC = () => {
         case '#blog': return pages.blog.seo;
         case '#contact':
         case '#book-now': return pages.contact.seo;
+        case '#checklist': return { title: 'Preparation Checklist | Champion Travels', description: 'Interactive Hajj and Umrah preparation checklist.', keywords: 'checklist, packing list, preparation' };
         case '#home':
         default:
           return pages.home.seo;
@@ -461,21 +535,18 @@ const AppContent: React.FC = () => {
       case '#contact': return <ContactPage defaultSubject={contactSubject} />;
       case '#login': return <LoginPage />;
       case '#admin': return <AdminPage />;
+      case '#checklist': return <HomePage />; // Render home behind the modal when checklist is active via hash
       case '#home':
       default: return <HomePage />;
     }
   };
 
   if (isAuthLoading || isDataLoading) {
+    // Initial hard loading state (before data fetch)
     return (
         <div className="min-h-screen flex items-center justify-center bg-[#0d1117] text-white relative overflow-hidden">
-             {/* Luxury Background Effect */}
-            <div className="absolute inset-0">
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(197,164,126,0.1)_0%,_transparent_70%)]"></div>
-            </div>
-            
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(197,164,126,0.1)_0%,_transparent_70%)]"></div>
             <div className="flex flex-col items-center z-10">
-                {/* Luxury Pulse Logo/Icon */}
                 <div className="relative mb-8">
                     <div className="absolute inset-0 bg-[var(--color-primary)] blur-xl opacity-20 animate-pulse"></div>
                     <svg className="w-20 h-20 text-[var(--color-primary)] animate-pulse" fill="currentColor" viewBox="0 0 24 24">
@@ -483,43 +554,44 @@ const AppContent: React.FC = () => {
                          <circle cx="12" cy="11" r="1.5" />
                     </svg>
                 </div>
-                
-                <h1 className="font-display text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[var(--color-primary)] via-[#e3cba5] to-[var(--color-primary)] tracking-widest mb-2">
-                    CHAMPION
-                </h1>
-                <p className="text-[var(--color-muted-text)] text-sm tracking-[0.3em] uppercase">Travels & Tours</p>
-                
-                {/* Gold Progress Bar */}
-                <div className="mt-8 w-48 h-1 bg-gray-800 rounded-full overflow-hidden">
-                    <div className="h-full bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary)] w-full animate-[shimmer_1.5s_infinite]"></div>
-                </div>
             </div>
-            <style>{`
-                @keyframes shimmer {
-                    0% { transform: translateX(-100%); }
-                    100% { transform: translateX(100%); }
-                }
-            `}</style>
         </div>
     );
   }
 
   return (
-    <div className="bg-[var(--color-dark-bg)] min-h-screen transition-colors duration-500">
-      <ThemeInjector />
-      <AnnouncementBar />
-      <Header activePage={page} />
-      <main>
-        {renderPage()}
-      </main>
-      {/* New Marketing Popup Config */}
-      <MarketingPopup />
-      <FloatingActionButton />
-      <ScrollToTop />
-      <PrayerTimesWidget />
-      <Partners />
-      <Footer />
-    </div>
+    <>
+      {showPreloader && <Preloader onFinish={() => setShowPreloader(false)} />}
+      
+      <div className={`bg-[var(--color-dark-bg)] min-h-screen transition-colors duration-500 ${showPreloader ? 'overflow-hidden h-screen' : ''}`}>
+        <ScrollProgressBar /> {/* New Scroll Progress Bar */}
+        <ThemeInjector />
+        <AnalyticsInjector /> {/* New Analytics Injector */}
+        <SchemaMarkup /> {/* New SEO Schema */}
+        <AnnouncementBar />
+        <Header activePage={page} />
+        {page !== '#home' && page !== '' && page !== '#checklist' && (
+            <Breadcrumbs currentPage={page} /> 
+        )}
+        <main className={`pb-20 md:pb-0 ${page !== '#home' && page !== '#checklist' ? '-mt-20 md:mt-0' : ''}`}> 
+            {/* -mt-20 compensates for the fixed header spacing added in page components if Breadcrumbs are present, adjusting flow */}
+          {renderPage()}
+        </main>
+        {/* New Marketing Popup Config */}
+        <MarketingPopup />
+        
+        <CompareFloatingWidget /> {/* New Compare Widget */}
+        <CompareModal /> {/* New Compare Modal */}
+        <ChecklistModal /> {/* New Checklist Modal */}
+
+        <FloatingActionButton />
+        <ScrollToTop />
+        <PrayerTimesWidget />
+        <MobileBottomNav /> {/* New Mobile Navigation */}
+        <Partners />
+        <Footer />
+      </div>
+    </>
   );
 };
 
@@ -528,7 +600,9 @@ const App: React.FC = () => {
   return (
     <AuthProvider>
       <DataProvider>
-        <AppContent />
+        <LanguageProvider>
+            <AppContent />
+        </LanguageProvider>
       </DataProvider>
     </AuthProvider>
   )

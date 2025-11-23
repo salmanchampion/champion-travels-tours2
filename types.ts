@@ -383,6 +383,20 @@ export interface ExclusivePageData {
     introText: string;
 }
 
+// --- Ziyarat Page Data ---
+export interface ZiyaratSite {
+    title: string;
+    subtitle: string;
+    desc: string;
+    img: string;
+    significance: string;
+}
+
+export interface ZiyaratData {
+    makkah: ZiyaratSite[];
+    madinah: ZiyaratSite[];
+}
+
 // --- New Special Offer Interface ---
 export interface SpecialOfferConfig {
     enabled: boolean;
@@ -433,28 +447,6 @@ export interface InteractiveMapConfig {
     };
 }
 
-// --- Ziyarat Data Types ---
-export interface ZiyaratSite {
-    title: string;
-    subtitle: string;
-    desc: string;
-    img: string;
-    significance: string;
-}
-
-export interface ZiyaratData {
-    seo: SeoMetadata;
-    heroImage: string;
-    heroTitle: string;
-    heroSubtitle: string;
-    introQuote: string;
-    introQuoteSource: string;
-    sites: {
-        makkah: ZiyaratSite[];
-        madinah: ZiyaratSite[];
-    };
-}
-
 // --- Marketing Popup Types ---
 export interface MarketingPopupConfig {
     enabled: boolean;
@@ -477,6 +469,21 @@ export interface TextLabelsConfig {
     viewPackages: string;
 }
 
+// --- Application Tracker Types ---
+export interface ApplicationStep {
+    label: string;
+    date?: string;
+    completed: boolean;
+    current: boolean;
+}
+
+export interface Application {
+    id: string;
+    passportNumber: string;
+    serviceType: string; // e.g., Umrah Visa, Hajj Visa, Ticket
+    steps: ApplicationStep[];
+}
+
 // --- GLOBAL CONFIG FOR TOTAL CONTROL ---
 export interface GlobalConfig {
     announcementBar: {
@@ -490,6 +497,20 @@ export interface GlobalConfig {
         siteName: string;
         faviconUrl: string; // For total branding control
         metaDescription: string; // Global SEO fallback
+    };
+    // New SEO & Analytics Config
+    seoSchema?: {
+        enabled: boolean;
+        organizationType: string; // e.g. 'TravelAgency'
+        sameAs: string[]; // Social links for schema
+    };
+    analytics?: {
+        googleAnalyticsId: string; // G-XXXXXXXXXX
+        facebookPixelId: string; // XXXXXXXXXXXXXXX
+    };
+    language?: {
+        enableSwitcher: boolean;
+        defaultLanguage: 'en' | 'bn';
     };
     marketingPopup?: MarketingPopupConfig;
     textLabels?: TextLabelsConfig;
@@ -633,7 +654,6 @@ export interface AppData {
         };
         hajjDetails: TopicDetailsData;
         umrahDetails: TopicDetailsData;
-        ziyarat: ZiyaratData; // Added Ziyarat Data Interface
         services: {
             seo: SeoMetadata;
             pageBanner: { title: string; subtitle: string; };
@@ -719,6 +739,8 @@ export interface AppData {
         umrahGuide: UmrahGuideData;
         hajjGuide: HajjGuideData;
         blog: BlogData;
+        ziyarat: ZiyaratData; // NEW
     };
     customPages: CustomPage[];
+    applications: Application[]; // Application Tracker Data
 }

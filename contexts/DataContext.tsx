@@ -16,6 +16,19 @@ interface DataContextType {
   resetAppData: () => Promise<void>;
   userTheme: UserTheme;
   setUserTheme: (theme: UserTheme) => void;
+  // New UI State for Prayer Times
+  isPrayerTimesOpen: boolean;
+  setPrayerTimesOpen: (open: boolean) => void;
+  // --- Compare Feature State ---
+  compareList: any[];
+  addToCompare: (pkg: any) => void;
+  removeFromCompare: (idOrName: string) => void;
+  clearCompare: () => void;
+  isCompareModalOpen: boolean;
+  setCompareModalOpen: (open: boolean) => void;
+  // --- Checklist State ---
+  isChecklistOpen: boolean;
+  setChecklistOpen: (open: boolean) => void;
 }
 
 const initialContextValue: DataContextType = {
@@ -25,6 +38,16 @@ const initialContextValue: DataContextType = {
     resetAppData: async () => {},
     userTheme: { mode: 'dark', primaryColor: '' },
     setUserTheme: () => {},
+    isPrayerTimesOpen: false,
+    setPrayerTimesOpen: () => {},
+    compareList: [],
+    addToCompare: () => {},
+    removeFromCompare: () => {},
+    clearCompare: () => {},
+    isCompareModalOpen: false,
+    setCompareModalOpen: () => {},
+    isChecklistOpen: false,
+    setChecklistOpen: () => {},
 };
 
 export const DataContext = createContext<DataContextType>(initialContextValue);
@@ -58,7 +81,43 @@ interface DataProviderProps {
 export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
   const [appData, setAppData] = useState<AppData>(defaultData);
   const [isLoading, setIsLoading] = useState(true);
+  const [isPrayerTimesOpen, setPrayerTimesOpen] = useState(false);
+  const [isChecklistOpen, setChecklistOpen] = useState(false);
   
+  // --- Compare Feature State ---
+  const [compareList, setCompareList] = useState<any[]>([]);
+  const [isCompareModalOpen, setCompareModalOpen] = useState(false);
+
+  const addToCompare = (pkg: any) => {
+      // Check if already exists (robust check for id, name, or title)
+      const exists = compareList.some(p => {
+          if (p.id !== undefined && pkg.id !== undefined && p.id === pkg.id) return true;
+          if (p.name !== undefined && pkg.name !== undefined && p.name === pkg.name) return true;
+          if (p.title !== undefined && pkg.title !== undefined && p.title === pkg.title) return true;
+          return false;
+      });
+      
+      if (exists) {
+          alert('This package is already in your comparison list.');
+          return;
+      }
+
+      if (compareList.length >= 3) {
+          alert('You can compare up to 3 packages at a time. Please remove one to add another.');
+          return;
+      }
+
+      setCompareList([...compareList, pkg]);
+  };
+
+  const removeFromCompare = (idOrName: string) => {
+      setCompareList(compareList.filter(p => p.id !== idOrName && p.name !== idOrName && p.title !== idOrName));
+  };
+
+  const clearCompare = () => {
+      setCompareList([]);
+  };
+
   // Initialize User Theme from LocalStorage
   const [userTheme, setUserThemeState] = useState<UserTheme>(() => {
       try {
@@ -142,7 +201,6 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
                     }
 
                     // Step 4: Enforce new Services Menu Structure
-                    // NOTE: This is critical to ensure 'Ziyarat Tours' appears correctly
                     const defaultServicesLink = defaultData.header.navLinks.find(link => link.label === 'Services');
                     const servicesIndex = navLinks.findIndex(link => link.label === 'Services');
                     
@@ -153,6 +211,24 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
                         } else {
                             // If not found, add it
                              navLinks.splice(2, 0, JSON.parse(JSON.stringify(defaultServicesLink)));
+                        }
+                    }
+
+                    // Step 5: Patch Guidelines for Checklist
+                    const guidelinesIndex = navLinks.findIndex(link => link.label === 'Guidelines');
+                    const defaultGuidelinesLink = defaultData.header.navLinks.find(link => link.label === 'Guidelines');
+                    
+                    if (defaultGuidelinesLink) {
+                        if (guidelinesIndex !== -1) {
+                            // Ensure sublinks are updated (specifically for #checklist)
+                            const currentSubLinks = navLinks[guidelinesIndex].subLinks || [];
+                            const checklistLink = defaultGuidelinesLink.subLinks?.find(l => l.href === '#checklist');
+                            
+                            if (checklistLink && !currentSubLinks.some(l => l.href === '#checklist')) {
+                                navLinks[guidelinesIndex].subLinks = [...currentSubLinks, checklistLink];
+                            }
+                        } else {
+                             navLinks.splice(3, 0, JSON.parse(JSON.stringify(defaultGuidelinesLink)));
                         }
                     }
 
@@ -255,31 +331,64 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
                 if (!dbData.pages.home.sections.islamicTools) {
                     dbData.pages.home.sections.islamicTools = JSON.parse(JSON.stringify(defaultData.pages.home.sections.islamicTools));
                 }
+                
+                if (!dbData.pages.home.sections.islamicTools.zakat) dbData.pages.home.sections.islamicTools.zakat = { enabled: true, googleSheetUrl: '' };
+                if (!dbData.pages.home.sections.islamicTools.tasbeeh) dbData.pages.home.sections.islamicTools.tasbeeh = { enabled: true };
+                if (!dbData.pages.home.sections.islamicTools.currency) dbData.pages.home.sections.islamicTools.currency = { enabled: true };
 
-                 // Patch: Ensure footer newsletter exists
                 if (!dbData.footer.newsletter) {
-                    dbData.footer.newsletter = JSON.parse(JSON.stringify(defaultData.footer.newsletter));
+                     dbData.footer.newsletter = JSON.parse(JSON.stringify(defaultData.footer.newsletter));
                 }
 
                 // Patch: Ensure Interactive Map Data Exists
                 if (!dbData.pages.home.interactiveMap) {
                     dbData.pages.home.interactiveMap = JSON.parse(JSON.stringify(defaultData.pages.home.interactiveMap));
                 }
-
-                // Patch: Ensure Ziyarat Data Exists (NEW)
+                
+                // Patch: Ensure Ziyarat Data Exists
                 if (!dbData.pages.ziyarat) {
                     dbData.pages.ziyarat = JSON.parse(JSON.stringify(defaultData.pages.ziyarat));
+                }
+                
+                // Patch: Ensure Hajj PreRegistration Data Exists
+                if (!dbData.pages.packages.hajjPreRegistration) {
+                    dbData.pages.packages.hajjPreRegistration = JSON.parse(JSON.stringify(defaultData.pages.packages.hajjPreRegistration));
+                }
+
+                // Robust Check for Global Config
+                if (!dbData.globalConfig) {
+                     dbData.globalConfig = JSON.parse(JSON.stringify(defaultData.globalConfig));
+                }
+                if (!dbData.globalConfig.textLabels) {
+                    dbData.globalConfig.textLabels = JSON.parse(JSON.stringify(defaultData.globalConfig?.textLabels));
+                }
+                if (!dbData.globalConfig.marketingPopup) {
+                    dbData.globalConfig.marketingPopup = JSON.parse(JSON.stringify(defaultData.globalConfig?.marketingPopup));
+                }
+                if (!dbData.globalConfig.advanced.typography) {
+                    dbData.globalConfig.advanced.typography = JSON.parse(JSON.stringify(defaultData.globalConfig?.advanced.typography));
+                }
+                // --- NEW: Ensure SEO, Analytics & Language Config ---
+                if (!dbData.globalConfig.seoSchema) {
+                    dbData.globalConfig.seoSchema = JSON.parse(JSON.stringify(defaultData.globalConfig?.seoSchema));
+                }
+                if (!dbData.globalConfig.analytics) {
+                    dbData.globalConfig.analytics = JSON.parse(JSON.stringify(defaultData.globalConfig?.analytics));
+                }
+                if (!dbData.globalConfig.language) {
+                    dbData.globalConfig.language = JSON.parse(JSON.stringify(defaultData.globalConfig?.language));
+                }
+                if (!dbData.applications) {
+                    dbData.applications = [];
                 }
 
                 setAppData(deepMerge(defaultData, dbData));
             } else {
-                // If no data exists in Firestore, initialize it with the default data
                 await docRef.set(defaultData);
                 setAppData(defaultData);
             }
         } catch (error) {
             console.error("Error fetching data from Firestore:", error);
-            // Fallback to default data in case of an error
             setAppData(defaultData);
         } finally {
             setIsLoading(false);
@@ -298,7 +407,6 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
         await docRef.set(mergedData);
     } catch (error) {
         console.error("Failed to save data to Firestore:", error);
-        // Optionally, revert the state or show an error message
     }
   };
 
@@ -315,7 +423,24 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
   }
 
   return (
-    <DataContext.Provider value={{ appData, isLoading, updateAppData, resetAppData, userTheme, setUserTheme }}>
+    <DataContext.Provider value={{ 
+        appData, 
+        isLoading, 
+        updateAppData, 
+        resetAppData, 
+        userTheme, 
+        setUserTheme, 
+        isPrayerTimesOpen, 
+        setPrayerTimesOpen,
+        compareList,
+        addToCompare,
+        removeFromCompare,
+        clearCompare,
+        isCompareModalOpen,
+        setCompareModalOpen,
+        isChecklistOpen,
+        setChecklistOpen
+    }}>
       {children}
     </DataContext.Provider>
   );

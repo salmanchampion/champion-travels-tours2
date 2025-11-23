@@ -1,9 +1,11 @@
 
 import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { DataContext } from '../contexts/DataContext';
+import { useLanguage } from '../contexts/LanguageContext';
 
 const Hero: React.FC = () => {
   const { appData } = useContext(DataContext);
+  const { t } = useLanguage();
   const { hero } = appData.pages.home;
   const [currentSlide, setCurrentSlide] = useState(0);
 
@@ -58,23 +60,23 @@ const Hero: React.FC = () => {
       <div className="relative z-20 container mx-auto px-4 h-full flex flex-col justify-center text-center pt-20 md:pt-0">
           <div className="hero-slide-content max-w-4xl mx-auto">
               <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-bold tracking-wide mb-3 leading-tight" data-aos="fade-up" data-aos-delay="200">
-              {hero.title}
+              {t(hero.title)}
               </h1>
               <p className="text-xs md:text-lg font-sans text-[var(--color-primary)] mb-4 md:mb-6 font-medium tracking-wider uppercase" data-aos="fade-up" data-aos-delay="400">
-              {hero.licenseInfo}
+              {t(hero.licenseInfo)}
               </p>
               <h2 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-display font-extrabold text-[var(--color-light-text)] mb-6 leading-tight" data-aos="fade-up" data-aos-delay="600">
-              {hero.subtitle}
+              {t(hero.subtitle)}
               </h2>
               <p className="text-sm sm:text-lg md:text-xl max-w-3xl mx-auto mb-8 text-[var(--color-light-text)]/90 px-2 leading-relaxed" data-aos="fade-up" data-aos-delay="800">
-              {hero.description}
+              {t(hero.description)}
               </p>
               <div data-aos="zoom-in" data-aos-delay="1000">
                   <a
                   href="#packages"
                   className="bg-[var(--color-primary)] text-white font-bold py-3 px-8 md:py-4 md:px-10 rounded-[var(--ui-button-radius)] text-base md:text-lg hover:bg-[var(--color-primary-dark)] transition-transform duration-300 hover:scale-105 inline-block shadow-lg hover:shadow-[var(--color-primary)]/30"
                   >
-                  {hero.buttonText}
+                  {t(hero.buttonText)}
                   </a>
               </div>
           </div>

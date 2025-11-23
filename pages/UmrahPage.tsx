@@ -1,3 +1,4 @@
+
 import React, { useContext, useState, useMemo } from 'react';
 import { DataContext } from '../contexts/DataContext';
 import PageBanner from '../components/PageBanner';
@@ -11,31 +12,58 @@ const DetailRow: React.FC<{ label: string; value: string }> = ({ label, value })
     </div>
 );
 
-const UmrahPackageCard: React.FC<{ pkg: UmrahPackage; onViewDetails: () => void; }> = ({ pkg, onViewDetails }) => (
-    <div className="bg-[var(--color-light-bg)] rounded-lg shadow-[var(--ui-shadow)] overflow-hidden flex flex-col h-full">
-        <img src={pkg.image} alt={pkg.name} className="w-full h-48 object-cover" />
-        <div className="p-6 flex flex-col flex-grow">
-            <h3 className="text-xl font-bold text-[var(--color-light-text)] mb-2">{pkg.name}</h3>
-            <p className="text-[var(--color-muted-text)] text-sm mb-4 flex-grow">{pkg.shortDescription}</p>
-            <div className="flex justify-between items-center text-sm text-[var(--color-muted-text)] mb-4">
-                <span>Starting from</span>
-                <span className="font-bold text-lg text-[var(--color-primary)]">{pkg.price}</span>
+const UmrahPackageCard: React.FC<{ pkg: UmrahPackage; onViewDetails: () => void; }> = ({ pkg, onViewDetails }) => {
+    const { addToCompare, compareList, removeFromCompare } = useContext(DataContext);
+    const isSelected = compareList.some(p => p.name === pkg.name);
+    const safeId = `compare-pg-umrah-${pkg.name.replace(/\s+/g, '_')}`;
+
+    const handleCompare = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.checked) {
+            addToCompare(pkg);
+        } else {
+            removeFromCompare(pkg.name);
+        }
+    };
+
+    return (
+        <div className="bg-[var(--color-light-bg)] rounded-lg shadow-[var(--ui-shadow)] overflow-hidden flex flex-col h-full relative group">
+            <img src={pkg.image} alt={pkg.name} className="w-full h-48 object-cover" />
+            
+            {/* Compare Checkbox */}
+            <div className="absolute top-2 left-2 bg-black/60 backdrop-blur-sm rounded px-2 py-1 flex items-center gap-2 border border-white/10 z-10">
+                <input 
+                    type="checkbox" 
+                    id={safeId} 
+                    checked={isSelected}
+                    onChange={handleCompare}
+                    className="w-3.5 h-3.5 accent-[var(--color-primary)] cursor-pointer"
+                />
+                <label htmlFor={safeId} className="text-[10px] text-white font-bold cursor-pointer uppercase tracking-wide">Compare</label>
             </div>
-            <div className="flex space-x-2 mt-auto">
-                <button
-                    onClick={onViewDetails}
-                    className="flex-1 bg-[var(--color-dark-bg)] text-white font-semibold py-2 px-4 rounded-md hover:bg-black/50 transition-colors flex items-center justify-center space-x-2"
-                >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 1h8v2H6V5zm0 4h8v2H6V9zm0 4h5v2H6v-2z" clipRule="evenodd" /></svg>
-                    <span>View Details</span>
-                </button>
-                <a href={`#contact?subject=Inquiry for ${pkg.name}`} className="flex-1 bg-[var(--color-primary)] text-white font-semibold py-2 px-4 rounded-md hover:bg-[var(--color-primary-dark)] transition-colors text-center">
-                    Send Query
-                </a>
+
+            <div className="p-6 flex flex-col flex-grow">
+                <h3 className="text-xl font-bold text-[var(--color-light-text)] mb-2">{pkg.name}</h3>
+                <p className="text-[var(--color-muted-text)] text-sm mb-4 flex-grow">{pkg.shortDescription}</p>
+                <div className="flex justify-between items-center text-sm text-[var(--color-muted-text)] mb-4">
+                    <span>Starting from</span>
+                    <span className="font-bold text-lg text-[var(--color-primary)]">{pkg.price}</span>
+                </div>
+                <div className="flex space-x-2 mt-auto">
+                    <button
+                        onClick={onViewDetails}
+                        className="flex-1 bg-[var(--color-dark-bg)] text-white font-semibold py-2 px-4 rounded-md hover:bg-black/50 transition-colors flex items-center justify-center space-x-2"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 1h8v2H6V5zm0 4h8v2H6V9zm0 4h5v2H6v-2z" clipRule="evenodd" /></svg>
+                        <span>View Details</span>
+                    </button>
+                    <a href={`#contact?subject=Inquiry for ${pkg.name}`} className="flex-1 bg-[var(--color-primary)] text-white font-semibold py-2 px-4 rounded-md hover:bg-[var(--color-primary-dark)] transition-colors text-center">
+                        Send Query
+                    </a>
+                </div>
             </div>
         </div>
-    </div>
-);
+    );
+};
 
 const UmrahPage: React.FC = () => {
     const { appData } = useContext(DataContext);

@@ -1,5 +1,7 @@
+
 import React, { useState, useEffect, useContext } from 'react';
 import { DataContext } from '../contexts/DataContext';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface ContactProps {
   defaultSubject?: string;
@@ -8,6 +10,7 @@ interface ContactProps {
 
 const Contact: React.FC<ContactProps> = ({ defaultSubject = '', showTitle = true }) => {
   const { appData } = useContext(DataContext);
+  const { t } = useLanguage();
   // FIX: Corrected path to home page contact section data.
   const homeData = appData.pages.home.sections.contact;
   const contactPageData = appData.pages.contact;
@@ -82,14 +85,14 @@ const Contact: React.FC<ContactProps> = ({ defaultSubject = '', showTitle = true
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {showTitle && (
             <div className="text-center mb-12">
-            <h2 className="text-4xl md:text-5xl font-display font-bold text-[var(--color-primary)]">{data.title}</h2>
-            <p className="mt-4 text-lg text-[var(--color-muted-text)] max-w-2xl mx-auto">{data.subtitle}</p>
+            <h2 className="text-4xl md:text-5xl font-display font-bold text-[var(--color-primary)]">{t(data.title)}</h2>
+            <p className="mt-4 text-lg text-[var(--color-muted-text)] max-w-2xl mx-auto">{t(data.subtitle)}</p>
             </div>
         )}
         <div className="flex flex-col lg:flex-row gap-12 bg-[var(--color-light-bg)] p-4 sm:p-8 md:p-12 rounded-[var(--ui-border-radius)] shadow-2xl">
           <div className="lg:w-1/2">
-            <h3 className="text-3xl font-display font-semibold text-white mb-6">{contactPageData.infoTitle}</h3>
-            <p className="text-[var(--color-muted-text)] mb-8">{contactPageData.infoSubtitle}</p>
+            <h3 className="text-3xl font-display font-semibold text-white mb-6">{t(contactPageData.infoTitle)}</h3>
+            <p className="text-[var(--color-muted-text)] mb-8">{t(contactPageData.infoSubtitle)}</p>
 
             <div className="mb-8">
               <div 
@@ -118,7 +121,7 @@ const Contact: React.FC<ContactProps> = ({ defaultSubject = '', showTitle = true
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" dangerouslySetInnerHTML={{ __html: info.icon }} />
                   </div>
                   <div className="ml-4">
-                    <h4 className="text-lg font-bold text-white">{info.label}</h4>
+                    <h4 className="text-lg font-bold text-white">{t(info.label)}</h4>
                     {info.label === 'Address' ? (
                       <a href={googleMapsUrl} target="_blank" rel="noopener noreferrer" className="text-[var(--color-muted-text)] hover:text-[var(--color-primary)] transition-colors break-words">
                         {info.value}
@@ -149,19 +152,19 @@ const Contact: React.FC<ContactProps> = ({ defaultSubject = '', showTitle = true
             </div>
 
             <div className="mt-8 pt-8 border-t border-gray-700">
-                <h4 className="text-xl font-display font-semibold text-white mb-4">{contactPageData.accreditationsTitle}</h4>
+                <h4 className="text-xl font-display font-semibold text-white mb-4">{t(contactPageData.accreditationsTitle)}</h4>
                 <img src={contactPageData.accreditationsImage} alt='Accreditations from IATA, ATAB, TOAB, and more.' className="w-full h-auto rounded-[var(--ui-border-radius)] bg-white p-2" />
             </div>
 
           </div>
           <div className="lg:w-1/2">
-            <h3 className="text-3xl font-display font-semibold text-white mb-6">{contactPageData.formTitle}</h3>
+            <h3 className="text-3xl font-display font-semibold text-white mb-6">{t(contactPageData.formTitle)}</h3>
             <form onSubmit={handleSubmit} className="space-y-4">
-              <input type="text" name="name" value={formData.name} onChange={handleChange} placeholder="Your Name" required className="w-full bg-[var(--color-dark-bg)] border border-gray-600 rounded-[var(--ui-border-radius)] py-3 px-4 text-[var(--color-light-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] transition" />
-              <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="Your Email" required className="w-full bg-[var(--color-dark-bg)] border border-gray-600 rounded-[var(--ui-border-radius)] py-3 px-4 text-[var(--color-light-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] transition" />
-              <input type="tel" name="phone" value={formData.phone} onChange={handleChange} placeholder="Your Phone" className="w-full bg-[var(--color-dark-bg)] border border-gray-600 rounded-[var(--ui-border-radius)] py-3 px-4 text-[var(--color-light-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] transition" />
-              <input type="text" name="subject" value={formData.subject} onChange={handleChange} placeholder="Subject" required className="w-full bg-[var(--color-dark-bg)] border border-gray-600 rounded-[var(--ui-border-radius)] py-3 px-4 text-[var(--color-light-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] transition" />
-              <textarea name="message" value={formData.message} onChange={handleChange} placeholder="Your Message" rows={5} required className="w-full bg-[var(--color-dark-bg)] border border-gray-600 rounded-[var(--ui-border-radius)] py-3 px-4 text-[var(--color-light-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] transition"></textarea>
+              <input type="text" name="name" value={formData.name} onChange={handleChange} placeholder={t("Your Name")} required className="w-full bg-[var(--color-dark-bg)] border border-gray-600 rounded-[var(--ui-border-radius)] py-3 px-4 text-[var(--color-light-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] transition" />
+              <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder={t("Your Email")} required className="w-full bg-[var(--color-dark-bg)] border border-gray-600 rounded-[var(--ui-border-radius)] py-3 px-4 text-[var(--color-light-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] transition" />
+              <input type="tel" name="phone" value={formData.phone} onChange={handleChange} placeholder={t("Your Phone")} className="w-full bg-[var(--color-dark-bg)] border border-gray-600 rounded-[var(--ui-border-radius)] py-3 px-4 text-[var(--color-light-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] transition" />
+              <input type="text" name="subject" value={formData.subject} onChange={handleChange} placeholder={t("Subject")} required className="w-full bg-[var(--color-dark-bg)] border border-gray-600 rounded-[var(--ui-border-radius)] py-3 px-4 text-[var(--color-light-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] transition" />
+              <textarea name="message" value={formData.message} onChange={handleChange} placeholder={t("Your Message")} rows={5} required className="w-full bg-[var(--color-dark-bg)] border border-gray-600 rounded-[var(--ui-border-radius)] py-3 px-4 text-[var(--color-light-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] transition"></textarea>
               
               {submitStatus === 'success' && (
                 <p className="text-green-400 text-center">Thank you for your message! We will get back to you soon.</p>
@@ -171,7 +174,7 @@ const Contact: React.FC<ContactProps> = ({ defaultSubject = '', showTitle = true
               )}
 
               <button type="submit" disabled={isSubmitting} className="w-full bg-[var(--color-primary)] text-white font-bold py-3 px-6 rounded-[var(--ui-button-radius)] hover:bg-[var(--color-primary-dark)] transition-all duration-300 transform hover:scale-105 disabled:bg-gray-500 disabled:cursor-not-allowed">
-                {isSubmitting ? 'Sending...' : contactPageData.formButtonText}
+                {isSubmitting ? 'Sending...' : t(contactPageData.formButtonText)}
               </button>
             </form>
           </div>

@@ -2,8 +2,10 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../contexts/AuthContext';
 import { DataContext } from '../contexts/DataContext';
+import { useLanguage } from '../contexts/LanguageContext';
 import { NavLink } from '../data';
 import ThemeSettingsModal from './ThemeSettingsModal';
+import ApplicationStatus from './ApplicationStatus';
 
 interface HeaderProps {
   activePage: string;
@@ -18,14 +20,16 @@ const Header: React.FC<HeaderProps> = ({ activePage }) => {
   const [visible, setVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isStatusOpen, setIsStatusOpen] = useState(false); // Tracker State
   
   const { isAuthenticated, logout } = useContext(AuthContext);
   const { appData } = useContext(DataContext);
+  const { language, setLanguage, t } = useLanguage();
   const { header, site, globalConfig } = appData;
 
-  const showThemeSwitcher = header.showThemeSwitcher !== false; // Default to true if undefined
+  const showThemeSwitcher = header.showThemeSwitcher !== false; 
+  const showLanguageSwitcher = globalConfig?.language?.enableSwitcher !== false;
 
-  // Dynamic Site Name Logic
   const siteName = globalConfig?.siteIdentity?.siteName || 'Champion Travels & Tours';
   const siteNameParts = siteName.split(' ');
   const siteNameFirst = siteNameParts[0];
@@ -35,31 +39,23 @@ const Header: React.FC<HeaderProps> = ({ activePage }) => {
     if (!header.taglines || header.taglines.length === 0) return;
     const interval = setInterval(() => {
       setCurrentTagline(prev => (prev + 1) % (header.taglines?.length || 1));
-    }, 5000); // Change every 5 seconds
+    }, 5000); 
     return () => clearInterval(interval);
   }, [header.taglines]);
 
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
-
-      // Logic for background change on scroll
       setScrolled(currentScrollY > 10);
-
-      // Logic for showing/hiding header on scroll direction
       if (isMenuOpen) {
-        // If mobile menu is open, always keep header visible
         setVisible(true);
       } else {
-        // Hide header only if scrolling down and past the initial view
         if (currentScrollY > lastScrollY && currentScrollY > 100) {
           setVisible(false);
         } else {
           setVisible(true);
         }
       }
-      
-      // Update last scroll position, handling negative values on some devices
       setLastScrollY(currentScrollY <= 0 ? 0 : currentScrollY);
     };
 
@@ -69,7 +65,6 @@ const Header: React.FC<HeaderProps> = ({ activePage }) => {
     };
   }, [lastScrollY, isMenuOpen]);
 
-  // Close mobile menu when page changes
   useEffect(() => {
       if (isMenuOpen) {
           setIsMenuOpen(false);
@@ -92,12 +87,16 @@ const Header: React.FC<HeaderProps> = ({ activePage }) => {
   const visibleNavLinks = header.navLinks.filter(link => link.enabled);
   const hasTaglines = header.taglines && header.taglines.length > 0;
 
+  const toggleLanguage = () => {
+      setLanguage(language === 'en' ? 'bn' : 'en');
+  }
+
   return (
     <>
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out ${visible ? 'translate-y-0' : '-translate-y-full'}`}
     >
-        {/* Top Bar - Hidden on Mobile for cleaner look */}
+        {/* Top Bar */}
         <div className="bg-[var(--color-dark-bg)]/95 backdrop-blur-md text-[var(--color-muted-text)] py-2 text-xs md:text-sm border-b border-gray-800/50 hidden md:block">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-8">
                 <div className="flex items-center space-x-6">
@@ -120,6 +119,24 @@ const Header: React.FC<HeaderProps> = ({ activePage }) => {
                     </div>
                 )}
                 <div className="flex items-center space-x-4">
+                    {/* Check Status Button Desktop */}
+                    <button 
+                        onClick={() => setIsStatusOpen(true)}
+                        className="flex items-center space-x-1 hover:text-[var(--color-secondary)] transition-colors font-semibold"
+                    >
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        <span>Check Status</span>
+                    </button>
+
+                    {showLanguageSwitcher && (
+                        <button 
+                            onClick={toggleLanguage}
+                            className={`text-xs font-bold uppercase border border-gray-600 px-3 py-1 rounded hover:bg-[var(--color-primary)] hover:text-white hover:border-[var(--color-primary)] transition-all ${language === 'bn' ? 'bg-[var(--color-primary)] text-white' : ''}`}
+                        >
+                            {language === 'en' ? 'বাংলা' : 'ENG'}
+                        </button>
+                    )}
+
                     {header.socialLinks?.map(link => (
                     <a key={link.name} href={link.href} target="_blank" rel="noopener noreferrer" aria-label={link.name} className="hover:text-[var(--color-primary)] transition-colors">
                         <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" dangerouslySetInnerHTML={{ __html: link.icon }} />
@@ -136,7 +153,7 @@ const Header: React.FC<HeaderProps> = ({ activePage }) => {
         }`}>
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-16 md:h-20">
-            {/* Logo Section: Shows full name text alongside logo if present */}
+            {/* Logo */}
             <a href="#home" className="flex items-center z-50 relative gap-3">
                 {site.logoUrl && <img src={site.logoUrl} alt={siteName} className="h-10 md:h-12 w-auto" />}
                 <span className="font-display text-xl md:text-2xl font-bold tracking-tight leading-none">
@@ -145,7 +162,7 @@ const Header: React.FC<HeaderProps> = ({ activePage }) => {
                 </span>
             </a>
 
-            {/* Desktop Navigation */}
+            {/* Desktop Nav */}
             <nav className="hidden md:flex items-center space-x-6 lg:space-x-8">
                 {visibleNavLinks.map((link) => (
                 link.subLinks ? (
@@ -162,7 +179,7 @@ const Header: React.FC<HeaderProps> = ({ activePage }) => {
                         getIsActive(link) ? 'text-[var(--color-primary)]' : 'text-[var(--color-light-text)]'
                         }`}
                     >
-                        {link.label}
+                        {t(link.label)} 
                         <svg className={`w-4 h-4 ml-1 transition-transform duration-200 ${openDropdown === link.label ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
                     </a>
                     <div className={`absolute top-full left-0 w-60 pt-2 transition-all duration-200 transform origin-top-left ${openDropdown === link.label ? 'opacity-100 scale-100 visible' : 'opacity-0 scale-95 invisible'}`}>
@@ -175,7 +192,7 @@ const Header: React.FC<HeaderProps> = ({ activePage }) => {
                                     activePage === subLink.href ? 'text-[var(--color-primary)] bg-[var(--color-dark-bg)]' : 'text-[var(--color-light-text)]'
                                 }`}
                                 >
-                                {subLink.label}
+                                {t(subLink.label)}
                                 </a>
                             ))}
                         </div>
@@ -189,7 +206,7 @@ const Header: React.FC<HeaderProps> = ({ activePage }) => {
                         getIsActive(link) ? 'text-[var(--color-primary)]' : 'text-[var(--color-light-text)]'
                     }`}
                     >
-                    {link.label}
+                    {t(link.label)}
                     </a>
                 )
                 ))}
@@ -197,13 +214,12 @@ const Header: React.FC<HeaderProps> = ({ activePage }) => {
                 <>
                     <div className="w-px h-6 bg-gray-600"></div>
                     <a href="#admin" className={`hover:text-[var(--color-secondary)] transition-colors duration-300 font-medium ${activePage === '#admin' ? 'text-[var(--color-secondary)]' : 'text-[var(--color-light-text)]'}`}>
-                    Admin Panel
+                    {t('Admin Panel')}
                     </a>
-                    <button onClick={logout} className="hover:text-[var(--color-secondary)] transition-colors duration-300 font-medium text-[var(--color-light-text)]">(Logout)</button>
+                    <button onClick={logout} className="hover:text-[var(--color-secondary)] transition-colors duration-300 font-medium text-[var(--color-light-text)]">({t('Logout')})</button>
                 </>
                 )}
                 
-                {/* Settings Button */}
                 {showThemeSwitcher && (
                     <button 
                         onClick={() => setIsSettingsOpen(true)}
@@ -219,7 +235,7 @@ const Header: React.FC<HeaderProps> = ({ activePage }) => {
             </nav>
             
             <a href={header.bookNowButton.href} className="hidden md:inline-block bg-[var(--color-primary)] text-white font-bold py-2 px-6 rounded-[var(--ui-button-radius)] hover:bg-[var(--color-primary-dark)] transition-transform duration-300 hover:scale-105 text-sm shadow-lg">
-                {header.bookNowButton.text}
+                {t(header.bookNowButton.text)}
             </a>
 
             {/* Mobile Menu Button */}
@@ -248,6 +264,28 @@ const Header: React.FC<HeaderProps> = ({ activePage }) => {
             className={`fixed inset-0 bg-[var(--color-dark-bg)] z-40 transition-all duration-300 md:hidden flex flex-col pt-24 px-6 overflow-y-auto h-screen ${isMenuOpen ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full pointer-events-none'}`}
         >
             <div className="flex flex-col space-y-1 pb-24">
+                
+                {/* Mobile Top Actions */}
+                <div className="flex justify-between items-center mb-6">
+                    {/* Mobile Tracker */}
+                    <button 
+                        onClick={() => { setIsStatusOpen(true); setIsMenuOpen(false); }}
+                        className="bg-[var(--color-secondary)]/20 text-[var(--color-secondary)] px-4 py-2 rounded-full text-sm font-bold flex items-center space-x-2"
+                    >
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        <span>Check Status</span>
+                    </button>
+
+                    {showLanguageSwitcher && (
+                        <button 
+                            onClick={toggleLanguage}
+                            className="flex items-center space-x-2 bg-gray-800 px-4 py-2 rounded-full text-sm font-bold text-white"
+                        >
+                            <span>{language === 'en' ? 'বাংলা' : 'English'}</span>
+                        </button>
+                    )}
+                </div>
+
                 {showThemeSwitcher && (
                     <button 
                         onClick={() => { setIsSettingsOpen(true); setIsMenuOpen(false); }}
@@ -270,7 +308,9 @@ const Header: React.FC<HeaderProps> = ({ activePage }) => {
                             getIsActive(link) ? 'text-[var(--color-primary)]' : 'text-[var(--color-light-text)]'
                         }`}
                     >
-                        <span className="font-display tracking-wide text-xl">{link.label}</span>
+                        <span className="font-display tracking-wide text-xl">
+                            {t(link.label)}
+                        </span>
                         <svg className={`w-5 h-5 transition-transform duration-300 ${mobileSubmenu === link.label ? 'rotate-180 text-[var(--color-primary)]' : 'text-gray-500'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
                     </button>
                     <div className={`overflow-hidden transition-all duration-300 ease-in-out bg-black/20 rounded-lg ${mobileSubmenu === link.label ? 'max-h-[500px] opacity-100 mb-4 py-2' : 'max-h-0 opacity-0'}`}>
@@ -286,7 +326,7 @@ const Header: React.FC<HeaderProps> = ({ activePage }) => {
                                     : 'text-gray-400 hover:text-white hover:bg-white/5'
                             }`}
                             >
-                            {subLink.label}
+                            {t(subLink.label)}
                             </a>
                         ))}
                         </div>
@@ -302,7 +342,7 @@ const Header: React.FC<HeaderProps> = ({ activePage }) => {
                     }`}
                     style={{ animationDelay: `${index * 50}ms` }}
                     >
-                    {link.label}
+                    {t(link.label)}
                     </a>
                 )
                 ))}
@@ -313,14 +353,14 @@ const Header: React.FC<HeaderProps> = ({ activePage }) => {
                         onClick={() => setIsMenuOpen(false)}
                         className={`block py-4 text-lg font-medium border-b border-gray-800 text-[var(--color-secondary)] font-display tracking-wide text-xl`}
                         >
-                        Admin Panel
+                        {t('Admin Panel')}
                         </a>
-                        <button onClick={() => { logout(); setIsMenuOpen(false); }} className="w-full text-left py-4 text-lg font-medium text-red-400 font-display tracking-wide text-xl">Logout</button>
+                        <button onClick={() => { logout(); setIsMenuOpen(false); }} className="w-full text-left py-4 text-lg font-medium text-red-400 font-display tracking-wide text-xl">{t('Logout')}</button>
                     </>
                 )}
                 <div className="pt-8 pb-12">
                     <a href={header.bookNowButton.href} onClick={() => setIsMenuOpen(false)} className="block w-full bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] text-white font-bold py-4 rounded-[var(--ui-button-radius)] hover:shadow-lg transition-all text-center text-xl font-display tracking-wider uppercase">
-                        {header.bookNowButton.text}
+                        {t(header.bookNowButton.text)}
                     </a>
                 </div>
             </div>
@@ -328,6 +368,7 @@ const Header: React.FC<HeaderProps> = ({ activePage }) => {
       </div>
     </header>
     <ThemeSettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
+    <ApplicationStatus isOpen={isStatusOpen} onClose={() => setIsStatusOpen(false)} />
     </>
   );
 };

@@ -7,8 +7,32 @@ import { pagesData, customPagesData } from './data/pages';
 // Re-export types for backward compatibility
 export * from './types';
 
-export const defaultData: AppData = {
+// Patch the siteConfig to include the new checklist link
+const patchedSiteConfig = {
     ...siteConfig,
+    header: {
+        ...siteConfig.header,
+        navLinks: siteConfig.header.navLinks.map(link => {
+            if (link.label === 'Guidelines') {
+                const subLinks = link.subLinks || [];
+                // Check if already exists to avoid duplicates if hot-reloaded
+                if (!subLinks.some(sl => sl.href === '#checklist')) {
+                    return {
+                        ...link,
+                        subLinks: [
+                            ...subLinks,
+                            { href: '#checklist', label: 'Preparation Checklist', enabled: true }
+                        ]
+                    };
+                }
+            }
+            return link;
+        })
+    }
+};
+
+export const defaultData: AppData = {
+    ...patchedSiteConfig,
     hajjPackages,
     umrahPackages,
     // --- NEW DATA INITIALIZATION ---
@@ -98,5 +122,6 @@ export const defaultData: AppData = {
     },
     // -------------------------------
     pages: pagesData,
-    customPages: customPagesData
+    customPages: customPagesData,
+    applications: [] // Initial empty list for tracking
 };

@@ -18,6 +18,21 @@ export const siteConfig: Pick<AppData, 'site' | 'header' | 'floatingButton' | 'p
             faviconUrl: 'https://i.postimg.cc/9QNWStMS/champion-logo-1.png',
             metaDescription: 'Your trusted partner for Hajj, Umrah, and worldwide travel in Bangladesh.'
         },
+        // --- New Configs ---
+        seoSchema: {
+            enabled: true,
+            organizationType: 'TravelAgency',
+            sameAs: ['https://facebook.com', 'https://instagram.com', 'https://twitter.com']
+        },
+        analytics: {
+            googleAnalyticsId: '', // Placeholder for G-XXXXXXX
+            facebookPixelId: '', // Placeholder for XXXXXXXXXXXXXXX
+        },
+        language: {
+            enableSwitcher: true,
+            defaultLanguage: 'en'
+        },
+        // -------------------
         textLabels: {
             bookNow: 'Book Now',
             viewDetails: 'View Details',
@@ -38,7 +53,7 @@ export const siteConfig: Pick<AppData, 'site' | 'header' | 'floatingButton' | 'p
         },
         advanced: {
             customCss: '/* Add your custom CSS here */',
-            headScripts: '',
+            headScripts: '<!-- Add custom head scripts here (e.g. verification meta tags) -->',
             footerScripts: '',
             typography: {
                 h1Size: '3.5rem',

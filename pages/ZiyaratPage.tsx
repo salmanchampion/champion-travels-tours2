@@ -4,9 +4,11 @@ import InteractiveMap from '../components/InteractiveMap';
 import { DataContext } from '../contexts/DataContext';
 
 const ZiyaratPage: React.FC = () => {
-  const { appData } = useContext(DataContext);
-  const { ziyarat } = appData.pages;
   const [activeTab, setActiveTab] = useState<'makkah' | 'madinah'>('makkah');
+  const { appData } = useContext(DataContext);
+  
+  // Use data from appData (fallback to empty array if not initialized)
+  const siteDetails = appData.pages.ziyarat || { makkah: [], madinah: [] };
 
   return (
     <div className="bg-[#0B0F19] min-h-screen pt-20">
@@ -15,7 +17,7 @@ const ZiyaratPage: React.FC = () => {
       <div className="relative h-[70vh] flex items-center justify-center overflow-hidden">
            <div className="absolute inset-0">
              <img 
-                src={ziyarat.heroImage} 
+                src="https://i.postimg.cc/jSKtdnQ4/HD-wallpaper-mecca-madina-during-evening-time-ramzan.jpg" 
                 alt="Islamic Heritage" 
                 className="w-full h-full object-cover opacity-50 scale-110 animate-[kenBurns_20s_ease-out_infinite_alternate]"
              />
@@ -26,10 +28,10 @@ const ZiyaratPage: React.FC = () => {
                     <span className="text-[var(--color-primary)] text-sm tracking-[0.3em] uppercase font-bold">Historical Ziyarat Tours</span>
                </div>
                <h1 className="text-6xl md:text-8xl font-display font-bold text-white mb-6 drop-shadow-2xl animate-fade-in-up">
-                   {ziyarat.heroTitle}
+                   Echoes of History
                </h1>
                <p className="text-xl md:text-2xl text-gray-300 font-light max-w-3xl mx-auto leading-relaxed">
-                   {ziyarat.heroSubtitle}
+                   Walk in the footsteps of the Prophet (PBUH) and his companions. Witness the sacred landmarks that shaped the history of Islam.
                </p>
            </div>
            <style>{`
@@ -44,9 +46,9 @@ const ZiyaratPage: React.FC = () => {
       <div className="py-20 container mx-auto px-4 text-center">
           <div className="inline-block p-10 border-y border-[var(--color-primary)]/20 relative max-w-4xl mx-auto">
               <div className="text-3xl md:text-4xl font-display text-gray-300 italic">
-                  "{ziyarat.introQuote}"
+                  "Do not undertake a journey except to three Mosques: Al-Masjid Al-Haram, the Mosque of the Messenger (PBUH), and Al-Masjid Al-Aqsa."
               </div>
-              <div className="text-[var(--color-primary)] mt-4 font-bold uppercase tracking-widest text-sm">{ziyarat.introQuoteSource}</div>
+              <div className="text-[var(--color-primary)] mt-4 font-bold uppercase tracking-widest text-sm">- Sahih Bukhari</div>
           </div>
       </div>
 
@@ -92,7 +94,7 @@ const ZiyaratPage: React.FC = () => {
               </div>
 
               <div className="space-y-24">
-                  {ziyarat.sites[activeTab].map((site, index) => (
+                  {siteDetails[activeTab]?.map((site, index) => (
                       <div key={index} className={`flex flex-col ${index % 2 === 0 ? 'lg:flex-row' : 'lg:flex-row-reverse'} gap-12 items-center group`} data-aos="fade-up">
                           
                           {/* Image Card */}

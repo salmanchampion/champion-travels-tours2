@@ -1,6 +1,7 @@
 
 import React, { useState, useMemo, useEffect, useContext } from 'react';
 import { DataContext } from '../contexts/DataContext';
+import { useLanguage } from '../contexts/LanguageContext';
 import { HajjPackage, UmrahPackage, defaultData } from '../data';
 
 // --- Icon Components ---
@@ -65,41 +66,66 @@ const GridDetail: React.FC<{ icon: React.ReactNode; label: string; value: string
 
 
 // --- Hajj Package Card Component (NEW DESIGN) ---
-const HajjPackageCard: React.FC<{ pkg: HajjPackage }> = ({ pkg }) => (
+const HajjPackageCard: React.FC<{ pkg: HajjPackage }> = ({ pkg }) => {
+    const { t } = useLanguage();
+    const { addToCompare, compareList, removeFromCompare } = useContext(DataContext);
+    const isSelected = compareList.some(p => p.name === pkg.name);
+    const safeId = `compare-hajj-${pkg.name.replace(/\s+/g, '_')}`;
+
+    const handleCompare = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.checked) {
+            addToCompare(pkg);
+        } else {
+            removeFromCompare(pkg.name);
+        }
+    };
+
+    return (
     <div data-aos="fade-up" className="bg-[var(--color-light-bg)] rounded-[var(--ui-border-radius)] shadow-[var(--ui-shadow)] border border-transparent hover:border-[var(--color-primary)] flex flex-col h-full text-[var(--color-light-text)] overflow-hidden transition-all duration-500 hover:shadow-xl transform hover:-translate-y-1">
         <div className="relative group">
-            <img src={pkg.image} alt={pkg.name} className="w-full h-40 md:h-48 object-cover transition-transform duration-700 group-hover:scale-110" />
+            <img src={pkg.image} alt={pkg.name} className="w-full h-40 md:h-48 object-cover transition-transform duration-700 group-hover:scale-110" loading="lazy" />
             <div className="absolute bottom-0 left-0 right-0 p-3 md:p-4 bg-gradient-to-t from-black/90 to-transparent">
-                <h3 className="text-lg md:text-xl font-bold font-display text-white truncate">{pkg.name}</h3>
+                <h3 className="text-lg md:text-xl font-bold font-display text-white truncate">{t(pkg.name)}</h3>
+            </div>
+            {/* Compare Checkbox */}
+            <div className="absolute top-2 left-2 bg-black/60 backdrop-blur-sm rounded px-2 py-1 flex items-center gap-2 border border-white/10 z-10">
+                <input 
+                    type="checkbox" 
+                    id={safeId} 
+                    checked={isSelected}
+                    onChange={handleCompare}
+                    className="w-3.5 h-3.5 accent-[var(--color-primary)] cursor-pointer"
+                />
+                <label htmlFor={safeId} className="text-[10px] text-white font-bold cursor-pointer uppercase tracking-wide">Compare</label>
             </div>
         </div>
         
         <div className="p-4 md:p-6 flex-grow flex flex-col">
             <div className="flex justify-between items-center border-b border-gray-700 pb-4 mb-4">
                 <div>
-                    <p className="text-xs font-bold text-[var(--color-muted-text)] uppercase">Price</p>
-                    <p className="text-lg md:text-2xl font-bold text-[var(--color-primary)]">{pkg.price}</p>
+                    <p className="text-xs font-bold text-[var(--color-muted-text)] uppercase">{t('Price')}</p>
+                    <p className="text-lg md:text-2xl font-bold text-[var(--color-primary)]">{t(pkg.price)}</p>
                 </div>
                 <div className="text-right">
-                    <p className="text-xs font-bold text-[var(--color-muted-text)] uppercase">Duration</p>
-                    <p className="text-sm md:text-lg font-semibold text-white">{pkg.duration}</p>
+                    <p className="text-xs font-bold text-[var(--color-muted-text)] uppercase">{t('Duration')}</p>
+                    <p className="text-sm md:text-lg font-semibold text-white">{t(pkg.duration)}</p>
                 </div>
             </div>
 
             <div className="grid grid-cols-2 gap-3 md:gap-4 mb-4">
-                <GridDetail icon={<HotelIcon />} label="Makkah Hotel" value={pkg.hotelMakkah} />
-                <GridDetail icon={<HotelIcon />} label="Madinah Hotel" value={pkg.hotelMadinah} />
-                <GridDetail icon={<FlightIcon />} label="Flights Up" value={pkg.flightsUp} />
-                <GridDetail icon={<FlightIcon />} label="Flights Down" value={pkg.flightsDown} />
-                <GridDetail icon={<FoodIcon />} label="Food" value={pkg.food} />
-                <GridDetail icon={<SpecialIcon />} label="Special" value={pkg.special} />
+                <GridDetail icon={<HotelIcon />} label={t("Makkah Hotel")} value={t(pkg.hotelMakkah)} />
+                <GridDetail icon={<HotelIcon />} label={t("Madinah Hotel")} value={t(pkg.hotelMadinah)} />
+                <GridDetail icon={<FlightIcon />} label={t("Flights")} value={t(pkg.flightsUp)} />
+                <GridDetail icon={<FlightIcon />} label={t("Flights")} value={t(pkg.flightsDown)} />
+                <GridDetail icon={<FoodIcon />} label={t("Food")} value={t(pkg.food)} />
+                <GridDetail icon={<SpecialIcon />} label={t("Special")} value={t(pkg.special)} />
             </div>
 
             {pkg.note && (
                 <div className="mt-auto pt-4 border-t border-gray-700">
                      <div className="flex items-start space-x-2 text-[var(--color-muted-text)]">
                         <div className="flex-shrink-0 pt-1"><NoteIcon /></div>
-                        <p className="text-xs italic line-clamp-2">{pkg.note}</p>
+                        <p className="text-xs italic line-clamp-2">{t(pkg.note)}</p>
                     </div>
                 </div>
             )}
@@ -107,15 +133,17 @@ const HajjPackageCard: React.FC<{ pkg: HajjPackage }> = ({ pkg }) => (
 
         <div className="p-4 bg-[var(--color-dark-bg)] mt-auto">
              <a href={`#contact?subject=${encodeURIComponent(`Booking Inquiry: Hajj - ${pkg.name}`)}`} className="w-full text-center block bg-[var(--color-primary)] text-white font-bold py-3 px-6 rounded-[var(--ui-button-radius)] hover:bg-[var(--color-primary-dark)] transition-all duration-300">
-                Book Now
+                {t('Book Now')}
             </a>
         </div>
     </div>
-);
+    );
+};
 
 // --- Hajj Pre-Registration Card ---
 const HajjPreRegistrationCard: React.FC = () => {
     const { appData } = useContext(DataContext);
+    const { t } = useLanguage();
     const { hajjPreRegistration } = appData.pages.packages;
     const [isClicked, setIsClicked] = useState(false);
 
@@ -135,16 +163,17 @@ const HajjPreRegistrationCard: React.FC = () => {
             <img 
               src={hajjPreRegistration.image}
               alt="Hajj Pre Registration" 
+              loading="lazy"
               className="max-w-full max-h-full object-contain"
             />
           </div>
           <div className="p-6 flex flex-col flex-grow">
-            <h3 className="text-2xl font-bold text-[var(--color-secondary)] mb-3 font-display">{hajjPreRegistration.title}</h3>
+            <h3 className="text-2xl font-bold text-[var(--color-secondary)] mb-3 font-display">{t(hajjPreRegistration.title)}</h3>
             <p className="text-base text-[var(--color-muted-text)] mb-2 leading-relaxed">
-              {hajjPreRegistration.description}
+              {t(hajjPreRegistration.description)}
             </p>
             <p className="text-base text-[var(--color-muted-text)] mb-4 leading-relaxed flex-grow">
-             {hajjPreRegistration.subDescription}
+             {t(hajjPreRegistration.subDescription)}
             </p>
             
             {isClicked && (
@@ -158,7 +187,7 @@ const HajjPreRegistrationCard: React.FC = () => {
               disabled={isClicked}
               className="mt-auto w-full block bg-[var(--color-primary)] text-white font-bold py-3 px-6 rounded-[var(--ui-button-radius)] hover:bg-[var(--color-primary-dark)] transition-all duration-300 text-center shadow-md disabled:bg-gray-400 disabled:cursor-wait"
             >
-              {isClicked ? 'Redirecting...' : hajjPreRegistration.buttonText}
+              {isClicked ? 'Redirecting...' : t(hajjPreRegistration.buttonText)}
             </button>
           </div>
         </div>
@@ -167,21 +196,22 @@ const HajjPreRegistrationCard: React.FC = () => {
 
 const KeyHighlights: React.FC = () => {
     const { appData } = useContext(DataContext);
+    const { t } = useLanguage();
     const { keyHighlights } = appData.pages.packages;
     return (
     <div data-aos="zoom-in" className="bg-[var(--color-light-bg)] rounded-[var(--ui-border-radius)] p-6 md:p-10 mt-16 shadow-inner">
         <div className="text-center">
-            <h3 className="text-2xl md:text-4xl font-display font-bold text-white mb-8">{keyHighlights.title}</h3>
+            <h3 className="text-2xl md:text-4xl font-display font-bold text-white mb-8">{t(keyHighlights.title)}</h3>
             <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16">
                 <div className="flex flex-col items-center text-center max-w-xs">
                      <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 md:h-12 md:w-12 text-[var(--color-primary)] mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.653-.284-1.255-.758-1.658M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.653.284-1.255.758-1.658m0 0A5.986 5.986 0 0112 13a5.986 5.986 0 014.242 1.758m0 0a3 3 0 01-5.356-1.857m0 0a3 3 0 00-5.356-1.857m0 0A5.986 5.986 0 017 13a5.986 5.986 0 01-4.242 1.758M12 13a5 5 0 015 5v2H7v-2a5 5 0 015-5z" /></svg>
-                    <p className="text-2xl md:text-4xl font-bold text-[var(--color-primary)]">{keyHighlights.umrahStat}</p>
-                    <p className="text-[var(--color-muted-text)] mt-1 text-sm md:text-base">{keyHighlights.umrahStatLabel}</p>
+                    <p className="text-2xl md:text-4xl font-bold text-[var(--color-primary)]">{t(keyHighlights.umrahStat)}</p>
+                    <p className="text-[var(--color-muted-text)] mt-1 text-sm md:text-base">{t(keyHighlights.umrahStatLabel)}</p>
                 </div>
                 <div className="flex flex-col items-center text-center max-w-xs">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 md:h-12 md:w-12 text-[var(--color-primary)] mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 016-6h6a6 6 0 016 6v1h-3" /></svg>
-                    <p className="text-2xl md:text-4xl font-bold text-[var(--color-primary)]">{keyHighlights.hajjStat}</p>
-                    <p className="text-[var(--color-muted-text)] mt-1 text-sm md:text-base">{keyHighlights.hajjStatLabel}</p>
+                    <p className="text-2xl md:text-4xl font-bold text-[var(--color-primary)]">{t(keyHighlights.hajjStat)}</p>
+                    <p className="text-[var(--color-muted-text)] mt-1 text-sm md:text-base">{t(keyHighlights.hajjStatLabel)}</p>
                 </div>
             </div>
         </div>
@@ -192,32 +222,55 @@ const KeyHighlights: React.FC = () => {
 
 // --- Umrah Package Card Component ---
 const UmrahPackageCard: React.FC<{ pkg: EnhancedUmrahPackage }> = ({ pkg }) => {
-    const { appData } = useContext(DataContext);
+    const { appData, addToCompare, compareList, removeFromCompare } = useContext(DataContext);
+    const { t } = useLanguage();
     const logo = appData.site.logoUrl || 'https://i.postimg.cc/PJS59Bqw/champion-logo-1.png';
+    
+    const isSelected = compareList.some(p => p.name === pkg.name);
+    const safeId = `compare-umrah-${pkg.name.replace(/\s+/g, '_')}`;
+
+    const handleCompare = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.checked) {
+            addToCompare(pkg);
+        } else {
+            removeFromCompare(pkg.name);
+        }
+    };
 
     return (
     <div data-aos="fade-up" className="bg-[var(--color-light-bg)] rounded-[var(--ui-border-radius)] shadow-[var(--ui-shadow)] border border-gray-700 flex flex-col h-full text-[var(--color-light-text)] overflow-hidden hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300">
         <div className="bg-[var(--color-dark-bg)] p-4 flex items-center justify-between">
-            <h3 className="font-bold text-base md:text-lg font-display text-[var(--color-secondary)] truncate flex-1 pr-2">{pkg.name}</h3>
+            <h3 className="font-bold text-base md:text-lg font-display text-[var(--color-secondary)] truncate flex-1 pr-2">{t(pkg.name)}</h3>
             <img src={logo} alt='Champion Travels & Tours Logo' className="h-6 md:h-10 w-auto" />
         </div>
         <div className="relative group overflow-hidden h-40 md:h-48">
-             <img src={pkg.image} alt={pkg.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+             <img src={pkg.image} alt={pkg.name} loading="lazy" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+             {/* Compare Checkbox */}
+            <div className="absolute top-2 left-2 bg-black/60 backdrop-blur-sm rounded px-2 py-1 flex items-center gap-2 border border-white/10 z-10">
+                <input 
+                    type="checkbox" 
+                    id={safeId} 
+                    checked={isSelected}
+                    onChange={handleCompare}
+                    className="w-3.5 h-3.5 accent-[var(--color-primary)] cursor-pointer"
+                />
+                <label htmlFor={safeId} className="text-[10px] text-white font-bold cursor-pointer uppercase tracking-wide">Compare</label>
+            </div>
         </div>
         <div className="p-4 flex-grow">
-            <DetailRow icon={<PriceIcon />} label="Price" value={pkg.price} />
-            <DetailRow icon={<DateIcon />} label="Date" value={pkg.date} />
-            <DetailRow icon={<HotelIcon />} label="Hotel Makkah" value={pkg.hotelMakkah} />
-            <DetailRow icon={<HotelIcon />} label="Hotel Madinah" value={pkg.hotelMadinah} />
-            <DetailRow icon={<FlightIcon />} label="Flights Up" value={pkg.flightsUp} />
-            <DetailRow icon={<FlightIcon />} label="Flights Down" value={pkg.flightsDown} />
-            <DetailRow icon={<FoodIcon />} label="Food" value={pkg.food} />
-            <DetailRow icon={<SpecialIcon />} label="Special Services" value={pkg.special} />
-            <DetailRow icon={<NoteIcon />} label="Note" value={pkg.note} />
+            <DetailRow icon={<PriceIcon />} label={t("Price")} value={t(pkg.price)} />
+            <DetailRow icon={<DateIcon />} label={t("Date")} value={t(pkg.date)} />
+            <DetailRow icon={<HotelIcon />} label={t("Hotel Makkah")} value={t(pkg.hotelMakkah)} />
+            <DetailRow icon={<HotelIcon />} label={t("Hotel Madinah")} value={t(pkg.hotelMadinah)} />
+            <DetailRow icon={<FlightIcon />} label={t("Flights Up")} value={t(pkg.flightsUp)} />
+            <DetailRow icon={<FlightIcon />} label={t("Flights Down")} value={t(pkg.flightsDown)} />
+            <DetailRow icon={<FoodIcon />} label={t("Food")} value={t(pkg.food)} />
+            <DetailRow icon={<SpecialIcon />} label={t("Special Services")} value={t(pkg.special)} />
+            <DetailRow icon={<NoteIcon />} label={t("Note")} value={t(pkg.note)} />
         </div>
         <div className="p-4 mt-auto">
              <a href={`#contact?subject=${encodeURIComponent(`Booking Inquiry: Umrah - ${pkg.name}`)}`} className="w-full text-center block bg-[var(--color-primary)] text-white font-bold py-3 px-6 rounded-[var(--ui-button-radius)] hover:bg-[var(--color-primary-dark)] transition-all duration-300">
-                {pkg.buttonText}
+                {t(pkg.buttonText)}
             </a>
         </div>
     </div>
@@ -227,12 +280,13 @@ const UmrahPackageCard: React.FC<{ pkg: EnhancedUmrahPackage }> = ({ pkg }) => {
 // --- Gallery Component ---
 const Gallery: React.FC = () => {
     const { appData } = useContext(DataContext);
+    const { t } = useLanguage();
     const { gallery } = appData.pages.packages;
   return (
     <div className="bg-[var(--color-light-bg)] rounded-[var(--ui-border-radius)] p-6 md:p-10 mt-16 shadow-inner">
       <div className="text-center mb-12">
-        <h3 className="text-2xl md:text-4xl font-display font-bold text-white" data-aos="fade-up">{gallery.title}</h3>
-        <p className="mt-4 text-base md:text-lg text-[var(--color-muted-text)] max-w-3xl mx-auto" data-aos="fade-up" data-aos-delay="100">{gallery.description}</p>
+        <h3 className="text-2xl md:text-4xl font-display font-bold text-white" data-aos="fade-up">{t(gallery.title)}</h3>
+        <p className="mt-4 text-base md:text-lg text-[var(--color-muted-text)] max-w-3xl mx-auto" data-aos="fade-up" data-aos-delay="100">{t(gallery.description)}</p>
       </div>
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {gallery.images.filter(img => img.enabled).map((image, index) => (
@@ -240,6 +294,7 @@ const Gallery: React.FC = () => {
             <img
               src={image.src}
               alt={image.alt}
+              loading="lazy"
               className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500 ease-in-out cursor-pointer"
             />
           </div>
@@ -398,6 +453,7 @@ interface FeaturedPackagesProps {
 const FeaturedPackages: React.FC<FeaturedPackagesProps> = ({ showHajjFilters = false, showUmrahFilters = false, showTitle = true }) => {
     const [loading, setLoading] = useState(true);
     const { appData } = useContext(DataContext);
+    const { t } = useLanguage();
 
     // --- ROBUST FALLBACK LOGIC ---
     // Use default data if the appData lists are empty (e.g., fresh DB) or don't exist
@@ -500,8 +556,8 @@ const FeaturedPackages: React.FC<FeaturedPackagesProps> = ({ showHajjFilters = f
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 {showTitle && (
                     <div className="text-center mb-12">
-                        <h2 className="text-3xl md:text-5xl font-display font-bold text-[var(--color-primary)]" data-aos="fade-up">{homePageData.title}</h2>
-                        <p className="mt-4 text-base md:text-lg text-[var(--color-muted-text)] max-w-3xl mx-auto" data-aos="fade-up" data-aos-delay="100">{homePageData.subtitle}</p>
+                        <h2 className="text-3xl md:text-5xl font-display font-bold text-[var(--color-primary)]" data-aos="fade-up">{t(homePageData.title)}</h2>
+                        <p className="mt-4 text-base md:text-lg text-[var(--color-muted-text)] max-w-3xl mx-auto" data-aos="fade-up" data-aos-delay="100">{t(homePageData.subtitle)}</p>
                     </div>
                 )}
 
@@ -510,22 +566,22 @@ const FeaturedPackages: React.FC<FeaturedPackagesProps> = ({ showHajjFilters = f
                     {showHajjFilters && (
                         <div className="bg-[var(--color-light-bg)] p-4 md:p-6 rounded-[var(--ui-border-radius)] mb-10 shadow-[var(--ui-shadow)]">
                              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 items-end">
-                                <FilterSelect label="Sort by" value={hajjSort} onChange={e => setHajjSort(e.target.value)}>
+                                <FilterSelect label={t("Sort by")} value={hajjSort} onChange={e => setHajjSort(e.target.value)}>
                                     <option value="default">Default</option>
                                     <option value="price-asc">Price: Low to High</option>
                                     <option value="price-desc">Price: High to Low</option>
                                 </FilterSelect>
-                                <FilterInput label="Min Price" type="number" value={hajjMinPrice} onChange={e => setHajjMinPrice(e.target.value)} placeholder="e.g. 500000" />
-                                <FilterInput label="Max Price" type="number" value={hajjMaxPrice} onChange={e => setHajjMaxPrice(e.target.value)} placeholder="e.g. 1500000" />
-                                <FilterInput label="Min Days" type="number" value={hajjMinDuration} onChange={e => setHajjMinDuration(e.target.value)} placeholder="e.g. 15" />
-                                <FilterInput label="Max Days" type="number" value={hajjMaxDuration} onChange={e => setHajjMaxDuration(e.target.value)} placeholder="e.g. 45" />
+                                <FilterInput label={t("Min Price")} type="number" value={hajjMinPrice} onChange={e => setHajjMinPrice(e.target.value)} placeholder="e.g. 500000" />
+                                <FilterInput label={t("Max Price")} type="number" value={hajjMaxPrice} onChange={e => setHajjMaxPrice(e.target.value)} placeholder="e.g. 1500000" />
+                                <FilterInput label={t("Min Days")} type="number" value={hajjMinDuration} onChange={e => setHajjMinDuration(e.target.value)} placeholder="e.g. 15" />
+                                <FilterInput label={t("Max Days")} type="number" value={hajjMaxDuration} onChange={e => setHajjMaxDuration(e.target.value)} placeholder="e.g. 45" />
                                 <button onClick={resetHajjFilters} className="bg-[var(--color-primary)] text-white font-bold py-2 px-4 rounded-[var(--ui-button-radius)] hover:bg-[var(--color-primary-dark)] h-10 w-full">Reset</button>
                             </div>
                              <div className="mt-4 pt-4 border-t border-gray-700">
-                                <h4 className="text-lg font-semibold text-white mb-2">Package Type</h4>
+                                <h4 className="text-lg font-semibold text-white mb-2">{t("Package Type")}</h4>
                                 <div className="flex flex-wrap gap-x-6 gap-y-2">
                                     {hajjPackageTypes.map(type => (
-                                        <FilterCheckbox key={type} label={type} checked={hajjSelectedTypes.includes(type)} onChange={() => handleHajjTypeChange(type)} />
+                                        <FilterCheckbox key={type} label={t(type)} checked={hajjSelectedTypes.includes(type)} onChange={() => handleHajjTypeChange(type)} />
                                     ))}
                                 </div>
                             </div>
@@ -542,20 +598,20 @@ const FeaturedPackages: React.FC<FeaturedPackagesProps> = ({ showHajjFilters = f
                 {/* --- Umrah Packages Section --- */}
                 <div className="mt-20">
                     <div className="text-center mb-12">
-                        <h2 className="text-3xl md:text-5xl font-display font-bold text-[var(--color-primary)]" data-aos="fade-up">{packagesPageData.umrahSection.title}</h2>
-                        <p className="mt-4 text-base md:text-lg text-[var(--color-muted-text)] max-w-3xl mx-auto" data-aos="fade-up" data-aos-delay="100">{packagesPageData.umrahSection.subtitle}</p>
+                        <h2 className="text-3xl md:text-5xl font-display font-bold text-[var(--color-primary)]" data-aos="fade-up">{t(packagesPageData.umrahSection.title)}</h2>
+                        <p className="mt-4 text-base md:text-lg text-[var(--color-muted-text)] max-w-3xl mx-auto" data-aos="fade-up" data-aos-delay="100">{t(packagesPageData.umrahSection.subtitle)}</p>
                     </div>
                      {showUmrahFilters && (
                         <div className="bg-[var(--color-light-bg)] p-4 md:p-6 rounded-[var(--ui-border-radius)] mb-10 shadow-[var(--ui-shadow)]">
                              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 items-end">
-                                <FilterSelect label="Sort by" value={umrahSort} onChange={e => setUmrahSort(e.target.value)}>
+                                <FilterSelect label={t("Sort by")} value={umrahSort} onChange={e => setUmrahSort(e.target.value)}>
                                     <option value="default">Default</option>
                                     <option value="price-asc">Price: Low to High</option>
                                     <option value="price-desc">Price: High to Low</option>
                                 </FilterSelect>
-                                <FilterInput label="Min Price" type="number" value={umrahMinPrice} onChange={e => setUmrahMinPrice(e.target.value)} placeholder="e.g. 150000" />
-                                <FilterInput label="Max Price" type="number" value={umrahMaxPrice} onChange={e => setUmrahMaxPrice(e.target.value)} placeholder="e.g. 300000" />
-                                <FilterSelect label="Flight Type" value={umrahFlightType} onChange={e => setUmrahFlightType(e.target.value)}>
+                                <FilterInput label={t("Min Price")} type="number" value={umrahMinPrice} onChange={e => setUmrahMinPrice(e.target.value)} placeholder="e.g. 150000" />
+                                <FilterInput label={t("Max Price")} type="number" value={umrahMaxPrice} onChange={e => setUmrahMaxPrice(e.target.value)} placeholder="e.g. 300000" />
+                                <FilterSelect label={t("Flight Type")} value={umrahFlightType} onChange={e => setUmrahFlightType(e.target.value)}>
                                     <option value="all">All</option>
                                     <option value="direct">Direct</option>
                                     <option value="transit">Transit</option>
@@ -563,10 +619,10 @@ const FeaturedPackages: React.FC<FeaturedPackagesProps> = ({ showHajjFilters = f
                                 <button onClick={resetAllUmrahFilters} className="bg-[var(--color-primary)] text-white font-bold py-2 px-4 rounded-[var(--ui-button-radius)] hover:bg-[var(--color-primary-dark)] h-10 w-full">Reset</button>
                             </div>
                              <div className="mt-4 pt-4 border-t border-gray-700">
-                                <h4 className="text-lg font-semibold text-white mb-2">Package Type</h4>
+                                <h4 className="text-lg font-semibold text-white mb-2">{t("Package Type")}</h4>
                                 <div className="flex flex-wrap gap-x-6 gap-y-2">
                                     {umrahPackageTypes.map(type => (
-                                        <FilterCheckbox key={type} label={type} checked={umrahSelectedTypes.includes(type)} onChange={() => handleUmrahTypeChange(type)} />
+                                        <FilterCheckbox key={type} label={t(type)} checked={umrahSelectedTypes.includes(type)} onChange={() => handleUmrahTypeChange(type)} />
                                     ))}
                                 </div>
                             </div>

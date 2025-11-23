@@ -1,6 +1,7 @@
 
-import React from 'react';
+import React, { useContext } from 'react';
 import { ExclusivePackage } from '../types';
+import { DataContext } from '../contexts/DataContext';
 
 interface ExclusivePackageCardProps {
     pkg: ExclusivePackage;
@@ -8,11 +9,23 @@ interface ExclusivePackageCardProps {
 
 const CheckIcon = () => (
     <svg className="w-4 h-4 text-[var(--color-secondary)] mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
     </svg>
 );
 
 const ExclusivePackageCard: React.FC<ExclusivePackageCardProps> = ({ pkg }) => {
+    const { addToCompare, compareList, removeFromCompare } = useContext(DataContext);
+    const isSelected = compareList.some(p => p.id === pkg.id);
+    const safeId = `compare-${pkg.id.replace(/\s+/g, '_')}`;
+
+    const handleCompare = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.checked) {
+            addToCompare(pkg);
+        } else {
+            removeFromCompare(pkg.id);
+        }
+    };
+
     return (
         <div 
             data-aos="fade-up"
@@ -23,11 +36,25 @@ const ExclusivePackageCard: React.FC<ExclusivePackageCardProps> = ({ pkg }) => {
                 <img 
                     src={pkg.image} 
                     alt={pkg.title} 
+                    loading="lazy" // Image Optimization: Lazy Loading
+                    decoding="async"
                     className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 ease-out" 
                 />
                 <div className="absolute top-0 left-0 w-full h-full bg-black/20 group-hover:bg-black/0 transition-all duration-500"></div>
                 <div className="absolute top-4 right-4 bg-[var(--color-primary)] text-white font-bold py-1 px-3 rounded-full text-sm shadow-lg">
                     {pkg.category}
+                </div>
+                
+                {/* Compare Checkbox */}
+                <div className="absolute top-4 left-4 bg-black/60 backdrop-blur-sm rounded px-3 py-1.5 flex items-center gap-2 border border-white/10 z-10">
+                    <input 
+                        type="checkbox" 
+                        id={safeId} 
+                        checked={isSelected}
+                        onChange={handleCompare}
+                        className="w-4 h-4 accent-[var(--color-primary)] cursor-pointer"
+                    />
+                    <label htmlFor={safeId} className="text-xs text-white font-bold cursor-pointer uppercase tracking-wide">Compare</label>
                 </div>
             </div>
 

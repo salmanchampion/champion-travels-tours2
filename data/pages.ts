@@ -143,66 +143,6 @@ export const pagesData: AppData['pages'] = {
             buttonText: 'Explore Our Packages'
         },
     },
-    ziyarat: {
-        seo: {
-            title: 'Historical Ziyarat Tours | Makkah & Madinah | Champion Travels',
-            description: 'Guided tours to historical Islamic sites in Makkah and Madinah including Cave Hira, Mount Uhud, and Masjid Quba.',
-            keywords: 'Ziyarat tours, Makkah sites, Madinah sites, Islamic history tours'
-        },
-        heroImage: 'https://i.postimg.cc/jSKtdnQ4/HD-wallpaper-mecca-madina-during-evening-time-ramzan.jpg',
-        heroTitle: 'Echoes of History',
-        heroSubtitle: 'Walk in the footsteps of the Prophet (PBUH) and his companions. Witness the sacred landmarks that shaped the history of Islam.',
-        introQuote: "Do not undertake a journey except to three Mosques: Al-Masjid Al-Haram, the Mosque of the Messenger (PBUH), and Al-Masjid Al-Aqsa.",
-        introQuoteSource: "- Sahih Bukhari",
-        sites: {
-            makkah: [
-                {
-                    title: 'Jabal Al-Nour (Cave Hira)',
-                    subtitle: 'The Dawn of Revelation',
-                    desc: 'Jabal Al-Nour, meaning "Mountain of Light", houses the Cave of Hira. It is here that the Prophet Muhammad (PBUH) spent time in seclusion and received the first revelation of the Holy Quran from Archangel Jibreel (AS). The climb offers a spiritual connection to the very beginning of Islam.',
-                    img: 'https://i.postimg.cc/RZ8BGSpf/aj.webp',
-                    significance: 'First Revelation'
-                },
-                {
-                    title: 'Jabal Thawr',
-                    subtitle: 'The Sanctuary of Migration',
-                    desc: 'This mountain contains the Cave of Thawr, a small rocky opening where the Prophet (PBUH) and his companion Abu Bakr (RA) hid from the Quraish tribe for three days during the migration (Hijrah) to Madinah. It is a symbol of divine protection and trust in Allah.',
-                    img: 'https://i.postimg.cc/x1gn4TDd/ad.jpg',
-                    significance: 'Refuge during Hijrah'
-                },
-                {
-                    title: 'Jannat al-Mualla',
-                    subtitle: 'Cemetery of the Beloved',
-                    desc: 'Also known as Al-Hajun, this is the historical cemetery in Makkah. It is the resting place of many of the Prophet\'s (PBUH) ancestors, including his grandfather Abdul Muttalib, his uncle Abu Talib, and his beloved wife Khadija (RA).',
-                    img: 'https://i.postimg.cc/VkQL0LnX/al.webp',
-                    significance: 'Resting place of Khadija (RA)'
-                }
-            ],
-            madinah: [
-                {
-                    title: 'Masjid Quba',
-                    subtitle: 'The First Mosque of Islam',
-                    desc: 'Masjid Quba occupies a unique place in Islamic history as the first mosque built by the Prophet (PBUH) upon his arrival in Madinah. The Prophet (PBUH) said: "Whoever purifies himself in his house, then comes to the mosque of Quba and prays two Rakats therein, will have a reward like that of an Umrah."',
-                    img: 'https://i.postimg.cc/RZ8BGSpf/aj.webp',
-                    significance: 'Reward of an Umrah'
-                },
-                {
-                    title: 'Mount Uhud',
-                    subtitle: 'Mountain of Paradise',
-                    desc: 'Uhud is a mountain north of Madinah. It was the site of the Battle of Uhud. The Prophet (PBUH) declared, "Uhud is a mountain which loves us and which we love." It is also the resting place of 70 martyrs, including Hamza ibn Abdul-Muttalib (RA).',
-                    img: 'https://i.postimg.cc/mD2wzRfY/hajj-b.jpg',
-                    significance: 'Martyrs of Uhud'
-                },
-                {
-                    title: 'Masjid Al-Qiblatayn',
-                    subtitle: 'Mosque of Two Qiblas',
-                    desc: 'This mosque is historically significant because it is where the revelation of the Quran came to change the direction of the Qibla from Bayt al-Maqdis in Jerusalem to the Kaaba in Makkah. It uniquely contained two prayer niches (mihrabs) in the past.',
-                    img: 'https://i.postimg.cc/50rQG1f5/umrah-2.jpg',
-                    significance: 'Change of Qibla'
-                }
-            ]
-        }
-    },
     hajj: {
         seo: {
             title: 'Hajj Packages | Champion Travels & Tours',
@@ -803,6 +743,56 @@ export const pagesData: AppData['pages'] = {
             ]
         }
     },
+    // --- NEW: Ziyarat Data ---
+    ziyarat: {
+        makkah: [
+            {
+                title: 'Jabal Al-Nour (Cave Hira)',
+                subtitle: 'The Dawn of Revelation',
+                desc: 'Jabal Al-Nour, meaning "Mountain of Light", houses the Cave of Hira. It is here that the Prophet Muhammad (PBUH) spent time in seclusion and received the first revelation of the Holy Quran from Archangel Jibreel (AS). The climb offers a spiritual connection to the very beginning of Islam.',
+                img: 'https://i.postimg.cc/RZ8BGSpf/aj.webp',
+                significance: 'First Revelation'
+            },
+            {
+                title: 'Jabal Thawr',
+                subtitle: 'The Sanctuary of Migration',
+                desc: 'This mountain contains the Cave of Thawr, a small rocky opening where the Prophet (PBUH) and his companion Abu Bakr (RA) hid from the Quraish tribe for three days during the migration (Hijrah) to Madinah. It is a symbol of divine protection and trust in Allah.',
+                img: 'https://i.postimg.cc/x1gn4TDd/ad.jpg',
+                significance: 'Refuge during Hijrah'
+            },
+            {
+                title: 'Jannat al-Mualla',
+                subtitle: 'Cemetery of the Beloved',
+                desc: 'Also known as Al-Hajun, this is the historical cemetery in Makkah. It is the resting place of many of the Prophet\'s (PBUH) ancestors, including his grandfather Abdul Muttalib, his uncle Abu Talib, and his beloved wife Khadija (RA).',
+                img: 'https://i.postimg.cc/VkQL0LnX/al.webp',
+                significance: 'Resting place of Khadija (RA)'
+            }
+        ],
+        madinah: [
+            {
+                title: 'Masjid Quba',
+                subtitle: 'The First Mosque of Islam',
+                desc: 'Masjid Quba occupies a unique place in Islamic history as the first mosque built by the Prophet (PBUH) upon his arrival in Madinah. The Prophet (PBUH) said: "Whoever purifies himself in his house, then comes to the mosque of Quba and prays two Rakats therein, will have a reward like that of an Umrah."',
+                img: 'https://i.postimg.cc/RZ8BGSpf/aj.webp',
+                significance: 'Reward of an Umrah'
+            },
+            {
+                title: 'Mount Uhud',
+                subtitle: 'Mountain of Paradise',
+                desc: 'Uhud is a mountain north of Madinah. It was the site of the Battle of Uhud. The Prophet (PBUH) declared, "Uhud is a mountain which loves us and which we love." It is also the resting place of 70 martyrs, including Hamza ibn Abdul-Muttalib (RA).',
+                img: 'https://i.postimg.cc/mD2wzRfY/hajj-b.jpg',
+                significance: 'Martyrs of Uhud'
+            },
+            {
+                title: 'Masjid Al-Qiblatayn',
+                subtitle: 'Mosque of Two Qiblas',
+                desc: 'This mosque is historically significant because it is where the revelation of the Quran came to change the direction of the Qibla from Bayt al-Maqdis in Jerusalem to the Kaaba in Makkah. It uniquely contained two prayer niches (mihrabs) in the past.',
+                img: 'https://i.postimg.cc/50rQG1f5/umrah-2.jpg',
+                significance: 'Change of Qibla'
+            }
+        ]
+    },
+    // -----------------------------
     umrahGuide: {
             seo: {
             title: 'Umrah Guide (Bangla) | Champion Travels',

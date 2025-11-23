@@ -37,10 +37,9 @@ const RainIcon = () => (
 
 
 const PrayerTimesWidget: React.FC = () => {
-    const { appData } = useContext(DataContext);
+    const { appData, isPrayerTimesOpen, setPrayerTimesOpen } = useContext(DataContext);
     const { enabled, title, locations } = appData.prayerTimes || { enabled: false, locations: [] };
 
-    const [isOpen, setIsOpen] = useState(false);
     const [activeLocationIndex, setActiveLocationIndex] = useState(0);
     const [timings, setTimings] = useState<PrayerTimes | null>(null);
     const [weather, setWeather] = useState<{ temp: number; code: number } | null>(null);
@@ -84,7 +83,7 @@ const PrayerTimesWidget: React.FC = () => {
     };
 
     useEffect(() => {
-        if (!enabled || !isOpen || !activeLocation || !activeLocation.enabled) return;
+        if (!enabled || !isPrayerTimesOpen || !activeLocation || !activeLocation.enabled) return;
 
         const fetchPrayerTimesAndWeather = async () => {
             setLoading(true);
@@ -129,7 +128,7 @@ const PrayerTimesWidget: React.FC = () => {
         };
 
         fetchPrayerTimesAndWeather();
-    }, [isOpen, activeLocationIndex, enabled, activeLocation]);
+    }, [isPrayerTimesOpen, activeLocationIndex, enabled, activeLocation]);
 
     const getWeatherIconComponent = (code: number) => {
         if (code <= 3) return <SunIcon />;
@@ -140,14 +139,17 @@ const PrayerTimesWidget: React.FC = () => {
     if (!enabled || visibleLocations.length === 0) return null;
 
     return (
-        <div className="fixed bottom-6 left-6 z-[100] flex flex-col items-start">
+        <div className={`fixed z-[100] flex flex-col items-start transition-all duration-300 ${isPrayerTimesOpen ? 'bottom-20 left-1/2 -translate-x-1/2 md:translate-x-0 md:bottom-6 md:left-6' : 'bottom-6 left-6'}`}>
             
             {/* Widget Popup */}
             <div 
-                className={`mb-4 bg-[var(--color-light-bg)] rounded-[var(--ui-border-radius)] shadow-2xl overflow-hidden transition-all duration-300 origin-bottom-left border border-gray-700 w-72 ${isOpen ? 'scale-100 opacity-100' : 'scale-0 opacity-0 h-0'}`}
+                className={`mb-4 bg-[var(--color-light-bg)] rounded-[var(--ui-border-radius)] shadow-2xl overflow-hidden transition-all duration-300 origin-bottom border border-gray-700 w-80 md:w-72 ${isPrayerTimesOpen ? 'scale-100 opacity-100' : 'scale-0 opacity-0 h-0'}`}
             >
                 {/* Header */}
-                <div className="bg-[var(--color-primary)] p-3">
+                <div className="bg-[var(--color-primary)] p-3 relative">
+                    <button onClick={() => setPrayerTimesOpen(false)} className="absolute top-2 right-2 text-white/80 hover:text-white md:hidden">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
+                    </button>
                     <div className="flex justify-between items-center mb-1">
                          <h3 className="text-white font-display font-bold text-xl">{title}</h3>
                          {weather && (
@@ -191,7 +193,7 @@ const PrayerTimesWidget: React.FC = () => {
                     ) : error ? (
                         <div className="flex flex-col items-center justify-center h-40 text-center">
                             <p className="text-red-400 text-sm mb-2">Unable to load data.</p>
-                            <button onClick={() => setIsOpen(false)} className="text-xs underline text-[var(--color-muted-text)]">Close</button>
+                            <button onClick={() => setPrayerTimesOpen(false)} className="text-xs underline text-[var(--color-muted-text)]">Close</button>
                         </div>
                     ) : timings ? (
                         <div className="space-y-2">
@@ -210,15 +212,15 @@ const PrayerTimesWidget: React.FC = () => {
                 </div>
             </div>
 
-            {/* Toggle Button */}
+            {/* Toggle Button (Desktop Only - Hidden on Mobile) */}
             <button
-                onClick={() => setIsOpen(!isOpen)}
-                className="p-4 rounded-full text-white shadow-2xl transition-transform duration-300 hover:scale-110 bg-[var(--color-secondary)] hover:bg-green-700 flex items-center justify-center relative group"
+                onClick={() => setPrayerTimesOpen(!isPrayerTimesOpen)}
+                className="hidden md:flex p-4 rounded-full text-white shadow-2xl transition-transform duration-300 hover:scale-110 bg-[var(--color-secondary)] hover:bg-green-700 items-center justify-center relative group"
                 aria-label="Prayer Times"
             >
                 <div className="absolute -inset-2 rounded-full bg-inherit opacity-20 animate-pulse group-hover:animate-none"></div>
                 <div className="relative">
-                    {isOpen ? (
+                    {isPrayerTimesOpen ? (
                          <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                         </svg>
