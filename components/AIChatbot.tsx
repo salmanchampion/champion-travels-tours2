@@ -77,11 +77,13 @@ const AIChatbot: React.FC = () => {
         setIsLoading(true);
 
         try {
-            const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+            // Use the provided API key directly
+            const apiKey = "AIzaSyBJ1ZsUzggzqUaL3DkWsZ1pIPf5m1M0Qos";
+
+            const ai = new GoogleGenAI({ apiKey });
             const model = 'gemini-2.5-flash';
             
             // Construct conversation history for context
-            // We limit history to last 10 messages to save tokens and keep context relevant
             const history = messages.slice(-10).map(m => ({
                 role: m.sender === 'user' ? 'user' : 'model',
                 parts: [{ text: m.text }]
@@ -101,7 +103,7 @@ const AIChatbot: React.FC = () => {
             const botMessage: Message = {
                 id: (Date.now() + 1).toString(),
                 sender: 'bot',
-                text: responseText || 'দুঃখিত, আমি এখন উত্তর দিতে পারছি না। অনুগ্রহ করে পরে আবার চেষ্টা করুন।',
+                text: responseText || 'দুঃখিত, আমি এখন উত্তর দিতে পারছি না।',
                 timestamp: new Date()
             };
 
@@ -112,7 +114,7 @@ const AIChatbot: React.FC = () => {
             const errorMessage: Message = {
                 id: (Date.now() + 1).toString(),
                 sender: 'bot',
-                text: 'সাময়িক যান্ত্রিক ত্রুটির কারণে উত্তর দেওয়া যাচ্ছে না। দয়া করে আমাদের হটলাইনে কল করুন।',
+                text: 'দুঃখিত, যান্ত্রিক ত্রুটির কারণে উত্তর দেওয়া যাচ্ছে না।',
                 timestamp: new Date()
             };
             setMessages(prev => [...prev, errorMessage]);

@@ -2,6 +2,7 @@
 import React, { useContext, useState } from 'react';
 import { DataContext } from '../contexts/DataContext';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useToast } from '../contexts/ToastContext';
 
 const SocialIcon: React.FC<{ href: string; children: React.ReactNode }> = ({ href, children }) => (
   <a href={href} target="_blank" rel="noopener noreferrer" className="text-[var(--color-muted-text)] hover:text-[var(--color-primary)] transition-colors duration-300">
@@ -12,6 +13,7 @@ const SocialIcon: React.FC<{ href: string; children: React.ReactNode }> = ({ hre
 const Footer: React.FC = () => {
   const { appData } = useContext(DataContext);
   const { t } = useLanguage();
+  const { addToast } = useToast(); // Add Toast for better feedback
   const { footer } = appData;
   const { newsletter } = footer; // Destructure newsletter config
   const [email, setEmail] = useState('');
@@ -44,19 +46,19 @@ const Footer: React.FC = () => {
             
             setStatus('success');
             setEmail('');
+            addToast('Subscribed successfully!', 'success');
             setTimeout(() => setStatus('idle'), 3000);
         } catch (error) {
             console.error("Subscription error:", error);
             setStatus('error');
+            addToast('Failed to subscribe. Please try again.', 'error');
             setTimeout(() => setStatus('idle'), 3000);
         }
     } else {
-        // Fallback simulation if no URL is configured
-        setTimeout(() => {
-            setStatus('success');
-            setEmail('');
-            setTimeout(() => setStatus('idle'), 3000);
-        }, 1000);
+        // Warn if no URL is configured
+        alert("Newsletter configuration missing! Please add the Google Apps Script URL in the Admin Panel to collect emails.");
+        addToast('Configuration missing. Check Admin Panel.', 'error');
+        setStatus('idle');
     }
   }
 
