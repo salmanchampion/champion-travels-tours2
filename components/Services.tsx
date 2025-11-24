@@ -70,7 +70,7 @@ const Services: React.FC<ServicesProps> = ({ showTitle = true }) => {
                   icon={iconMap[service.icon] || iconMap['Default']}
                   title={t(service.title)}
                   description={t(service.description)}
-                  onClick={() => setSelectedService(null)} // Disabled modal temporarily or fix if content missing
+                  onClick={() => setSelectedService(service)}
                   delay={index * 100}
                 />
               ))}

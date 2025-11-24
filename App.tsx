@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect, useContext, useRef } from 'react';
+import ReactDOM from 'react-dom/client';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import HomePage from './pages/HomePage';
@@ -14,6 +15,7 @@ import AdminPage from './pages/AdminPage';
 import { AuthProvider, AuthContext } from './contexts/AuthContext';
 import { DataProvider, DataContext } from './contexts/DataContext';
 import { LanguageProvider } from './contexts/LanguageContext';
+import { ToastProvider } from './contexts/ToastContext'; // Import ToastProvider
 import WhyUsPage from './pages/WhyUsPage';
 import UmrahGuidePage from './pages/UmrahGuidePage';
 import { SeoMetadata } from './data';
@@ -44,6 +46,8 @@ import SchemaMarkup from './components/SEO/SchemaMarkup';
 import CompareFloatingWidget from './components/CompareFloatingWidget';
 import CompareModal from './components/CompareModal';
 import ChecklistModal from './components/ChecklistModal';
+import AIChatbot from './components/AIChatbot';
+import ThemeSettingsModal from './components/ThemeSettingsModal';
 
 // --- Announcement Bar Component ---
 const AnnouncementBar: React.FC = () => {
@@ -301,7 +305,7 @@ const AppContent: React.FC = () => {
   const [page, setPage] = useState('');
   const [contactSubject, setContactSubject] = useState('');
   const { isAuthenticated, isLoading: isAuthLoading } = useContext(AuthContext);
-  const { appData, isLoading: isDataLoading, setChecklistOpen } = useContext(DataContext);
+  const { appData, isLoading: isDataLoading, setChecklistOpen, isThemeSettingsOpen, setThemeSettingsOpen } = useContext(DataContext);
   const [showPreloader, setShowPreloader] = useState(true); // Preloader State
   const keySequenceRef = useRef('');
   const secretCode = '045';
@@ -386,15 +390,8 @@ const AppContent: React.FC = () => {
       const hash = window.location.hash || '#home';
       const [path, queryString] = hash.split('?');
       
-      // Specific check for checklist modal trigger
       if (path === '#checklist') {
           setChecklistOpen(true);
-          // Optional: Reset hash to home or keep it to allow bookmarking behavior, 
-          // but often modals work better if they don't trap the back button too hard.
-          // For now, let's just open it.
-          // Ideally, we might want to switch back to the previous page URL so the background isn't empty if refreshed
-          // But simpler logic: just open modal.
-          // Since renderPage will fall through to default if '#checklist' isn't handled, let's handle it.
       }
 
       setPage(path);
@@ -583,7 +580,9 @@ const AppContent: React.FC = () => {
         <CompareFloatingWidget /> {/* New Compare Widget */}
         <CompareModal /> {/* New Compare Modal */}
         <ChecklistModal /> {/* New Checklist Modal */}
+        <ThemeSettingsModal isOpen={isThemeSettingsOpen} onClose={() => setThemeSettingsOpen(false)} />
 
+        <AIChatbot /> {/* AI Chat Assistant */}
         <FloatingActionButton />
         <ScrollToTop />
         <PrayerTimesWidget />
@@ -601,7 +600,9 @@ const App: React.FC = () => {
     <AuthProvider>
       <DataProvider>
         <LanguageProvider>
+          <ToastProvider>
             <AppContent />
+          </ToastProvider>
         </LanguageProvider>
       </DataProvider>
     </AuthProvider>

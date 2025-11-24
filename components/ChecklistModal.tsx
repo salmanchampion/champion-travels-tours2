@@ -125,6 +125,10 @@ const ChecklistModal: React.FC = () => {
         }
     };
 
+    const handlePrint = () => {
+        window.print();
+    };
+
     // Calculate progress
     const totalItems = checklistData.reduce((acc, cat) => acc + cat.items.length, 0);
     const completedItems = Object.values(checkedItems).filter(Boolean).length;
@@ -134,20 +138,31 @@ const ChecklistModal: React.FC = () => {
 
     return (
         <Modal isOpen={isChecklistOpen} onClose={() => setChecklistOpen(false)}>
-            <div className="w-full max-w-4xl mx-auto bg-[var(--color-dark-bg)] text-[var(--color-light-text)] rounded-lg overflow-hidden flex flex-col h-[80vh] md:h-auto">
+            <div id="printable-area" className="w-full max-w-4xl mx-auto bg-[var(--color-dark-bg)] text-[var(--color-light-text)] rounded-lg overflow-hidden flex flex-col h-[80vh] md:h-auto">
                 
                 {/* Header */}
                 <div className="p-6 bg-[var(--color-light-bg)] border-b border-gray-700">
-                    <div className="flex justify-between items-start mb-4">
+                    <div className="flex justify-between items-start mb-4 print:hidden">
                         <div>
                             <h2 className="text-2xl md:text-3xl font-display font-bold text-[var(--color-primary)]">Preparation Checklist</h2>
                             <p className="text-sm text-[var(--color-muted-text)]">হজ্জ ও ওমরাহ প্রস্তুতির চেকলিস্ট</p>
                         </div>
-                        <button onClick={handleReset} className="text-xs text-red-400 hover:text-white underline">Reset</button>
+                        <div className="flex items-center gap-3">
+                            <button 
+                                onClick={handlePrint}
+                                className="flex items-center gap-1 text-sm text-[var(--color-primary)] hover:text-white bg-[var(--color-dark-bg)] px-3 py-1 rounded border border-[var(--color-primary)] transition-colors"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                                </svg>
+                                Print
+                            </button>
+                            <button onClick={handleReset} className="text-xs text-red-400 hover:text-white underline">Reset</button>
+                        </div>
                     </div>
                     
                     {/* Progress Bar */}
-                    <div className="relative w-full h-4 bg-gray-800 rounded-full overflow-hidden border border-gray-600">
+                    <div className="relative w-full h-4 bg-gray-800 rounded-full overflow-hidden border border-gray-600 print:hidden">
                         <div 
                             className="absolute top-0 left-0 h-full bg-gradient-to-r from-[var(--color-secondary)] to-green-400 transition-all duration-500 ease-out"
                             style={{ width: `${progress}%` }}
@@ -155,14 +170,14 @@ const ChecklistModal: React.FC = () => {
                         <span className="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-white shadow-black drop-shadow-md">{progress}% Completed</span>
                     </div>
                     {progress === 100 && (
-                        <p className="text-center text-green-400 text-sm mt-2 font-bold animate-pulse">আলহামদুলিল্লাহ! আপনার প্রস্তুতি সম্পন্ন হয়েছে।</p>
+                        <p className="text-center text-green-400 text-sm mt-2 font-bold animate-pulse print:hidden">আলহামদুলিল্লাহ! আপনার প্রস্তুতি সম্পন্ন হয়েছে।</p>
                     )}
                 </div>
 
                 {/* Body */}
                 <div className="flex flex-col md:flex-row flex-grow overflow-hidden">
-                    {/* Tabs */}
-                    <div className="w-full md:w-1/3 bg-[var(--color-dark-bg)] border-r border-gray-700 overflow-x-auto md:overflow-y-auto flex md:flex-col scrollbar-thin scrollbar-thumb-[var(--color-primary)]">
+                    {/* Tabs (Hidden in Print) */}
+                    <div className="w-full md:w-1/3 bg-[var(--color-dark-bg)] border-r border-gray-700 overflow-x-auto md:overflow-y-auto flex md:flex-col scrollbar-thin scrollbar-thumb-[var(--color-primary)] print:hidden">
                         {checklistData.map(cat => (
                             <button
                                 key={cat.id}
@@ -188,48 +203,98 @@ const ChecklistModal: React.FC = () => {
                         ))}
                     </div>
 
-                    {/* List Items */}
-                    <div className="flex-1 p-6 overflow-y-auto bg-[var(--color-light-bg)]">
-                        <h3 className="text-xl font-bold text-white mb-4 border-b border-gray-700 pb-2">{activeCategory.titleBn}</h3>
-                        <div className="space-y-3">
-                            {activeCategory.items.map(item => (
-                                <label 
-                                    key={item.id} 
-                                    className={`flex items-center p-3 rounded-lg border transition-all cursor-pointer ${
-                                        checkedItems[item.id] 
-                                        ? 'bg-[var(--color-primary)]/10 border-[var(--color-primary)]' 
-                                        : 'bg-[var(--color-dark-bg)] border-gray-700 hover:border-gray-500'
-                                    }`}
-                                >
-                                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center mr-4 transition-colors ${
-                                        checkedItems[item.id] 
-                                        ? 'bg-[var(--color-primary)] border-[var(--color-primary)]' 
-                                        : 'border-gray-500'
-                                    }`}>
-                                        {checkedItems[item.id] && (
-                                            <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                                            </svg>
-                                        )}
+                    {/* List Items (Main Content) */}
+                    <div className="flex-1 p-6 overflow-y-auto bg-[var(--color-light-bg)] print:overflow-visible">
+                        {/* Print Header (Only visible when printing) */}
+                        <div className="hidden print:block mb-6 text-center">
+                            <h1 className="text-2xl font-bold text-black">Champion Travels - Preparation Checklist</h1>
+                            <p className="text-sm text-gray-600">Call: +8801718425042</p>
+                        </div>
+
+                        {/* Logic: For screen show active tab, for print show ALL */}
+                        <div className="print:hidden">
+                            <h3 className="text-xl font-bold text-white mb-4 border-b border-gray-700 pb-2">{activeCategory.titleBn}</h3>
+                            <div className="space-y-3">
+                                {activeCategory.items.map(item => (
+                                    <ChecklistItemComponent key={item.id} item={item} checked={!!checkedItems[item.id]} onToggle={() => handleToggle(item.id)} />
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="hidden print:block space-y-6">
+                            {checklistData.map(cat => (
+                                <div key={cat.id} className="avoid-break">
+                                    <h3 className="text-lg font-bold text-black border-b border-black pb-1 mb-2">{cat.titleBn} / {cat.titleEn}</h3>
+                                    <div className="grid grid-cols-2 gap-2">
+                                        {cat.items.map(item => (
+                                            <div key={item.id} className="flex items-center gap-2 text-black text-sm">
+                                                <div className={`w-4 h-4 border border-black ${checkedItems[item.id] ? 'bg-gray-800' : ''}`}></div>
+                                                <span>{item.labelBn}</span>
+                                            </div>
+                                        ))}
                                     </div>
-                                    <input 
-                                        type="checkbox" 
-                                        className="hidden" 
-                                        checked={!!checkedItems[item.id]} 
-                                        onChange={() => handleToggle(item.id)} 
-                                    />
-                                    <div>
-                                        <p className={`font-bold text-base ${checkedItems[item.id] ? 'text-[var(--color-primary)] line-through' : 'text-white'}`}>{item.labelBn}</p>
-                                        <p className="text-xs text-[var(--color-muted-text)]">{item.labelEn}</p>
-                                    </div>
-                                </label>
+                                </div>
                             ))}
                         </div>
                     </div>
                 </div>
             </div>
+            <style>{`
+                @media print {
+                    body * {
+                        visibility: hidden;
+                    }
+                    #printable-area, #printable-area * {
+                        visibility: visible;
+                    }
+                    #printable-area {
+                        position: absolute;
+                        left: 0;
+                        top: 0;
+                        width: 100%;
+                        height: auto;
+                        background: white !important;
+                        color: black !important;
+                    }
+                    .avoid-break {
+                        break-inside: avoid;
+                    }
+                }
+            `}</style>
         </Modal>
     );
 };
+
+const ChecklistItemComponent: React.FC<{ item: ChecklistItem, checked: boolean, onToggle: () => void }> = ({ item, checked, onToggle }) => (
+    <label 
+        className={`flex items-center p-3 rounded-lg border transition-all cursor-pointer ${
+            checked 
+            ? 'bg-[var(--color-primary)]/10 border-[var(--color-primary)]' 
+            : 'bg-[var(--color-dark-bg)] border-gray-700 hover:border-gray-500'
+        }`}
+    >
+        <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center mr-4 transition-colors ${
+            checked 
+            ? 'bg-[var(--color-primary)] border-[var(--color-primary)]' 
+            : 'border-gray-500'
+        }`}>
+            {checked && (
+                <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                </svg>
+            )}
+        </div>
+        <input 
+            type="checkbox" 
+            className="hidden" 
+            checked={checked} 
+            onChange={onToggle} 
+        />
+        <div>
+            <p className={`font-bold text-base ${checked ? 'text-[var(--color-primary)] line-through' : 'text-white'}`}>{item.labelBn}</p>
+            <p className="text-xs text-[var(--color-muted-text)]">{item.labelEn}</p>
+        </div>
+    </label>
+);
 
 export default ChecklistModal;

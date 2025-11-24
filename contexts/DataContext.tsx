@@ -29,6 +29,9 @@ interface DataContextType {
   // --- Checklist State ---
   isChecklistOpen: boolean;
   setChecklistOpen: (open: boolean) => void;
+  // --- Theme Settings State ---
+  isThemeSettingsOpen: boolean;
+  setThemeSettingsOpen: (open: boolean) => void;
 }
 
 const initialContextValue: DataContextType = {
@@ -48,6 +51,8 @@ const initialContextValue: DataContextType = {
     setCompareModalOpen: () => {},
     isChecklistOpen: false,
     setChecklistOpen: () => {},
+    isThemeSettingsOpen: false,
+    setThemeSettingsOpen: () => {},
 };
 
 export const DataContext = createContext<DataContextType>(initialContextValue);
@@ -83,6 +88,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [isPrayerTimesOpen, setPrayerTimesOpen] = useState(false);
   const [isChecklistOpen, setChecklistOpen] = useState(false);
+  const [isThemeSettingsOpen, setThemeSettingsOpen] = useState(false);
   
   // --- Compare Feature State ---
   const [compareList, setCompareList] = useState<any[]>([]);
@@ -439,7 +445,9 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
         isCompareModalOpen,
         setCompareModalOpen,
         isChecklistOpen,
-        setChecklistOpen
+        setChecklistOpen,
+        isThemeSettingsOpen,
+        setThemeSettingsOpen
     }}>
       {children}
     </DataContext.Provider>

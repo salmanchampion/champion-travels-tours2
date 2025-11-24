@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { DataContext } from '../contexts/DataContext';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useToast } from '../contexts/ToastContext';
 
 interface ContactProps {
   defaultSubject?: string;
@@ -11,7 +12,8 @@ interface ContactProps {
 const Contact: React.FC<ContactProps> = ({ defaultSubject = '', showTitle = true }) => {
   const { appData } = useContext(DataContext);
   const { t } = useLanguage();
-  // FIX: Corrected path to home page contact section data.
+  const { addToast } = useToast();
+  
   const homeData = appData.pages.home.sections.contact;
   const contactPageData = appData.pages.contact;
   const data = showTitle ? homeData : contactPageData.pageBanner;
@@ -25,7 +27,6 @@ const Contact: React.FC<ContactProps> = ({ defaultSubject = '', showTitle = true
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState<'success' | 'error' | null>(null);
 
   useEffect(() => {
     setFormData(prevData => ({ ...prevData, subject: defaultSubject }));
@@ -39,12 +40,10 @@ const Contact: React.FC<ContactProps> = ({ defaultSubject = '', showTitle = true
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setSubmitStatus(null);
 
     const scriptURL = contactPageData.googleAppsScriptUrl;
     if (!scriptURL) {
-      console.error('Google Apps Script URL is not set in the admin panel.');
-      setSubmitStatus('error');
+      addToast('Error: Configuration missing. Please contact admin.', 'error');
       setIsSubmitting(false);
       return;
     }
@@ -63,15 +62,14 @@ const Contact: React.FC<ContactProps> = ({ defaultSubject = '', showTitle = true
       });
 
       if (response.ok) {
-        setSubmitStatus('success');
+        addToast('Message sent successfully! We will contact you soon.', 'success');
         setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
       } else {
-        console.error('Submission failed. Response status:', response.status);
         throw new Error('Submission failed.');
       }
     } catch (error) {
       console.error('Error submitting form:', error);
-      setSubmitStatus('error');
+      addToast('Failed to send message. Please try again later.', 'error');
     } finally {
       setIsSubmitting(false);
     }
@@ -166,13 +164,6 @@ const Contact: React.FC<ContactProps> = ({ defaultSubject = '', showTitle = true
               <input type="text" name="subject" value={formData.subject} onChange={handleChange} placeholder={t("Subject")} required className="w-full bg-[var(--color-dark-bg)] border border-gray-600 rounded-[var(--ui-border-radius)] py-3 px-4 text-[var(--color-light-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] transition" />
               <textarea name="message" value={formData.message} onChange={handleChange} placeholder={t("Your Message")} rows={5} required className="w-full bg-[var(--color-dark-bg)] border border-gray-600 rounded-[var(--ui-border-radius)] py-3 px-4 text-[var(--color-light-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] transition"></textarea>
               
-              {submitStatus === 'success' && (
-                <p className="text-green-400 text-center">Thank you for your message! We will get back to you soon.</p>
-              )}
-              {submitStatus === 'error' && (
-                <p className="text-red-400 text-center">Something went wrong. Please check the Admin Panel for the script URL or try again later.</p>
-              )}
-
               <button type="submit" disabled={isSubmitting} className="w-full bg-[var(--color-primary)] text-white font-bold py-3 px-6 rounded-[var(--ui-button-radius)] hover:bg-[var(--color-primary-dark)] transition-all duration-300 transform hover:scale-105 disabled:bg-gray-500 disabled:cursor-not-allowed">
                 {isSubmitting ? 'Sending...' : t(contactPageData.formButtonText)}
               </button>
