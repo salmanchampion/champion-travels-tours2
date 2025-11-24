@@ -479,6 +479,18 @@ const AppContent: React.FC = () => {
         document.head.appendChild(metaKeywords);
       }
       metaKeywords.setAttribute('content', seo.keywords);
+      
+      // --- NEW: Canonical Link Injection ---
+      let canonicalLink = document.querySelector("link[rel='canonical']") as HTMLLinkElement;
+      if (!canonicalLink) {
+          canonicalLink = document.createElement('link');
+          canonicalLink.setAttribute('rel', 'canonical');
+          document.head.appendChild(canonicalLink);
+      }
+      // Construct the canonical URL (simplified for SPA hash routing)
+      const baseUrl = window.location.origin + window.location.pathname;
+      canonicalLink.setAttribute('href', baseUrl + page);
+
     } else {
         // Fallback if SEO data is missing entirely
         document.title = siteName;

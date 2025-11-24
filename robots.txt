@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# Please replace 'https://championtravels.com' with your actual domain name if different
+Sitemap: https://championtravels.com/sitemap.xml
