@@ -4,6 +4,7 @@ import { DataContext } from '../contexts/DataContext';
 import PageBanner from '../components/PageBanner';
 import { UmrahPackage } from '../data';
 import Modal from '../components/Modal';
+import { useToast } from '../contexts/ToastContext';
 
 const DetailRow: React.FC<{ label: string; value: string }> = ({ label, value }) => (
     <div className="py-2 flex justify-between border-b border-gray-700 last:border-b-0">
@@ -69,6 +70,7 @@ const UmrahPage: React.FC = () => {
     const { appData } = useContext(DataContext);
     const { pageBanner, filters } = appData.pages.umrah;
     const umrahPackages = appData.umrahPackages.filter(p => p.enabled);
+    const { addToast } = useToast();
 
     const [activeCategory, setActiveCategory] = useState('All');
     const [selectedPackage, setSelectedPackage] = useState<UmrahPackage | null>(null);
@@ -77,6 +79,25 @@ const UmrahPage: React.FC = () => {
         if (activeCategory === 'All') return umrahPackages;
         return umrahPackages.filter(p => p.category === activeCategory);
     }, [activeCategory, umrahPackages]);
+
+    const handleShare = async (pkg: UmrahPackage) => {
+        const shareData = {
+            title: pkg.name,
+            text: `Check out this Umrah package: ${pkg.name} - ${pkg.price}`,
+            url: window.location.href,
+        };
+
+        if (navigator.share) {
+            try {
+                await navigator.share(shareData);
+            } catch (err) {
+                console.log('Error sharing:', err);
+            }
+        } else {
+            navigator.clipboard.writeText(`${shareData.text} \n ${shareData.url}`);
+            addToast('Link copied to clipboard!', 'info');
+        }
+    };
 
     return (
         <div className="pt-20 bg-[var(--color-dark-bg)]">
@@ -136,7 +157,16 @@ const UmrahPage: React.FC = () => {
              {selectedPackage && (
                 <Modal isOpen={!!selectedPackage} onClose={() => setSelectedPackage(null)}>
                     <div className="p-2 text-[var(--color-light-text)]">
-                        <img src={selectedPackage.image} alt={selectedPackage.name} className="w-full h-56 object-cover rounded-lg mb-4" />
+                        <div className="relative">
+                            <img src={selectedPackage.image} alt={selectedPackage.name} className="w-full h-56 object-cover rounded-lg mb-4" />
+                            <button 
+                                onClick={() => handleShare(selectedPackage)}
+                                className="absolute top-3 right-3 bg-black/60 p-2 rounded-full hover:bg-[var(--color-primary)] text-white transition-colors"
+                                title="Share Package"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>
+                            </button>
+                        </div>
                         <h2 className="text-3xl font-bold text-white font-display mb-2">{selectedPackage.name}</h2>
                         <div className="flex justify-between items-center text-lg mb-4 border-y border-gray-700 py-2">
                              <span className="font-semibold text-[var(--color-muted-text)]">Date: <span className="text-[var(--color-light-text)]">{selectedPackage.date}</span></span>
