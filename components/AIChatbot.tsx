@@ -76,10 +76,21 @@ const AIChatbot: React.FC = () => {
         setInput('');
         setIsLoading(true);
 
-        try {
-            // Use the provided API key directly
-            const apiKey = "AIzaSyBJ1ZsUzggzqUaL3DkWsZ1pIPf5m1M0Qos";
+        const apiKey = appData.globalConfig?.geminiApiKey;
 
+        if (!apiKey || apiKey.trim() === '') {
+            const errorMessage: Message = {
+                id: (Date.now() + 1).toString(),
+                sender: 'bot',
+                text: 'দুঃখিত, এআই সেবাটি বর্তমানে কনফিগার করা নেই। অনুগ্রহ করে অ্যাডমিন প্যানেলে API Key যুক্ত করুন।',
+                timestamp: new Date()
+            };
+            setMessages(prev => [...prev, errorMessage]);
+            setIsLoading(false);
+            return;
+        }
+
+        try {
             const ai = new GoogleGenAI({ apiKey });
             const model = 'gemini-2.5-flash';
             
@@ -114,7 +125,7 @@ const AIChatbot: React.FC = () => {
             const errorMessage: Message = {
                 id: (Date.now() + 1).toString(),
                 sender: 'bot',
-                text: 'দুঃখিত, যান্ত্রিক ত্রুটির কারণে উত্তর দেওয়া যাচ্ছে না।',
+                text: 'দুঃখিত, যান্ত্রিক ত্রুটির কারণে উত্তর দেওয়া যাচ্ছে না। অনুগ্রহ করে কিছুক্ষণ পর আবার চেষ্টা করুন বা সরাসরি আমাদের সাথে যোগাযোগ করুন।',
                 timestamp: new Date()
             };
             setMessages(prev => [...prev, errorMessage]);

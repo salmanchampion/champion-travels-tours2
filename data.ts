@@ -7,7 +7,7 @@ import { pagesData, customPagesData } from './data/pages';
 // Re-export types for backward compatibility
 export * from './types';
 
-// Patch the siteConfig to include the new checklist link
+// Patch the siteConfig to include the new checklist AND calculator link
 const patchedSiteConfig = {
     ...siteConfig,
     header: {
@@ -15,16 +15,21 @@ const patchedSiteConfig = {
         navLinks: siteConfig.header.navLinks.map(link => {
             if (link.label === 'Guidelines') {
                 const subLinks = link.subLinks || [];
-                // Check if already exists to avoid duplicates if hot-reloaded
-                if (!subLinks.some(sl => sl.href === '#checklist')) {
-                    return {
-                        ...link,
-                        subLinks: [
-                            ...subLinks,
-                            { href: '#checklist', label: 'Preparation Checklist', enabled: true }
-                        ]
-                    };
+                // Use a Set to ensure uniqueness based on href
+                const existingHrefs = new Set(subLinks.map(sl => sl.href));
+                const newSubLinks = [...subLinks];
+
+                if (!existingHrefs.has('#checklist')) {
+                    newSubLinks.push({ href: '#checklist', label: 'Preparation Checklist', enabled: true });
                 }
+                if (!existingHrefs.has('#calculator')) {
+                    newSubLinks.push({ href: '#calculator', label: 'Cost Estimator', enabled: true });
+                }
+
+                return {
+                    ...link,
+                    subLinks: newSubLinks
+                };
             }
             return link;
         })

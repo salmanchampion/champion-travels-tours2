@@ -21,7 +21,7 @@ const Header: React.FC<HeaderProps> = ({ activePage }) => {
   const [isStatusOpen, setIsStatusOpen] = useState(false); // Tracker State
   
   const { isAuthenticated, logout } = useContext(AuthContext);
-  const { appData, setThemeSettingsOpen } = useContext(DataContext);
+  const { appData, setThemeSettingsOpen, setSearchOpen } = useContext(DataContext);
   const { language, setLanguage, t } = useLanguage();
   const { header, site, globalConfig } = appData;
 
@@ -218,6 +218,17 @@ const Header: React.FC<HeaderProps> = ({ activePage }) => {
                 </>
                 )}
                 
+                {/* Search Button */}
+                <button 
+                    onClick={() => setSearchOpen(true)}
+                    className="text-[var(--color-light-text)] hover:text-[var(--color-primary)] transition-colors p-2 rounded-full hover:bg-white/5"
+                    aria-label="Search"
+                >
+                    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </button>
+
                 {showThemeSwitcher && (
                     <button 
                         onClick={() => setThemeSettingsOpen(true)}
@@ -237,10 +248,19 @@ const Header: React.FC<HeaderProps> = ({ activePage }) => {
             </a>
 
             {/* Mobile Menu Button */}
-            <div className="md:hidden flex items-center z-50">
+            <div className="md:hidden flex items-center z-50 gap-4">
+                <button 
+                    onClick={() => setSearchOpen(true)}
+                    className="text-white focus:outline-none hover:text-[var(--color-primary)] transition-colors"
+                    aria-label="Search"
+                >
+                    <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </button>
                 <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="text-white focus:outline-none p-2 hover:text-[var(--color-primary)] transition-colors"
+                className="text-white focus:outline-none hover:text-[var(--color-primary)] transition-colors"
                 aria-label="Toggle Menu"
                 >
                     {isMenuOpen ? (

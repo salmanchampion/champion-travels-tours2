@@ -3,6 +3,7 @@ import React, { useContext } from 'react';
 import { DataContext } from '../contexts/DataContext';
 import PageBanner from '../components/PageBanner';
 import BlogList from '../components/BlogList';
+import AdUnit from '../components/AdUnit';
 
 const BlogPage: React.FC = () => {
   const { appData } = useContext(DataContext);
@@ -17,13 +18,20 @@ const BlogPage: React.FC = () => {
         backgroundImage={blog.pageBanner.backgroundImage}
       />
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        {visiblePosts.length > 0 ? (
-             <BlogList posts={visiblePosts} />
-        ) : (
-            <div className="text-center py-20">
-                <h3 className="text-2xl text-[var(--color-muted-text)]">No blog posts available at the moment.</h3>
+        <div className="flex flex-col lg:flex-row gap-8">
+            <div className="lg:w-3/4">
+                {visiblePosts.length > 0 ? (
+                    <BlogList posts={visiblePosts} />
+                ) : (
+                    <div className="text-center py-20">
+                        <h3 className="text-2xl text-[var(--color-muted-text)]">No blog posts available at the moment.</h3>
+                    </div>
+                )}
             </div>
-        )}
+            <div className="lg:w-1/4">
+                <AdUnit placement="blogSidebar" className="sticky top-24" />
+            </div>
+        </div>
       </div>
     </div>
   );

@@ -6,6 +6,7 @@ export const siteConfig: Pick<AppData, 'site' | 'header' | 'floatingButton' | 'p
         logoUrl: 'https://i.postimg.cc/9QNWStMS/champion-logo-1.png',
     },
     globalConfig: {
+        geminiApiKey: '', 
         announcementBar: {
             enabled: false,
             text: 'Special Ramadan Offer: Get 10% off on all Umrah packages booked before March!',
@@ -18,21 +19,34 @@ export const siteConfig: Pick<AppData, 'site' | 'header' | 'floatingButton' | 'p
             faviconUrl: 'https://i.postimg.cc/9QNWStMS/champion-logo-1.png',
             metaDescription: 'Your trusted partner for Hajj, Umrah, and worldwide travel in Bangladesh.'
         },
-        // --- New Configs ---
         seoSchema: {
             enabled: true,
             organizationType: 'TravelAgency',
             sameAs: ['https://facebook.com', 'https://instagram.com', 'https://twitter.com']
         },
         analytics: {
-            googleAnalyticsId: '', // Placeholder for G-XXXXXXX
-            facebookPixelId: '', // Placeholder for XXXXXXXXXXXXXXX
+            googleAnalyticsId: '', 
+            facebookPixelId: '', 
         },
         language: {
             enableSwitcher: true,
             defaultLanguage: 'en'
         },
-        // -------------------
+        // --- NEW: Monetization Initialization ---
+        monetization: {
+            enabled: false,
+            scripts: {
+                headScript: '', 
+                bodyScript: ''
+            },
+            placements: {
+                homeTop: '',
+                homeMiddle: '',
+                blogSidebar: '',
+                postBottom: ''
+            }
+        },
+        // ----------------------------------------
         textLabels: {
             bookNow: 'Book Now',
             viewDetails: 'View Details',

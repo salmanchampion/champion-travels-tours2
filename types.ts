@@ -484,8 +484,24 @@ export interface Application {
     steps: ApplicationStep[];
 }
 
+// --- MONETIZATION CONFIG ---
+export interface MonetizationConfig {
+    enabled: boolean;
+    scripts: {
+        headScript: string; // Global head script (e.g. AdSense Auto Ads)
+        bodyScript: string; // Global body script
+    };
+    placements: {
+        homeTop: string; // Code for Top of Home
+        homeMiddle: string; // Code for Middle of Home
+        blogSidebar: string; // Code for Blog Sidebar
+        postBottom: string; // Code for Bottom of Blog Post
+    };
+}
+
 // --- GLOBAL CONFIG FOR TOTAL CONTROL ---
 export interface GlobalConfig {
+    geminiApiKey?: string; 
     announcementBar: {
         enabled: boolean;
         text: string;
@@ -495,29 +511,31 @@ export interface GlobalConfig {
     };
     siteIdentity: {
         siteName: string;
-        faviconUrl: string; // For total branding control
-        metaDescription: string; // Global SEO fallback
+        faviconUrl: string; 
+        metaDescription: string; 
     };
-    // New SEO & Analytics Config
     seoSchema?: {
         enabled: boolean;
-        organizationType: string; // e.g. 'TravelAgency'
-        sameAs: string[]; // Social links for schema
+        organizationType: string; 
+        sameAs: string[]; 
     };
     analytics?: {
-        googleAnalyticsId: string; // G-XXXXXXXXXX
-        facebookPixelId: string; // XXXXXXXXXXXXXXX
+        googleAnalyticsId: string; 
+        facebookPixelId: string; 
     };
     language?: {
         enableSwitcher: boolean;
         defaultLanguage: 'en' | 'bn';
     };
+    // NEW: Monetization
+    monetization?: MonetizationConfig;
+    
     marketingPopup?: MarketingPopupConfig;
     textLabels?: TextLabelsConfig;
     advanced: {
-        customCss: string; // The ultimate "small details" control
-        headScripts: string; // Google Analytics, Pixel etc.
-        footerScripts: string; // Chatbots etc.
+        customCss: string; 
+        headScripts: string; 
+        footerScripts: string; 
         typography?: {
             h1Size: string;
             h2Size: string;
@@ -531,7 +549,6 @@ export interface AppData {
     site: {
         logoUrl: string;
     };
-    // Added Global Config Here
     globalConfig?: GlobalConfig;
     
     header: {
@@ -739,8 +756,8 @@ export interface AppData {
         umrahGuide: UmrahGuideData;
         hajjGuide: HajjGuideData;
         blog: BlogData;
-        ziyarat: ZiyaratData; // NEW
+        ziyarat: ZiyaratData; 
     };
     customPages: CustomPage[];
-    applications: Application[]; // Application Tracker Data
+    applications: Application[]; 
 }

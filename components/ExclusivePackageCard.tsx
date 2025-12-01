@@ -2,6 +2,7 @@
 import React, { useContext } from 'react';
 import { ExclusivePackage } from '../types';
 import { DataContext } from '../contexts/DataContext';
+import { printPackage } from '../utils/printManager';
 
 interface ExclusivePackageCardProps {
     pkg: ExclusivePackage;
@@ -14,7 +15,7 @@ const CheckIcon = () => (
 );
 
 const ExclusivePackageCard: React.FC<ExclusivePackageCardProps> = ({ pkg }) => {
-    const { addToCompare, compareList, removeFromCompare } = useContext(DataContext);
+    const { appData, addToCompare, compareList, removeFromCompare } = useContext(DataContext);
     const isSelected = compareList.some(p => p.id === pkg.id);
     const safeId = `compare-${pkg.id.replace(/\s+/g, '_')}`;
 
@@ -24,6 +25,11 @@ const ExclusivePackageCard: React.FC<ExclusivePackageCardProps> = ({ pkg }) => {
         } else {
             removeFromCompare(pkg.id);
         }
+    };
+
+    const handlePrint = (e: React.MouseEvent) => {
+        e.preventDefault();
+        printPackage(pkg, appData.site.logoUrl, appData.pages.contact.contactInfo);
     };
 
     return (
@@ -36,7 +42,7 @@ const ExclusivePackageCard: React.FC<ExclusivePackageCardProps> = ({ pkg }) => {
                 <img 
                     src={pkg.image} 
                     alt={pkg.title} 
-                    loading="lazy" // Image Optimization: Lazy Loading
+                    loading="lazy" 
                     decoding="async"
                     className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 ease-out" 
                 />
@@ -98,7 +104,14 @@ const ExclusivePackageCard: React.FC<ExclusivePackageCardProps> = ({ pkg }) => {
                 </div>
 
                 {/* Buttons */}
-                <div className="flex gap-3 mt-auto">
+                <div className="flex gap-2 mt-auto">
+                    <button 
+                        onClick={handlePrint}
+                        className="px-3 py-3 border border-gray-600 rounded hover:bg-gray-700 text-[var(--color-light-text)] transition-colors group/print"
+                        title="Download Brochure"
+                    >
+                        <svg className="w-5 h-5 group-hover/print:text-[var(--color-primary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                    </button>
                     <a 
                         href={`#contact?subject=${encodeURIComponent(`Inquiry: ${pkg.title}`)}`}
                         className="flex-1 bg-[var(--color-secondary)] text-[var(--color-dark-bg)] text-center py-3 rounded font-bold hover:bg-amber-600 transition-all duration-300 shadow-md hover:shadow-lg"
@@ -110,8 +123,8 @@ const ExclusivePackageCard: React.FC<ExclusivePackageCardProps> = ({ pkg }) => {
                             href={pkg.pdfLink}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex-none px-4 py-3 border border-gray-600 rounded hover:bg-gray-700 text-[var(--color-light-text)] transition-colors"
-                            title="Download Flyer"
+                            className="px-3 py-3 border border-gray-600 rounded hover:bg-gray-700 text-[var(--color-light-text)] transition-colors"
+                            title="Official PDF"
                         >
                             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
                         </a>

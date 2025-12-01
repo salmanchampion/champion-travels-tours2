@@ -164,6 +164,7 @@ const ExclusivePackageEditor: React.FC<{
 const AdminSidebar: React.FC = () => {
     const sections = [
         { id: 'section-general', label: 'General & Advanced' },
+        { id: 'section-monetization', label: 'Monetization (Ads)' }, // New Section
         { id: 'section-seo', label: 'SEO & Analytics' },
         { id: 'section-marketing', label: 'Marketing Popup' },
         { id: 'section-visuals', label: 'Visual Control' },
@@ -308,6 +309,11 @@ const AdminPage: React.FC = () => {
         }
         if (!mergedData.applications) {
             mergedData.applications = [];
+        }
+        
+        // Monetization Init Check
+        if (!mergedData.globalConfig.monetization) {
+            mergedData.globalConfig.monetization = JSON.parse(JSON.stringify(defaultData.globalConfig?.monetization));
         }
 
         // Ensure Gallery Data
@@ -772,6 +778,22 @@ const AdminPage: React.FC = () => {
                                             <p className="text-xs text-[var(--color-muted-text)] mt-1">This description is used if a specific page doesn't have its own SEO description.</p>
                                         </div>
 
+                                        {/* AI Assistant Config */}
+                                        <div className="p-4 border border-gray-700 rounded-lg bg-[var(--color-dark-bg)]">
+                                            <h4 className="font-bold text-lg text-[var(--color-secondary)] mb-3">AI Assistant Configuration</h4>
+                                            <p className="text-xs text-[var(--color-muted-text)] mb-2">
+                                                Enter your Gemini API Key here to enable the AI Chatbot.
+                                            </p>
+                                            <AdminInput 
+                                                label="Gemini API Key" 
+                                                name="globalConfig.geminiApiKey" 
+                                                value={localData.globalConfig?.geminiApiKey} 
+                                                onChange={e => handleNestedChange(e.target.name, e.target.value)} 
+                                                placeholder="AIzaSy..."
+                                                type="password"
+                                            />
+                                        </div>
+
                                         {/* Top Announcement Bar */}
                                         <div className="p-4 border border-gray-700 rounded-lg bg-[var(--color-dark-bg)]">
                                             <div className="flex justify-between items-center mb-3">
@@ -805,7 +827,7 @@ const AdminPage: React.FC = () => {
                                         {/* Custom Scripts & CSS */}
                                         <div className="col-span-1 md:col-span-2 p-4 border border-gray-700 rounded-lg bg-[var(--color-dark-bg)]">
                                             <h4 className="font-bold text-lg text-red-400 mb-1">Custom Scripts (Header/Footer)</h4>
-                                            <p className="text-sm text-[var(--color-muted-text)] mb-4">Add code for Google Analytics, Facebook Pixel, Chatbots, or custom styling.</p>
+                                            <p className="text-sm text-[var(--color-muted-text)] mb-4">Add code for Google Analytics, FB Pixel, Chatbots, or custom styling.</p>
                                             
                                             <div className="mb-4">
                                                 <label className="block text-sm font-medium text-white mb-1">Custom CSS (Styles)</label>
@@ -838,6 +860,77 @@ const AdminPage: React.FC = () => {
                                                         placeholder="<script>...</script>"
                                                     />
                                                 </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </Section>
+                            </div>
+
+                            {/* --- NEW: MONETIZATION SECTION --- */}
+                            <div id="section-monetization">
+                                <Section title="Monetization (Google AdSense / Adsterra)">
+                                    <div className="p-4 border border-gray-700 rounded-lg bg-[var(--color-dark-bg)]">
+                                        <div className="flex justify-between items-center mb-4">
+                                            <div>
+                                                <h4 className="font-bold text-lg text-[var(--color-primary)]">Monetization Settings</h4>
+                                                <p className="text-xs text-[var(--color-muted-text)]">Enable this to show ads on your website.</p>
+                                            </div>
+                                            <ToggleSwitch 
+                                                label="Enable Ads" 
+                                                enabled={localData.globalConfig?.monetization?.enabled ?? false} 
+                                                onChange={(val) => handleNestedChange('globalConfig.monetization.enabled', val)} 
+                                            />
+                                        </div>
+
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                            <div>
+                                                <label className="block text-sm font-medium text-white mb-1">Global Head Script (e.g. Auto Ads)</label>
+                                                <textarea 
+                                                    className="w-full bg-[#0d1117] border border-gray-600 rounded-md p-3 text-green-400 font-mono text-xs h-32 focus:ring-1 focus:ring-green-500 outline-none"
+                                                    value={localData.globalConfig?.monetization?.scripts?.headScript || ''}
+                                                    onChange={e => handleNestedChange('globalConfig.monetization.scripts.headScript', e.target.value)}
+                                                    placeholder="<script async src='https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js' ...></script>"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-white mb-1">Global Body Script (e.g. Popunder)</label>
+                                                <textarea 
+                                                    className="w-full bg-[#0d1117] border border-gray-600 rounded-md p-3 text-green-400 font-mono text-xs h-32 focus:ring-1 focus:ring-green-500 outline-none"
+                                                    value={localData.globalConfig?.monetization?.scripts?.bodyScript || ''}
+                                                    onChange={e => handleNestedChange('globalConfig.monetization.scripts.bodyScript', e.target.value)}
+                                                    placeholder="<script>...</script>"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <h5 className="font-bold text-white mb-3 mt-6 border-t border-gray-700 pt-4">Specific Ad Placements (Ad Units)</h5>
+                                        <div className="grid grid-cols-1 gap-4">
+                                            <div className="p-3 border border-gray-600 rounded bg-[#1f2937]">
+                                                <label className="block text-sm font-bold text-[var(--color-secondary)] mb-1">Homepage Top (Below Nav)</label>
+                                                <textarea 
+                                                    className="w-full bg-[#0d1117] border border-gray-600 rounded-md p-2 text-gray-300 font-mono text-xs h-24 focus:outline-none"
+                                                    value={localData.globalConfig?.monetization?.placements?.homeTop || ''}
+                                                    onChange={e => handleNestedChange('globalConfig.monetization.placements.homeTop', e.target.value)}
+                                                    placeholder="Paste Ad Unit code here..."
+                                                />
+                                            </div>
+                                            <div className="p-3 border border-gray-600 rounded bg-[#1f2937]">
+                                                <label className="block text-sm font-bold text-[var(--color-secondary)] mb-1">Homepage Middle (Between Sections)</label>
+                                                <textarea 
+                                                    className="w-full bg-[#0d1117] border border-gray-600 rounded-md p-2 text-gray-300 font-mono text-xs h-24 focus:outline-none"
+                                                    value={localData.globalConfig?.monetization?.placements?.homeMiddle || ''}
+                                                    onChange={e => handleNestedChange('globalConfig.monetization.placements.homeMiddle', e.target.value)}
+                                                    placeholder="Paste Ad Unit code here..."
+                                                />
+                                            </div>
+                                            <div className="p-3 border border-gray-600 rounded bg-[#1f2937]">
+                                                <label className="block text-sm font-bold text-[var(--color-secondary)] mb-1">Blog Sidebar</label>
+                                                <textarea 
+                                                    className="w-full bg-[#0d1117] border border-gray-600 rounded-md p-2 text-gray-300 font-mono text-xs h-24 focus:outline-none"
+                                                    value={localData.globalConfig?.monetization?.placements?.blogSidebar || ''}
+                                                    onChange={e => handleNestedChange('globalConfig.monetization.placements.blogSidebar', e.target.value)}
+                                                    placeholder="Paste vertical ad code here..."
+                                                />
                                             </div>
                                         </div>
                                     </div>
@@ -2698,212 +2791,178 @@ const AdminPage: React.FC = () => {
                                         </div>
                                     ))}
                                     <button onClick={() => addListItem('pages.airTicketing.features', { icon: 'Default', title: 'New Feature', description: '', enabled: true })} className="mt-2 bg-green-600 text-white font-bold py-2 px-4 rounded">Add Feature</button>
-
-                                    <h4 className="font-bold text-xl mt-6 mb-2 text-[var(--color-secondary)]">Inquiry Form</h4>
-                                    <AdminInput label="Form Title" name="pages.airTicketing.form.title" value={localData.pages.airTicketing.form.title} onChange={e => handleNestedChange(e.target.name, e.target.value)} />
-                                    <AdminInput label="Form Subtitle" name="pages.airTicketing.form.subtitle" value={localData.pages.airTicketing.form.subtitle} onChange={e => handleNestedChange(e.target.name, e.target.value)} />
-                                    <AdminInput label="Button Text" name="pages.airTicketing.form.buttonText" value={localData.pages.airTicketing.form.buttonText} onChange={e => handleNestedChange(e.target.name, e.target.value)} />
-                                    <AdminInput label="Google Apps Script URL" name="pages.airTicketing.googleAppsScriptUrl" value={localData.pages.airTicketing.googleAppsScriptUrl} onChange={e => handleNestedChange(e.target.name, e.target.value)} className="mt-4" placeholder="https://script.google.com/..." />
                                 </Section>
                             </div>
 
                             <div id="section-team">
-                                <Section title="Team Page">
+                                <Section title="Team Page Management">
                                     <PageIdDisplay id="#team" label="Page ID" />
                                     <AdminInput label="Page Title" name="pages.team.pageBanner.title" value={localData.pages.team.pageBanner.title} onChange={e => handleNestedChange(e.target.name, e.target.value)} />
-                                    <AdminTextarea label="Page Subtitle" name="pages.team.pageBanner.subtitle" value={localData.pages.team.pageBanner.subtitle} onChange={e => handleNestedChange(e.target.name, e.target.value)} />
-                                    
-                                    <h4 className="font-bold text-xl mt-6 mb-2 text-[var(--color-secondary)]">Chairman Section</h4>
-                                    <AdminInput label="Section Title" name="pages.team.chairmanTitle" value={localData.pages.team.chairmanTitle} onChange={e => handleNestedChange(e.target.name, e.target.value)} />
-                                    <div className="p-4 border border-gray-600 rounded-md mt-2">
-                                        <ToggleSwitch label="Show Chairman" enabled={localData.pages.team.chairman.enabled} onChange={val => handleNestedChange('pages.team.chairman.enabled', val)} />
+                                    <AdminTextarea label="Page Subtitle" name="pages.team.pageBanner.subtitle" value={localData.pages.team.pageBanner.subtitle} onChange={e => handleNestedChange(e.target.name, e.target.value)} className="mt-2" />
+
+                                    <h4 className="font-bold text-xl mt-6 mb-4 text-[var(--color-secondary)]">Chairman Section</h4>
+                                    <div className="p-4 border border-gray-600 rounded-md">
+                                        <AdminInput label="Section Title" name="pages.team.chairmanTitle" value={localData.pages.team.chairmanTitle} onChange={e => handleNestedChange(e.target.name, e.target.value)} />
+                                        <div className="mt-4">
+                                            <ToggleSwitch label="Show Chairman" enabled={localData.pages.team.chairman.enabled} onChange={val => handleNestedChange('pages.team.chairman.enabled', val)} />
+                                        </div>
                                         <AdminInput label="Name" name="pages.team.chairman.name" value={localData.pages.team.chairman.name} onChange={e => handleNestedChange(e.target.name, e.target.value)} className="mt-2" />
                                         <AdminInput label="Role" name="pages.team.chairman.role" value={localData.pages.team.chairman.role} onChange={e => handleNestedChange(e.target.name, e.target.value)} className="mt-2" />
-                                        <AdminInput label="Title (Optional)" name="pages.team.chairman.title" value={localData.pages.team.chairman.title} onChange={e => handleNestedChange(e.target.name, e.target.value)} className="mt-2" />
                                         <AdminInput label="Image URL" name="pages.team.chairman.imageUrl" value={localData.pages.team.chairman.imageUrl} onChange={e => handleNestedChange(e.target.name, e.target.value)} className="mt-2" />
-                                        <AdminInput label="Phone" name="pages.team.chairman.socials.phone" value={localData.pages.team.chairman.socials?.phone} onChange={e => handleNestedChange('pages.team.chairman.socials.phone', e.target.value)} className="mt-2" />
-                                        <AdminInput label="Email" name="pages.team.chairman.socials.email" value={localData.pages.team.chairman.socials?.email} onChange={e => handleNestedChange('pages.team.chairman.socials.email', e.target.value)} className="mt-2" />
                                     </div>
 
-                                    <h4 className="font-bold text-xl mt-6 mb-2 text-[var(--color-secondary)]">Employees Section</h4>
-                                    <AdminInput label="Section Title" name="pages.team.employeesTitle" value={localData.pages.team.employeesTitle} onChange={e => handleNestedChange(e.target.name, e.target.value)} />
-                                    <AdminTextarea label="Section Subtitle" name="pages.team.employeesSubtitle" value={localData.pages.team.employeesSubtitle} onChange={e => handleNestedChange(e.target.name, e.target.value)} />
+                                    <h4 className="font-bold text-xl mt-6 mb-4 text-[var(--color-secondary)]">Employees Section</h4>
+                                    <AdminInput label="Employees Section Title" name="pages.team.employeesTitle" value={localData.pages.team.employeesTitle} onChange={e => handleNestedChange(e.target.name, e.target.value)} />
                                     
-                                    {localData.pages.team.talentedEmployees.map((member, index) => (
-                                        <div key={index} className="mb-4 p-3 border border-gray-600 rounded-md mt-2">
-                                            <div className="flex justify-between items-start mb-2">
-                                                <ToggleSwitch label="Visible" enabled={member.enabled} onChange={val => handleListChange('pages.team.talentedEmployees', index, 'enabled', val)} />
-                                                <button onClick={() => deleteListItem('pages.team.talentedEmployees', index)} className="bg-red-600 text-white px-3 py-1 rounded text-xs">Delete</button>
+                                    {localData.pages.team.talentedEmployees.map((emp, index) => (
+                                        <div key={index} className="mt-4 p-4 border border-gray-600 rounded-md bg-[var(--color-dark-bg)]">
+                                            <div className="flex justify-between items-center mb-2">
+                                                <h5 className="font-bold text-white">{emp.name || `Employee ${index + 1}`}</h5>
+                                                <div className="flex items-center gap-2">
+                                                    <ToggleSwitch label="Visible" enabled={emp.enabled} onChange={val => handleListChange('pages.team.talentedEmployees', index, 'enabled', val)} />
+                                                    <button onClick={() => deleteListItem('pages.team.talentedEmployees', index)} className="bg-red-600 text-white px-3 py-1 rounded text-xs">Delete</button>
+                                                </div>
                                             </div>
-                                            <AdminInput label="Name" name="name" value={member.name} onChange={e => handleListChange('pages.team.talentedEmployees', index, e.target.name, e.target.value)} />
-                                            <AdminInput label="Role" name="role" value={member.role} onChange={e => handleListChange('pages.team.talentedEmployees', index, e.target.name, e.target.value)} className="mt-2" />
-                                            <AdminInput label="Image URL" name="imageUrl" value={member.imageUrl} onChange={e => handleListChange('pages.team.talentedEmployees', index, e.target.name, e.target.value)} className="mt-2" />
-                                            <AdminInput label="Phone" name="phone" value={member.socials?.phone} onChange={e => handleListChange('pages.team.talentedEmployees', index, 'socials.phone', e.target.value)} className="mt-2" />
-                                            <AdminInput label="Email" name="email" value={member.socials?.email} onChange={e => handleListChange('pages.team.talentedEmployees', index, 'socials.email', e.target.value)} className="mt-2" />
+                                            <AdminInput label="Name" name="name" value={emp.name} onChange={e => handleListChange('pages.team.talentedEmployees', index, e.target.name, e.target.value)} />
+                                            <AdminInput label="Role" name="role" value={emp.role} onChange={e => handleListChange('pages.team.talentedEmployees', index, e.target.name, e.target.value)} className="mt-2" />
+                                            <AdminInput label="Image URL" name="imageUrl" value={emp.imageUrl} onChange={e => handleListChange('pages.team.talentedEmployees', index, e.target.name, e.target.value)} className="mt-2" />
                                         </div>
                                     ))}
-                                    <button onClick={() => addListItem('pages.team.talentedEmployees', { name: 'New Member', role: 'Role', imageUrl: '', enabled: true, socials: {} })} className="mt-2 bg-green-600 text-white font-bold py-2 px-4 rounded">Add Employee</button>
+                                    <button onClick={() => addListItem('pages.team.talentedEmployees', { name: 'New Employee', role: 'Staff', imageUrl: '', enabled: true })} className="mt-4 bg-green-600 text-white font-bold py-2 px-4 rounded">Add Employee</button>
                                 </Section>
                             </div>
 
                             <div id="section-contact">
-                                <Section title="Contact Page">
+                                <Section title="Contact Page Management">
                                     <PageIdDisplay id="#contact" label="Page ID" />
                                     <AdminInput label="Page Title" name="pages.contact.pageBanner.title" value={localData.pages.contact.pageBanner.title} onChange={e => handleNestedChange(e.target.name, e.target.value)} />
-                                    <AdminTextarea label="Page Subtitle" name="pages.contact.pageBanner.subtitle" value={localData.pages.contact.pageBanner.subtitle} onChange={e => handleNestedChange(e.target.name, e.target.value)} />
-                                    
-                                    <h4 className="font-bold text-xl mt-6 mb-2 text-[var(--color-secondary)]">Info Section</h4>
-                                    <AdminInput label="Info Title" name="pages.contact.infoTitle" value={localData.pages.contact.infoTitle} onChange={e => handleNestedChange(e.target.name, e.target.value)} />
-                                    <AdminTextarea label="Info Subtitle" name="pages.contact.infoSubtitle" value={localData.pages.contact.infoSubtitle} onChange={e => handleNestedChange(e.target.name, e.target.value)} />
-                                    
-                                    <h4 className="font-bold text-xl mt-6 mb-2 text-[var(--color-secondary)]">Contact Details</h4>
+                                    <AdminTextarea label="Page Subtitle" name="pages.contact.pageBanner.subtitle" value={localData.pages.contact.pageBanner.subtitle} onChange={e => handleNestedChange(e.target.name, e.target.value)} className="mt-2" />
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                                        <div>
+                                            <h4 className="font-bold text-lg text-white mb-2">Info Section</h4>
+                                            <AdminInput label="Title" name="pages.contact.infoTitle" value={localData.pages.contact.infoTitle} onChange={e => handleNestedChange(e.target.name, e.target.value)} />
+                                            <AdminTextarea label="Subtitle" name="pages.contact.infoSubtitle" value={localData.pages.contact.infoSubtitle} onChange={e => handleNestedChange(e.target.name, e.target.value)} className="mt-2" />
+                                        </div>
+                                        <div>
+                                            <h4 className="font-bold text-lg text-white mb-2">Form Section</h4>
+                                            <AdminInput label="Form Title" name="pages.contact.formTitle" value={localData.pages.contact.formTitle} onChange={e => handleNestedChange(e.target.name, e.target.value)} />
+                                            <AdminInput label="Button Text" name="pages.contact.formButtonText" value={localData.pages.contact.formButtonText} onChange={e => handleNestedChange(e.target.name, e.target.value)} className="mt-2" />
+                                        </div>
+                                    </div>
+
+                                    <h4 className="font-bold text-xl mt-6 mb-4 text-[var(--color-secondary)]">Contact Details</h4>
                                     {localData.pages.contact.contactInfo.map((info, index) => (
-                                        <div key={index} className="mb-4 p-3 border border-gray-600 rounded-md mt-2">
-                                            <AdminInput label="Label" name="label" value={info.label} onChange={e => handleListChange('pages.contact.contactInfo', index, e.target.name, e.target.value)} />
-                                            <AdminInput label="Value" name="value" value={info.value} onChange={e => handleListChange('pages.contact.contactInfo', index, e.target.name, e.target.value)} className="mt-2" />
-                                            <AdminTextarea label="Icon (SVG)" name="icon" value={info.icon} onChange={e => handleListChange('pages.contact.contactInfo', index, e.target.name, e.target.value)} className="mt-2" />
+                                        <div key={index} className="mb-4 p-3 border border-gray-600 rounded-md">
+                                            <div className="flex justify-between items-center mb-2">
+                                                <span className="font-bold text-gray-300">{info.label}</span>
+                                                <ToggleSwitch label="Visible" enabled={info.enabled} onChange={val => handleListChange('pages.contact.contactInfo', index, 'enabled', val)} />
+                                            </div>
+                                            <AdminInput label="Value" name="value" value={info.value} onChange={e => handleListChange('pages.contact.contactInfo', index, e.target.name, e.target.value)} />
                                         </div>
                                     ))}
 
-                                    <h4 className="font-bold text-xl mt-6 mb-2 text-[var(--color-secondary)]">Form Section</h4>
-                                    <AdminInput label="Form Title" name="pages.contact.formTitle" value={localData.pages.contact.formTitle} onChange={e => handleNestedChange(e.target.name, e.target.value)} />
-                                    <AdminInput label="Button Text" name="pages.contact.formButtonText" value={localData.pages.contact.formButtonText} onChange={e => handleNestedChange(e.target.name, e.target.value)} />
-                                    <AdminInput label="Google Apps Script URL" name="pages.contact.googleAppsScriptUrl" value={localData.pages.contact.googleAppsScriptUrl} onChange={e => handleNestedChange(e.target.name, e.target.value)} className="mt-4" placeholder="https://script.google.com/..." />
-                                    
-                                    <h4 className="font-bold text-xl mt-6 mb-2 text-[var(--color-secondary)]">Map & Accreditations</h4>
-                                    <AdminInput label="Map Image URL" name="pages.contact.mapUrl" value={localData.pages.contact.mapUrl} onChange={e => handleNestedChange(e.target.name, e.target.value)} />
-                                    <AdminInput label="Accreditations Title" name="pages.contact.accreditationsTitle" value={localData.pages.contact.accreditationsTitle} onChange={e => handleNestedChange(e.target.name, e.target.value)} className="mt-4" />
-                                    <AdminInput label="Accreditations Image URL" name="pages.contact.accreditationsImage" value={localData.pages.contact.accreditationsImage} onChange={e => handleNestedChange(e.target.name, e.target.value)} className="mt-2" />
-                                </Section>
-                            </div>
-
-                            {/* --- NEW: Application Tracker Management --- */}
-                            <div id="section-apps">
-                                <Section title="Application Tracker Management">
-                                    <p className="text-[var(--color-muted-text)] mb-6">Manage client applications for the "Check Status" feature. Add passport numbers and update processing steps.</p>
-                                    
-                                    <div className="space-y-6">
-                                        {localData.applications?.map((app, appIndex) => (
-                                            <div key={app.id} className="p-6 bg-[var(--color-dark-bg)] border border-gray-600 rounded-lg">
-                                                <div className="flex justify-between items-start mb-4 border-b border-gray-700 pb-2">
-                                                    <div>
-                                                        <h4 className="text-xl font-bold text-white">{app.passportNumber}</h4>
-                                                        <span className="text-sm text-[var(--color-secondary)] uppercase">{app.serviceType}</span>
-                                                    </div>
-                                                    <button 
-                                                        onClick={() => deleteListItem('applications', appIndex)} 
-                                                        className="bg-red-600 text-white px-3 py-1 rounded text-sm"
-                                                    >
-                                                        Delete Application
-                                                    </button>
-                                                </div>
-
-                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                                                    <AdminInput 
-                                                        label="Passport Number" 
-                                                        name="passportNumber" 
-                                                        value={app.passportNumber} 
-                                                        onChange={e => handleListChange('applications', appIndex, 'passportNumber', e.target.value.toUpperCase())} 
-                                                    />
-                                                    <AdminInput 
-                                                        label="Service Type" 
-                                                        name="serviceType" 
-                                                        value={app.serviceType} 
-                                                        onChange={e => handleListChange('applications', appIndex, 'serviceType', e.target.value)} 
-                                                    />
-                                                </div>
-
-                                                <h5 className="font-bold text-lg text-[var(--color-light-text)] mb-2">Tracking Steps</h5>
-                                                <div className="space-y-3 pl-4 border-l-2 border-gray-700">
-                                                    {app.steps.map((step, stepIndex) => (
-                                                        <div key={stepIndex} className="bg-[var(--color-light-bg)] p-3 rounded border border-gray-600">
-                                                            <div className="flex justify-between items-center mb-2">
-                                                                <span className="text-xs font-bold text-gray-400 uppercase">Step {stepIndex + 1}</span>
-                                                                <button 
-                                                                    onClick={() => deleteListItem(`applications.${appIndex}.steps`, stepIndex)} 
-                                                                    className="text-red-400 hover:text-red-300 text-xs underline"
-                                                                >
-                                                                    Remove
-                                                                </button>
-                                                            </div>
-                                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-2">
-                                                                <AdminInput 
-                                                                    label="Label" 
-                                                                    name="label" 
-                                                                    value={step.label} 
-                                                                    onChange={e => handleListChange(`applications.${appIndex}.steps`, stepIndex, 'label', e.target.value)} 
-                                                                />
-                                                                <AdminInput 
-                                                                    label="Date (Optional)" 
-                                                                    name="date" 
-                                                                    value={step.date} 
-                                                                    onChange={e => handleListChange(`applications.${appIndex}.steps`, stepIndex, 'date', e.target.value)} 
-                                                                />
-                                                            </div>
-                                                            <div className="flex gap-6 mt-2">
-                                                                <ToggleSwitch 
-                                                                    label="Completed" 
-                                                                    enabled={step.completed} 
-                                                                    onChange={(val) => handleListChange(`applications.${appIndex}.steps`, stepIndex, 'completed', val)} 
-                                                                />
-                                                                <ToggleSwitch 
-                                                                    label="Current Stage" 
-                                                                    enabled={step.current} 
-                                                                    onChange={(val) => handleListChange(`applications.${appIndex}.steps`, stepIndex, 'current', val)} 
-                                                                />
-                                                            </div>
-                                                        </div>
-                                                    ))}
-                                                    <button 
-                                                        onClick={() => addListItem(`applications.${appIndex}.steps`, { label: 'New Step', completed: false, current: false, date: '' })} 
-                                                        className="text-sm bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
-                                                    >
-                                                        + Add Step
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        ))}
-
-                                        <button 
-                                            onClick={() => addListItem('applications', { 
-                                                id: Date.now().toString(), 
-                                                passportNumber: '', 
-                                                serviceType: 'Umrah Visa', 
-                                                steps: [
-                                                    { label: 'Application Received', completed: true, current: false, date: new Date().toLocaleDateString() },
-                                                    { label: 'Processing', completed: false, current: true, date: '' },
-                                                    { label: 'Completed', completed: false, current: false, date: '' }
-                                                ] 
-                                            })} 
-                                            className="w-full py-3 border-2 border-dashed border-gray-500 text-gray-400 rounded-lg hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] transition-colors font-bold"
-                                        >
-                                            + Create New Application Tracker
-                                        </button>
+                                    <div className="mt-6">
+                                        <AdminInput label="Map Image URL" name="pages.contact.mapUrl" value={localData.pages.contact.mapUrl} onChange={e => handleNestedChange(e.target.name, e.target.value)} />
+                                        <AdminInput label="Google Apps Script URL (for Contact Form)" name="pages.contact.googleAppsScriptUrl" value={localData.pages.contact.googleAppsScriptUrl} onChange={e => handleNestedChange(e.target.name, e.target.value)} className="mt-2" />
                                     </div>
                                 </Section>
                             </div>
+
+                            <div id="section-apps">
+                                <Section title="Application Tracker Management">
+                                    <p className="text-[var(--color-muted-text)] mb-6">Manage visa and ticket application statuses here. Users can track these using their passport number.</p>
+                                    
+                                    {localData.applications?.map((app, index) => (
+                                        <div key={app.id || index} className="mb-6 p-4 border border-gray-600 rounded-md bg-[var(--color-dark-bg)]">
+                                            <div className="flex justify-between items-center mb-4 border-b border-gray-700 pb-2">
+                                                <h4 className="font-bold text-lg text-white">Application #{index + 1}</h4>
+                                                <button onClick={() => deleteListItem('applications', index)} className="bg-red-600 text-white px-3 py-1 rounded text-sm">Delete</button>
+                                            </div>
+                                            
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                                <AdminInput label="Passport Number" name="passportNumber" value={app.passportNumber} onChange={e => handleListChange('applications', index, e.target.name, e.target.value)} />
+                                                <AdminInput label="Service Type (e.g. Umrah Visa)" name="serviceType" value={app.serviceType} onChange={e => handleListChange('applications', index, e.target.name, e.target.value)} />
+                                            </div>
+
+                                            <h5 className="font-semibold text-sm text-gray-400 mb-2 uppercase">Tracking Steps</h5>
+                                            {app.steps.map((step, stepIndex) => (
+                                                <div key={stepIndex} className="grid grid-cols-1 md:grid-cols-4 gap-2 mb-2 items-end p-2 bg-black/20 rounded">
+                                                    <div className="md:col-span-2">
+                                                        <label className="text-xs text-gray-500">Label</label>
+                                                        <input 
+                                                            type="text" 
+                                                            value={step.label} 
+                                                            onChange={e => handleListChange(`applications.${index}.steps`, stepIndex, 'label', e.target.value)}
+                                                            className="w-full bg-gray-800 border border-gray-600 rounded px-2 py-1 text-sm text-white"
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <label className="text-xs text-gray-500">Date (Optional)</label>
+                                                        <input 
+                                                            type="text" 
+                                                            value={step.date || ''} 
+                                                            onChange={e => handleListChange(`applications.${index}.steps`, stepIndex, 'date', e.target.value)}
+                                                            className="w-full bg-gray-800 border border-gray-600 rounded px-2 py-1 text-sm text-white"
+                                                            placeholder="DD/MM/YYYY"
+                                                        />
+                                                    </div>
+                                                    <div className="flex flex-col gap-1">
+                                                        <ToggleSwitch label="Completed" enabled={step.completed} onChange={val => handleListChange(`applications.${index}.steps`, stepIndex, 'completed', val)} />
+                                                        <ToggleSwitch label="Current" enabled={step.current} onChange={val => handleListChange(`applications.${index}.steps`, stepIndex, 'current', val)} />
+                                                    </div>
+                                                </div>
+                                            ))}
+                                            <div className="flex gap-2 mt-2">
+                                                <button onClick={() => addListItem(`applications.${index}.steps`, { label: 'New Step', completed: false, current: false })} className="text-xs bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700">Add Step</button>
+                                                <button onClick={() => {
+                                                    const newSteps = [...app.steps];
+                                                    newSteps.pop();
+                                                    handleListChange('applications', index, 'steps', newSteps);
+                                                }} className="text-xs bg-gray-600 text-white px-2 py-1 rounded hover:bg-gray-700">Remove Last Step</button>
+                                            </div>
+                                        </div>
+                                    ))}
+
+                                    <button 
+                                        onClick={() => addListItem('applications', { 
+                                            id: Date.now().toString(), 
+                                            passportNumber: '', 
+                                            serviceType: 'Umrah Visa', 
+                                            steps: [
+                                                { label: 'Application Received', completed: true, current: false, date: new Date().toLocaleDateString() },
+                                                { label: 'Processing', completed: false, current: true },
+                                                { label: 'Completed', completed: false, current: false }
+                                            ] 
+                                        })} 
+                                        className="mt-4 bg-green-600 text-white font-bold py-2 px-4 rounded hover:bg-green-700"
+                                    >
+                                        Add New Application
+                                    </button>
+                                </Section>
+                            </div>
+
                         </div>
                     </div>
                 )}
 
-                {/* Save Button */}
-                <div className="fixed bottom-6 right-6 z-[60] md:static md:mt-12 md:flex md:justify-end">
-                    <div className="flex gap-4">
-                        <button
-                            onClick={handleReset}
-                            className="bg-red-600 text-white font-bold py-3 px-6 rounded-[var(--ui-button-radius)] shadow-lg hover:bg-red-700 transition-all duration-300"
-                        >
-                            Reset to Default
-                        </button>
-                        <button
-                            onClick={saveChanges}
-                            disabled={isSaving}
-                            className="bg-[var(--color-primary)] text-white font-bold py-3 px-8 rounded-[var(--ui-button-radius)] shadow-lg hover:bg-[var(--color-primary-dark)] transition-all duration-300 disabled:bg-gray-500"
-                        >
-                            {isSaving ? 'Saving...' : 'Save All Changes'}
-                        </button>
-                    </div>
+                {/* --- Bottom Actions --- */}
+                <div className="fixed bottom-0 left-0 right-0 p-4 bg-[var(--color-dark-bg)] border-t border-gray-700 flex justify-between items-center z-50 shadow-2xl">
+                    <button 
+                        onClick={handleReset}
+                        className="text-red-500 hover:text-red-400 font-bold px-4 py-2 border border-red-500 rounded-md hover:bg-red-900/20 transition-colors"
+                    >
+                        Reset All Data
+                    </button>
+                    <button
+                        onClick={saveChanges}
+                        disabled={isSaving}
+                        className="bg-green-600 text-white font-bold py-3 px-8 rounded-md shadow-lg hover:bg-green-700 transition-all transform hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        {isSaving ? 'Saving...' : 'Save All Changes'}
+                    </button>
                 </div>
+                <div className="h-20"></div> {/* Spacer for fixed bottom bar */}
             </div>
         </div>
     );

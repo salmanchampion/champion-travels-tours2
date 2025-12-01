@@ -169,6 +169,7 @@ const Footer: React.FC = () => {
           <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-6">
               <a href="#privacy-policy" className="hover:text-[var(--color-primary)] transition-colors">{t("Privacy Policy")}</a>
               <a href="#contact" className="hover:text-[var(--color-primary)] transition-colors">{t("Terms of Service")}</a>
+              <a href="#sitemap" className="hover:text-[var(--color-primary)] transition-colors">Sitemap</a>
           </div>
         </div>
       </div>

@@ -36,6 +36,8 @@ import PrayerTimesWidget from './components/PrayerTimesWidget';
 import ExclusiveHajjPage from './pages/ExclusiveHajjPage';
 import ExclusiveUmrahPage from './pages/ExclusiveUmrahPage';
 import ZiyaratPage from './pages/ZiyaratPage';
+import SitemapPage from './pages/SitemapPage'; // New Dynamic Sitemap Page
+import CalculatorPage from './pages/CalculatorPage'; // New Calculator Page
 import ScrollToTop from './components/ScrollToTop';
 import MarketingPopup from './components/MarketingPopup';
 import Preloader from './components/Preloader';
@@ -48,6 +50,7 @@ import CompareModal from './components/CompareModal';
 import ChecklistModal from './components/ChecklistModal';
 import AIChatbot from './components/AIChatbot';
 import ThemeSettingsModal from './components/ThemeSettingsModal';
+import SearchModal from './components/SearchModal';
 
 // --- Announcement Bar Component ---
 const AnnouncementBar: React.FC = () => {
@@ -125,6 +128,46 @@ const AnalyticsInjector: React.FC = () => {
 
     return null;
 }
+
+// Monetization Injector Component
+const MonetizationInjector: React.FC = () => {
+    const { appData } = useContext(DataContext);
+    const monetization = appData.globalConfig?.monetization;
+
+    useEffect(() => {
+        if (!monetization || !monetization.enabled) return;
+
+        // Inject Head Script (e.g. AdSense Auto Ads)
+        if (monetization.scripts.headScript) {
+            const range = document.createRange();
+            range.selectNode(document.head);
+            const fragment = range.createContextualFragment(monetization.scripts.headScript);
+            // Mark for cleanup
+            Array.from(fragment.childNodes).forEach(node => {
+                if(node instanceof HTMLElement) node.classList.add('monetization-script');
+            });
+            document.head.appendChild(fragment);
+        }
+
+        // Inject Body Script (e.g. Popunder or specific network scripts)
+        if (monetization.scripts.bodyScript) {
+            const range = document.createRange();
+            range.selectNode(document.body);
+            const fragment = range.createContextualFragment(monetization.scripts.bodyScript);
+             // Mark for cleanup
+             Array.from(fragment.childNodes).forEach(node => {
+                if(node instanceof HTMLElement) node.classList.add('monetization-script');
+            });
+            document.body.appendChild(fragment);
+        }
+
+        return () => {
+            document.querySelectorAll('.monetization-script').forEach(el => el.remove());
+        }
+    }, [monetization]);
+
+    return null;
+};
 
 // Theme Injector Component
 const ThemeInjector: React.FC = () => {
@@ -449,6 +492,8 @@ const AppContent: React.FC = () => {
         case '#contact':
         case '#book-now': return pages.contact.seo;
         case '#checklist': return { title: 'Preparation Checklist | Champion Travels', description: 'Interactive Hajj and Umrah preparation checklist.', keywords: 'checklist, packing list, preparation' };
+        case '#sitemap': return { title: 'Sitemap - Champion Travels', description: 'Complete list of pages, packages, and services on Champion Travels website.', keywords: 'sitemap, site map, champion travels pages' };
+        case '#calculator': return { title: 'Umrah Cost Estimator | Champion Travels', description: 'Calculate the approximate cost of your Umrah journey with our smart estimator.', keywords: 'umrah cost, umrah calculator, umrah budget' };
         case '#home':
         default:
           return pages.home.seo;
@@ -544,6 +589,8 @@ const AppContent: React.FC = () => {
       case '#contact': return <ContactPage defaultSubject={contactSubject} />;
       case '#login': return <LoginPage />;
       case '#admin': return <AdminPage />;
+      case '#sitemap': return <SitemapPage />;
+      case '#calculator': return <CalculatorPage />;
       case '#checklist': return <HomePage />; // Render home behind the modal when checklist is active via hash
       case '#home':
       default: return <HomePage />;
@@ -576,6 +623,7 @@ const AppContent: React.FC = () => {
         <ScrollProgressBar /> {/* New Scroll Progress Bar */}
         <ThemeInjector />
         <AnalyticsInjector /> {/* New Analytics Injector */}
+        <MonetizationInjector /> {/* New Ad Script Injector */}
         <SchemaMarkup /> {/* New SEO Schema */}
         <AnnouncementBar />
         <Header activePage={page} />
@@ -593,6 +641,7 @@ const AppContent: React.FC = () => {
         <CompareModal /> {/* New Compare Modal */}
         <ChecklistModal /> {/* New Checklist Modal */}
         <ThemeSettingsModal isOpen={isThemeSettingsOpen} onClose={() => setThemeSettingsOpen(false)} />
+        <SearchModal /> {/* Global Search Modal */}
 
         <AIChatbot /> {/* AI Chat Assistant */}
         <FloatingActionButton />

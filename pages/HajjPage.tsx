@@ -5,6 +5,7 @@ import PageBanner from '../components/PageBanner';
 import { HajjPackage } from '../data';
 import Modal from '../components/Modal';
 import { useToast } from '../contexts/ToastContext';
+import { printPackage } from '../utils/printManager';
 
 const DetailRow: React.FC<{ label: string; value: string }> = ({ label, value }) => (
     <div className="py-2 flex justify-between border-b border-gray-700 last:border-b-0">
@@ -158,13 +159,22 @@ const HajjPage: React.FC = () => {
                     <div className="p-2 text-[var(--color-light-text)]">
                         <div className="relative">
                             <img src={selectedPackage.image} alt={selectedPackage.name} className="w-full h-56 object-cover rounded-lg mb-4" />
-                            <button 
-                                onClick={() => handleShare(selectedPackage)}
-                                className="absolute top-3 right-3 bg-black/60 p-2 rounded-full hover:bg-[var(--color-primary)] text-white transition-colors"
-                                title="Share Package"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>
-                            </button>
+                            <div className="absolute top-3 right-3 flex gap-2">
+                                <button 
+                                    onClick={() => printPackage(selectedPackage, appData.site.logoUrl, appData.pages.contact.contactInfo)}
+                                    className="bg-black/60 p-2 rounded-full hover:bg-[var(--color-primary)] text-white transition-colors"
+                                    title="Download/Print Flyer"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                                </button>
+                                <button 
+                                    onClick={() => handleShare(selectedPackage)}
+                                    className="bg-black/60 p-2 rounded-full hover:bg-[var(--color-primary)] text-white transition-colors"
+                                    title="Share Package"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>
+                                </button>
+                            </div>
                         </div>
                         <h2 className="text-3xl font-bold text-white font-display mb-2">{selectedPackage.name}</h2>
                         <div className="flex justify-between items-center text-lg mb-4 border-y border-gray-700 py-2">

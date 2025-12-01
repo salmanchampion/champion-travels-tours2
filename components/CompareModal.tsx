@@ -2,9 +2,10 @@
 import React, { useContext } from 'react';
 import Modal from './Modal';
 import { DataContext } from '../contexts/DataContext';
+import { printComparison } from '../utils/printManager';
 
 const CompareModal: React.FC = () => {
-    const { isCompareModalOpen, setCompareModalOpen, compareList, removeFromCompare } = useContext(DataContext);
+    const { isCompareModalOpen, setCompareModalOpen, compareList, removeFromCompare, appData } = useContext(DataContext);
 
     // Helper to get property value safe for different package types
     const getVal = (pkg: any, keys: string[]) => {
@@ -26,17 +27,32 @@ const CompareModal: React.FC = () => {
         { label: 'Special Services', keys: ['special', 'features'] }, // Logic handled in render
     ];
 
+    const handlePrint = () => {
+        printComparison(compareList, appData.site.logoUrl);
+    }
+
     return (
         <Modal isOpen={isCompareModalOpen} onClose={() => setCompareModalOpen(false)}>
             <div className="w-full max-w-5xl mx-auto">
                 <div className="flex justify-between items-center mb-6 border-b border-gray-700 pb-4">
                     <h2 className="text-2xl font-display font-bold text-[var(--color-primary)]">Compare Packages</h2>
-                    <button 
-                        onClick={() => setCompareModalOpen(false)}
-                        className="text-[var(--color-muted-text)] hover:text-red-400 font-bold"
-                    >
-                        Close
-                    </button>
+                    <div className="flex items-center gap-4">
+                        {compareList.length > 0 && (
+                            <button 
+                                onClick={handlePrint}
+                                className="flex items-center gap-2 text-sm bg-gray-700 hover:bg-[var(--color-primary)] hover:text-white px-3 py-1 rounded transition-colors text-gray-300"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
+                                Print
+                            </button>
+                        )}
+                        <button 
+                            onClick={() => setCompareModalOpen(false)}
+                            className="text-[var(--color-muted-text)] hover:text-red-400 font-bold"
+                        >
+                            Close
+                        </button>
+                    </div>
                 </div>
 
                 {compareList.length === 0 ? (
