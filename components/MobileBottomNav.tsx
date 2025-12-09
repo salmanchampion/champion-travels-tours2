@@ -1,13 +1,33 @@
 
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { DataContext } from '../contexts/DataContext';
 
 const MobileBottomNav: React.FC = () => {
     const { appData, setPrayerTimesOpen, isPrayerTimesOpen, setThemeSettingsOpen } = useContext(DataContext);
     const { floatingButton } = appData;
+    const [isVisible, setIsVisible] = useState(true);
 
     const cleanPhone = floatingButton?.phoneNumber?.replace(/[^\d+]/g, '') || '';
     const whatsappLink = `https://wa.me/${cleanPhone.replace('+', '')}`;
+
+    useEffect(() => {
+        const checkHash = () => {
+            const hash = window.location.hash;
+            // Hide nav on Admin and Login pages to prevent overlap with Save buttons
+            if (hash === '#admin' || hash === '#login') {
+                setIsVisible(false);
+            } else {
+                setIsVisible(true);
+            }
+        };
+
+        window.addEventListener('hashchange', checkHash);
+        checkHash(); // Initial check
+
+        return () => window.removeEventListener('hashchange', checkHash);
+    }, []);
+
+    if (!isVisible) return null;
 
     return (
         <div className="md:hidden fixed bottom-0 left-0 right-0 bg-[#0B0F19]/95 backdrop-blur-lg border-t border-gray-800 z-[90] pb-safe">
