@@ -153,7 +153,7 @@ I am interested in booking this. Please confirm final rates.`;
                                         className={`p-4 rounded-xl border-2 transition-all text-center ${hotelType === 'economy' ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/10 text-white' : 'border-gray-700 bg-[var(--color-dark-bg)] text-gray-400 hover:border-gray-500'}`}
                                     >
                                         <div className="font-bold mb-1">Economy</div>
-                                        <div className="text-[10px] opacity-70">Distance: >1km</div>
+                                        <div className="text-[10px] opacity-70">Distance: &gt;1km</div>
                                     </button>
                                     <button 
                                         onClick={() => setHotelType('3star')}
