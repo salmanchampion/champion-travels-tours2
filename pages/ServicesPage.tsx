@@ -113,7 +113,7 @@ const ServicesPage: React.FC = () => {
             subtitle="Echoes of History"
             description="Walk in the footsteps of the Prophet (PBUH) and his companions. Our guided Ziyarat tours take you to the most significant historical sites in Makkah and Madinah, providing deep historical context and spiritual insight."
             features={['Guided by Historians/Scholars', 'Exclusive Access to Sites', 'Comfortable AC Transport', 'Educational Sessions']}
-            image="https://i.postimg.cc/RZ8BGSpf/aj.webp"
+            image="https://i.postimg.cc/K8cRp4r0/jeyarah.png"
             align="right"
             link="#ziyarat-tours"
             buttonText="Explore Ziyarat"
@@ -124,7 +124,7 @@ const ServicesPage: React.FC = () => {
             subtitle="Hassle-Free Documentation"
             description="Navigating complex immigration rules can be daunting. Our expert visa consultants handle the intricacies of visa processing for major destinations worldwide, ensuring a high success rate and peace of mind for tourists, students, and business travelers."
             features={['Tourist & Business Visas', 'Student Visa Assistance', 'Medical Visa Support', 'Document Verification']}
-            image="https://i.postimg.cc/x1gn4TDd/ad.jpg"
+            image="hhttps://i.postimg.cc/j2qpYVgt/visa.jpg"
             align="left"
             link="#visa-processing"
           />
@@ -134,7 +134,7 @@ const ServicesPage: React.FC = () => {
             subtitle="Connect to the World"
             description="As an IATA accredited agency, we offer competitive fares on all major international airlines. Whether you need a last-minute business class seat or a budget-friendly family vacation ticket, our global distribution system ensures you get the best deal."
             features={['Domestic & International Flights', 'Group Booking Discounts', '24/7 Flight Support', 'Date Change & Refund Assistance']}
-            image="https://i.postimg.cc/Y2z4HFFK/ah.jpg"
+            image="https://i.postimg.cc/8kFcxq6b/air-tekate.png"
             align="right"
             link="#air-ticketing"
           />
@@ -144,7 +144,7 @@ const ServicesPage: React.FC = () => {
             subtitle="Comfort Beyond Borders"
             description="From 5-star suites overlooking the Kaaba to serene resorts in Europe, we have partnerships with top-tier hotels globally. We also curate exclusive holiday tour packages for families and honeymoons, blending adventure with relaxation."
             features={['Direct Hotel Booking System', 'Kaaba/Haram View Rooms', 'Custom Holiday Packages', 'Airport Transfers']}
-            image="https://i.postimg.cc/50rQG1f5/umrah-2.jpg"
+            image="https://i.postimg.cc/pV9r3gF3/HOTEL.png"
             align="left"
             link="#contact?subject=Hotel/Tour Service Inquiry"
           />

@@ -351,7 +351,7 @@ const AppContent: React.FC = () => {
   const { appData, isLoading: isDataLoading, setChecklistOpen, isThemeSettingsOpen, setThemeSettingsOpen } = useContext(DataContext);
   const [showPreloader, setShowPreloader] = useState(true); // Preloader State
   const keySequenceRef = useRef('');
-  const secretCode = '045';
+  const secretCode = '*045#'; // Updated Secret Code
 
   // --- AOS Initialization & Robust Handling ---
   useEffect(() => {
@@ -409,6 +409,9 @@ const AppContent: React.FC = () => {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+        // Ignore modifier keys to avoid polluting the sequence when typing characters like * or #
+        if (['Shift', 'Control', 'Alt', 'Meta'].includes(e.key)) return;
+
         keySequenceRef.current += e.key;
 
         if (keySequenceRef.current.length > secretCode.length) {

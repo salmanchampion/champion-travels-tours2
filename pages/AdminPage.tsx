@@ -2809,6 +2809,14 @@ const AdminPage: React.FC = () => {
                                         <AdminInput label="Name" name="pages.team.chairman.name" value={localData.pages.team.chairman.name} onChange={e => handleNestedChange(e.target.name, e.target.value)} className="mt-2" />
                                         <AdminInput label="Role" name="pages.team.chairman.role" value={localData.pages.team.chairman.role} onChange={e => handleNestedChange(e.target.name, e.target.value)} className="mt-2" />
                                         <AdminInput label="Image URL" name="pages.team.chairman.imageUrl" value={localData.pages.team.chairman.imageUrl} onChange={e => handleNestedChange(e.target.name, e.target.value)} className="mt-2" />
+                                        
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 p-3 bg-[var(--color-dark-bg)] rounded border border-gray-700">
+                                            <h5 className="col-span-full font-bold text-gray-400 text-sm uppercase">Contact Details</h5>
+                                            <AdminInput label="Phone" name="pages.team.chairman.socials.phone" value={localData.pages.team.chairman.socials?.phone} onChange={e => handleNestedChange(e.target.name, e.target.value)} />
+                                            <AdminInput label="Email" name="pages.team.chairman.socials.email" value={localData.pages.team.chairman.socials?.email} onChange={e => handleNestedChange(e.target.name, e.target.value)} />
+                                            <AdminInput label="WhatsApp (e.g. +880...)" name="pages.team.chairman.socials.whatsapp" value={localData.pages.team.chairman.socials?.whatsapp} onChange={e => handleNestedChange(e.target.name, e.target.value)} />
+                                            <AdminInput label="Facebook Link" name="pages.team.chairman.socials.facebook" value={localData.pages.team.chairman.socials?.facebook} onChange={e => handleNestedChange(e.target.name, e.target.value)} />
+                                        </div>
                                     </div>
 
                                     <h4 className="font-bold text-xl mt-6 mb-4 text-[var(--color-secondary)]">Employees Section</h4>
@@ -2826,6 +2834,14 @@ const AdminPage: React.FC = () => {
                                             <AdminInput label="Name" name="name" value={emp.name} onChange={e => handleListChange('pages.team.talentedEmployees', index, e.target.name, e.target.value)} />
                                             <AdminInput label="Role" name="role" value={emp.role} onChange={e => handleListChange('pages.team.talentedEmployees', index, e.target.name, e.target.value)} className="mt-2" />
                                             <AdminInput label="Image URL" name="imageUrl" value={emp.imageUrl} onChange={e => handleListChange('pages.team.talentedEmployees', index, e.target.name, e.target.value)} className="mt-2" />
+                                            
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 p-3 bg-black/20 rounded border border-gray-700">
+                                                <h5 className="col-span-full font-bold text-gray-400 text-sm uppercase">Contact Details</h5>
+                                                <AdminInput label="Phone" name="socials.phone" value={emp.socials?.phone} onChange={e => handleListChange('pages.team.talentedEmployees', index, 'socials.phone', e.target.value)} />
+                                                <AdminInput label="Email" name="socials.email" value={emp.socials?.email} onChange={e => handleListChange('pages.team.talentedEmployees', index, 'socials.email', e.target.value)} />
+                                                <AdminInput label="WhatsApp" name="socials.whatsapp" value={emp.socials?.whatsapp} onChange={e => handleListChange('pages.team.talentedEmployees', index, 'socials.whatsapp', e.target.value)} />
+                                                <AdminInput label="Facebook" name="socials.facebook" value={emp.socials?.facebook} onChange={e => handleListChange('pages.team.talentedEmployees', index, 'socials.facebook', e.target.value)} />
+                                            </div>
                                         </div>
                                     ))}
                                     <button onClick={() => addListItem('pages.team.talentedEmployees', { name: 'New Employee', role: 'Staff', imageUrl: '', enabled: true })} className="mt-4 bg-green-600 text-white font-bold py-2 px-4 rounded">Add Employee</button>
