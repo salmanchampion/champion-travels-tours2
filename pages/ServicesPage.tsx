@@ -124,7 +124,7 @@ const ServicesPage: React.FC = () => {
             subtitle="Hassle-Free Documentation"
             description="Navigating complex immigration rules can be daunting. Our expert visa consultants handle the intricacies of visa processing for major destinations worldwide, ensuring a high success rate and peace of mind for tourists, students, and business travelers."
             features={['Tourist & Business Visas', 'Student Visa Assistance', 'Medical Visa Support', 'Document Verification']}
-            image="hhttps://i.postimg.cc/j2qpYVgt/visa.jpg"
+            image="https://i.postimg.cc/j2qpYVgt/visa.jpg"
             align="left"
             link="#visa-processing"
           />
