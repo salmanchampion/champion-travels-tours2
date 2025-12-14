@@ -109,7 +109,7 @@ const SitemapManager: React.FC = () => {
                                 Redeploy your website (or run <code>npm run build</code> & deploy).
                             </li>
                             <li className="text-[var(--color-secondary)]">
-                                Finally, go to <strong>Google Search Console</strong> -> Sitemaps -> Submit <code>sitemap.xml</code>.
+                                Finally, go to <strong>Google Search Console</strong> &rarr; Sitemaps &rarr; Submit <code>sitemap.xml</code>.
                             </li>
                         </ol>
                     </div>
