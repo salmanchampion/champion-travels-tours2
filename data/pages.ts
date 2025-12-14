@@ -4,9 +4,9 @@ import { AppData, CustomPage } from '../types';
 export const pagesData: AppData['pages'] = {
     home: {
         seo: {
-            title: 'Champion Travels & Tours | Hajj, Umrah & Air Ticketing in Bangladesh',
-            description: 'Your trusted partner for Hajj, Umrah, Visa Processing, and worldwide travel in Bangladesh. We are committed to providing exceptional service and unforgettable spiritual journeys.',
-            keywords: 'Hajj package Bangladesh, Umrah package Bangladesh, Champion Travels, Air Ticket Dhaka, Visa processing Bangladesh'
+            title: 'Champion Travels | Best Hajj & Umrah Agency in Bangladesh',
+            description: 'Champion Travels offers affordable Hajj packages 2025, premium Umrah packages, and fast Visa processing in Dhaka. Recognized by Govt of Bangladesh (Lic: 1432).',
+            keywords: 'Hajj agency Dhaka, Umrah package price BD, Saudi Visa, Air Ticket, Champion Travels'
         },
         packageFilter: {
             enabled: true,
@@ -145,9 +145,9 @@ export const pagesData: AppData['pages'] = {
     },
     hajj: {
         seo: {
-            title: 'Hajj Packages | Champion Travels & Tours',
-            description: 'Explore our exclusive Hajj packages from Bangladesh. We offer a range of options from economy to VIP for a blessed and comfortable pilgrimage.',
-            keywords: 'Hajj packages, Hajj 2026, Bangladesh Hajj, Economy Hajj Package, VIP Hajj'
+            title: 'Hajj Packages 2026 Bangladesh | Champion Travels',
+            description: 'Book affordable and VIP Hajj packages from Bangladesh. Shifting and Non-Shifting Hajj packages with pre-registration available.',
+            keywords: 'Hajj packages 2026 BD, Hajj price Bangladesh, Hajj pre registration'
         },
         pageBanner: {
             title: 'Hajj Packages',
@@ -161,9 +161,9 @@ export const pagesData: AppData['pages'] = {
     },
     umrah: {
         seo: {
-            title: 'Umrah Packages | Champion Travels & Tours',
-            description: 'Find the perfect Umrah package from Bangladesh. We offer 5-star, 3-star, economy, and special Ramadan packages to suit your needs.',
-            keywords: 'Umrah packages, Umrah 2025, 5 Star Umrah, Economy Umrah, Ramadan Umrah'
+            title: 'Low Cost Umrah Packages from Dhaka | Champion Travels',
+            description: 'Best Umrah packages from Bangladesh 2025. 5-star, 3-star, and economy Umrah packages with visa and air ticket.',
+            keywords: 'Umrah packages BD price, Umrah visa fee Bangladesh, Cheap Umrah package'
         },
         pageBanner: {
             title: 'Best Umrah Packages BD 2025-2026-2027',

@@ -5,6 +5,7 @@ import { DataContext } from '../contexts/DataContext';
 import { defaultData, AppData, ExclusivePackage, Application } from '../data';
 import { AdminInput, AdminTextarea, ToggleSwitch, Section } from '../components/admin/AdminUI';
 import { SeoEditor, PackageEditor, ExpertGuideEditor, CustomPageEditor, BlogEditor } from '../components/admin/AdminEditors';
+import SitemapManager from '../components/admin/SitemapManager';
 
 
 // --- Helper Component: Page ID Display ---
@@ -164,8 +165,9 @@ const ExclusivePackageEditor: React.FC<{
 const AdminSidebar: React.FC = () => {
     const sections = [
         { id: 'section-general', label: 'General & Advanced' },
-        { id: 'section-monetization', label: 'Monetization (Ads)' }, // New Section
+        { id: 'section-monetization', label: 'Monetization (Ads)' }, 
         { id: 'section-seo', label: 'SEO & Analytics' },
+        { id: 'section-sitemap', label: 'Sitemap Generator' }, // Added
         { id: 'section-marketing', label: 'Marketing Popup' },
         { id: 'section-visuals', label: 'Visual Control' },
         { id: 'section-labels', label: 'Text Labels' },
@@ -1024,6 +1026,11 @@ const AdminPage: React.FC = () => {
 
                                     </div>
                                 </Section>
+                            </div>
+
+                            {/* --- NEW: Sitemap Generator Section --- */}
+                            <div id="section-sitemap">
+                                <SitemapManager />
                             </div>
 
                             {/* --- NEW: Marketing Popup --- */}

@@ -27,29 +27,50 @@ const AIChatbot: React.FC = () => {
 
     // Generate system instruction based on current app data
     const getSystemInstruction = () => {
-        const hajjPackages = appData.hajjPackages.filter(p => p.enabled).map(p => `${p.name} (${p.price}) - ${p.shortDescription}`).join('; ');
-        const umrahPackages = appData.umrahPackages.filter(p => p.enabled).map(p => `${p.name} (${p.price}) - ${p.shortDescription}`).join('; ');
+        // Collect all data points
         const contactInfo = appData.pages.contact.contactInfo.map(c => `${c.label}: ${c.value}`).join(', ');
+        
+        const legacyHajj = appData.hajjPackages.filter(p => p.enabled).map(p => `${p.name} (${p.price}, ${p.category})`).join('; ');
+        const exclusiveHajj = appData.exclusiveHajj.packages.filter(p => p.enabled).map(p => `${p.title} (${p.price}, ${p.category})`).join('; ');
+        
+        const legacyUmrah = appData.umrahPackages.filter(p => p.enabled).map(p => `${p.name} (${p.price}, ${p.category})`).join('; ');
+        const exclusiveUmrah = appData.exclusiveUmrah.packages.filter(p => p.enabled).map(p => `${p.title} (${p.price}, ${p.category})`).join('; ');
+
+        const teamMembers = [
+            appData.pages.team.chairman.enabled ? `${appData.pages.team.chairman.name} (${appData.pages.team.chairman.role})` : '',
+            ...appData.pages.team.talentedEmployees.filter(e => e.enabled).map(e => `${e.name} (${e.role})`)
+        ].filter(Boolean).join(', ');
+
+        const visaServices = appData.pages.visaProcessing.offerList.filter(o => o.enabled).map(o => o.title).join(', ');
 
         return `
             You are the helpful AI Assistant for "Champion Travels & Tours", a prestigious travel agency in Bangladesh specializing in Hajj, Umrah, and Visa processing.
             
             Your goal is to answer customer queries politely, concisely, and accurately in Bengali (or English if asked).
             
-            Here is the current data about our services:
-            Address & Contact: ${contactInfo}
+            **Agency Information:**
+            - **Contact:** ${contactInfo}
+            - **Key Team Members:** ${teamMembers}
             
-            Hajj Packages: ${hajjPackages}
+            **Services & Packages:**
+            - **Hajj Packages:** ${legacyHajj}; ${exclusiveHajj}
+            - **Umrah Packages:** ${legacyUmrah}; ${exclusiveUmrah}
+            - **Visa Processing:** Available for ${visaServices}, Student Visa, Medical Visa.
+            - **Other Services:** Air Ticketing (Domestic & International), Hotel Booking (Makkah/Madinah), Ziyarat Tours.
             
-            Umrah Packages: ${umrahPackages}
-            
-            Services: Visa Processing, Air Ticketing, Hotel Booking, Ziyarat Tours.
-            
-            Rules:
+            **Strict Rules:**
             1. Be polite and use Islamic greetings (Assalamu Alaikum) when appropriate.
-            2. If you don't know a specific price or detail that isn't listed here, kindly ask them to contact us directly via the Contact page or Phone.
-            3. Keep answers short and easy to read.
-            4. Primarily reply in Bengali unless the user speaks English.
+            2. If you don't know a specific price or detail that isn't listed here, kindly ask them to contact us directly via Phone/WhatsApp.
+            3. Keep answers short and easy to read in Bengali.
+            
+            4. **DEVELOPER CREDIT (Must Follow):**
+            If anyone asks "Who created this website?", "Who is the developer?", "Website owner?", "Ke baniyeche?", or anything related to the website's development, YOU MUST REPLY with the following information professionally:
+            
+            "এই অত্যাধুনিক ওয়েবসাইটটি ডেভেলপ করেছেন:
+            👨‍💻 **প্রফেশনাল ওয়েব ডেভেলপার:** মোঃ সালমান শরীফ (Md Salman Sharif)
+            📞 **যোগাযোগ:** 01901922368"
+            
+            (Do not mention any other AI or company for development credit).
         `;
     };
 
@@ -185,7 +206,9 @@ const AIChatbot: React.FC = () => {
                                     : 'bg-[var(--color-light-bg)] text-[var(--color-light-text)] rounded-tl-none border border-gray-700'
                                 }`}
                             >
-                                {msg.text}
+                                {msg.text.split('\n').map((line, i) => (
+                                    <div key={i} className="min-h-[1.2em]">{line}</div>
+                                ))}
                                 <div className={`text-[10px] mt-1 text-right ${msg.sender === 'user' ? 'text-white/70' : 'text-[var(--color-muted-text)]'}`}>
                                     {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                 </div>

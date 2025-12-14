@@ -2,48 +2,140 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://championtravelsbd.netlify.app/</loc>
-    <lastmod>2025-02-24</lastmod>
+    <lastmod>2025-12-14</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
+    <loc>https://championtravelsbd.netlify.app/#services</loc>
+    <lastmod>2025-12-14</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://championtravelsbd.netlify.app/#visa-processing</loc>
+    <lastmod>2025-12-14</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://championtravelsbd.netlify.app/#air-ticketing</loc>
+    <lastmod>2025-12-14</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://championtravelsbd.netlify.app/#ziyarat-tours</loc>
+    <lastmod>2025-12-14</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://championtravelsbd.netlify.app/#contact</loc>
+    <lastmod>2025-12-14</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://championtravelsbd.netlify.app/#blog</loc>
+    <lastmod>2025-12-14</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://championtravelsbd.netlify.app/#team</loc>
+    <lastmod>2025-12-14</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://championtravelsbd.netlify.app/#testimonials</loc>
+    <lastmod>2025-12-14</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://championtravelsbd.netlify.app/#hajj-guide-in-bangla</loc>
+    <lastmod>2025-12-14</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://championtravelsbd.netlify.app/#umrah-guide-in-bangla</loc>
+    <lastmod>2025-12-14</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://championtravelsbd.netlify.app/#hajj</loc>
+    <lastmod>2025-12-14</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://championtravelsbd.netlify.app/#umrah</loc>
+    <lastmod>2025-12-14</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://championtravelsbd.netlify.app/#services</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://championtravelsbd.netlify.app/#visa-processing</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://championtravelsbd.netlify.app/#air-ticketing</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://championtravelsbd.netlify.app/#ziyarat-tours</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://championtravelsbd.netlify.app/#blog</loc>
+    <loc>https://championtravelsbd.netlify.app/#exclusive-hajj</loc>
+    <lastmod>2025-12-14</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://championtravelsbd.netlify.app/#contact</loc>
-    <changefreq>yearly</changefreq>
-    <priority>0.5</priority>
+    <loc>https://championtravelsbd.netlify.app/#exclusive-umrah</loc>
+    <lastmod>2025-12-14</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://championtravelsbd.netlify.app/#blog-post?id=1</loc>
+    <lastmod>2025-12-14</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://championtravelsbd.netlify.app/#blog-post?id=2</loc>
+    <lastmod>2025-12-14</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://championtravelsbd.netlify.app/#blog-post?id=3</loc>
+    <lastmod>2025-12-14</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://championtravelsbd.netlify.app/#about-us</loc>
+    <lastmod>2025-12-14</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://championtravelsbd.netlify.app/#privacy-policy</loc>
+    <lastmod>2025-12-14</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://championtravelsbd.netlify.app/#new-page</loc>
+    <lastmod>2025-12-14</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://championtravelsbd.netlify.app/#hotel-booking</loc>
+    <lastmod>2025-12-14</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://championtravelsbd.netlify.app/#umrah-training</loc>
+    <lastmod>2025-12-14</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
   </url>
 </urlset>
